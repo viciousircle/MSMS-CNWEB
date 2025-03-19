@@ -1,7 +1,12 @@
 import React from "react";
+import Example from "../components/Example";
 
 const About = () => {
-    return <div>About</div>;
+    return (
+        <div>
+            <Example />
+        </div>
+    );
 };
 
 export default About;
