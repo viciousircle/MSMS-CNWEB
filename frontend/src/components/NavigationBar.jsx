@@ -5,7 +5,7 @@ import { Routes, Route, Link } from "react-router-dom";
 const NavigationBar = () => {
     return (
         <nav>
-            <div className="p-3  flex items-center justify-center gap-4 ">
+            <div className="flex justify-center p-3 gap-4 items-center">
                 <FlyoutMenus />
                 <FlyoutMenus />
                 <FlyoutMenus />
@@ -13,6 +13,7 @@ const NavigationBar = () => {
                 <Link to="/">Home</Link>
                 <Link to="/about">About</Link>
                 <Link to="/notfound">Not Found</Link>
+                <Link to="/cart">Cart</Link>
             </div>
         </nav>
     );
