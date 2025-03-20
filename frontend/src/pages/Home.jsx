@@ -1,67 +1,60 @@
 import React from "react";
-// import Example from "../components/Example";
 import img2 from "../assets/img2.jpeg";
+
 const Home = () => {
     return (
-        <main className="relative flex justify-between">
+        <main className="flex justify-between w-full overflow-hidden relative">
             {/* Left Decoration */}
-            <div className="px-6 border-x text-gray-950/5 bg-[size:10px_10px] bg-fixed bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)]"></div>
+            <div className="bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed border-x text-gray-950/5 px-6"></div>
 
             {/* Center Content */}
-            <div className="w-full pt-16 flex flex-col gap-16 ">
-                {/* Horizontal Line Overflow */}
-                <div className="relative ">
-                    <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
-                    <h1 className="px-8 py-8 max-w-none text-5xl tracking-tight text-pretty whitespace-nowrap inline-flex gap-x-2">
+            <div className="flex flex-col w-full gap-16 pt-16 px-4">
+                {/* Title Section */}
+                <div className="text-center relative">
+                    <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+                    <h1 className="text-5xl text-pretty gap-x-2 inline-flex max-w-none px-8 py-8 tracking-tight whitespace-nowrap">
                         Vicious Store.
                         <span className="text-gray-500">
                             Cách tốt nhất để mua sản phẩm bạn thích
                         </span>
                     </h1>
-
-                    <hr className="absolute left-[-100%] right-[-100%] border-gray-950/5 bottom-0" />
+                    <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
                 </div>
 
+                {/* MacBook Section */}
                 <div className="flex flex-col gap-4">
-                    <div className="relative ">
-                        <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
-
-                        <div className=" px-6 py-1 font-mono  font-medium tracking-widest text-pretty uppercase text-gray-700 ">
+                    <div className="text-center relative">
+                        <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+                        <div className="text-gray-700 text-pretty font-medium font-mono px-6 py-1 tracking-widest uppercase">
                             Macbook
                         </div>
-
-                        <hr className="absolute left-[-100%] right-[-100%] border-gray-950/5 bottom-0" />
+                        <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
                     </div>
 
-                    <div className="relative text-center">
+                    {/* Product Grid */}
+                    <div className="text-center relative">
                         {/* Top Decorative Line */}
-                        <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
+                        <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
 
                         {/* Cards Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid grid-cols-1 w-full lg:grid-cols-4 sm:grid-cols-2">
                             {[...Array(8)].map((_, index) => (
-                                <div className="flex flex-col gap-0 w-full">
-                                    <div className="flex gap-0 w-full">
-                                        <div
-                                            className="p-2
-                                    "
-                                        ></div>
-                                        <div className="p-2 border-x border-gray-950/5 w-full"></div>
-                                        <div
-                                            className="p-2
-                                    "
-                                        ></div>
+                                <div
+                                    key={index}
+                                    className="flex flex-col w-full gap-0"
+                                >
+                                    <div className="flex w-full gap-0">
+                                        <div className="p-2"></div>
+                                        <div className="border-gray-950/5 border-x p-2 w-full"></div>
+                                        <div className="p-2"></div>
                                     </div>
-                                    <div className="flex gap-0 w-full">
-                                        <div className="p-2 border-y border-gray-950/5 "></div>
-                                        <div
-                                            key={index}
-                                            className="border border-gray-950/5  min-w-max  hover:bg-gray-950/2.5 flex flex-col gap-4 p-2 w-full"
-                                        >
-                                            <div className="outline outline-gray-950/5 flex bg-white justify-center items-center w-full h-64 rounded-lg">
+                                    <div className="flex w-full gap-0">
+                                        <div className="border-gray-950/5 border-y p-2"></div>
+                                        <div className="flex flex-col border border-gray-950/5 p-2 w-full gap-4 hover:bg-gray-950/5 min-w-max">
+                                            <div className="flex bg-white h-64 justify-center rounded-lg w-full items-center outline outline-gray-950/5">
                                                 <img
                                                     src={img2}
-                                                    alt="img2"
+                                                    alt="MacBook"
                                                     className="w-64 object-contain"
                                                 />
                                             </div>
@@ -69,49 +62,37 @@ const Home = () => {
                                                 <div className="font-medium">
                                                     MacBook Pro
                                                 </div>
-                                                <div className="font-mono text-xs text-gray-400">
+                                                <div className="text-gray-400 text-xs font-mono">
                                                     39.000.000
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-2 border-y border-gray-950/5 "></div>
+                                        <div className="border-gray-950/5 border-y p-2"></div>
                                     </div>
-                                    <div className="flex gap-0 w-full">
-                                        <div
-                                            className="p-2
-                                    "
-                                        ></div>
-                                        <div className="p-2 border-x border-gray-950/5 w-full"></div>
-                                        <div
-                                            className="p-2
-                                    "
-                                        ></div>
+                                    <div className="flex w-full gap-0">
+                                        <div className="p-2"></div>
+                                        <div className="border-gray-950/5 border-x p-2 w-full"></div>
+                                        <div className="p-2"></div>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
                         {/* Bottom Decorative Line */}
-                        <hr className="absolute left-[-100%] right-[-100%] bottom-0 border-gray-950/5" />
+                        <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
                     </div>
                 </div>
 
-                <div className="relative text-center ">
-                    <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
-                    <div className="py-2 font-medium text-lg w-1/2">
-                        Hi
-                        {/* <img
-                            src={img1}
-                            alt="img1"
-                            className=" h-56 object-contain w-full"
-                        /> */}
-                    </div>
-                    <hr className="absolute left-[-100%] right-[-100%] border-gray-950/5 bottom-0" />
+                {/* Footer Section */}
+                <div className="text-center relative">
+                    <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+                    <div className="text-lg w-1/2 font-medium py-2">Hi</div>
+                    <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
                 </div>
             </div>
 
             {/* Right Decoration */}
-            <div className="px-6 border-x text-gray-950/5 bg-[size:10px_10px] bg-fixed bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)]"></div>
+            <div className="bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed border-x text-gray-950/5 px-6"></div>
         </main>
     );
 };

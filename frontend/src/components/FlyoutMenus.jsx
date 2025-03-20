@@ -6,54 +6,61 @@ import {
 } from "@heroicons/react/20/solid";
 import {
     ArrowPathIcon,
+    ArrowTopRightOnSquareIcon,
     ChartPieIcon,
+    ComputerDesktopIcon,
+    CubeTransparentIcon,
     CursorArrowRaysIcon,
+    DevicePhoneMobileIcon,
+    DeviceTabletIcon,
     FingerPrintIcon,
+    GifIcon,
+    GiftIcon,
     SquaresPlusIcon,
 } from "@heroicons/react/24/outline";
 
 const solutions = [
     {
-        name: "Analytics",
-        description: "Get a better understanding of your traffic",
+        name: "Sales",
+        description: "Sales up to 50% off",
         href: "#",
-        icon: ChartPieIcon,
+        icon: GiftIcon,
     },
     {
-        name: "Engagement",
-        description: "Speak directly to your customers",
+        name: "Mac",
+        description: "Exclusive sales and discounts",
         href: "#",
-        icon: CursorArrowRaysIcon,
+        icon: ComputerDesktopIcon,
     },
     {
-        name: "Security",
-        description: "Your customers' data will be safe and secure",
+        name: "Ipad",
+        description: "Smooth experience with large screen",
         href: "#",
-        icon: FingerPrintIcon,
+        icon: DeviceTabletIcon,
     },
     {
-        name: "Integrations",
-        description: "Connect with third-party tools",
+        name: "Iphone",
+        description: "Modern design and high performance",
         href: "#",
-        icon: SquaresPlusIcon,
+        icon: DevicePhoneMobileIcon,
     },
     {
-        name: "Automations",
-        description: "Build strategic funnels that will convert",
+        name: "Accessory",
+        description: "High quality accessories",
         href: "#",
-        icon: ArrowPathIcon,
+        icon: CubeTransparentIcon,
     },
 ];
 const callsToAction = [
-    { name: "Watch demo", href: "#", icon: PlayCircleIcon },
-    { name: "Contact sales", href: "#", icon: PhoneIcon },
+    { name: "Facebook", href: "#", icon: ArrowTopRightOnSquareIcon },
+    { name: "Contact", href: "#", icon: PhoneIcon },
 ];
 
 export default function FlyoutMenus() {
     return (
         <Popover className="relative">
-            <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                <span>Solutions</span>
+            <PopoverButton className="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900 focus:outline-none">
+                <span>Store</span>
                 <ChevronDownIcon aria-hidden="true" className="size-5" />
             </PopoverButton>
 
