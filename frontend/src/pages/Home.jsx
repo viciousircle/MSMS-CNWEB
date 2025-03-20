@@ -8,7 +8,7 @@ const Home = () => {
             <div className="px-6 border-x text-gray-950/5 bg-[size:10px_10px] bg-fixed bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)]"></div>
 
             {/* Center Content */}
-            <div className="w-full pt-16 flex flex-col gap-8">
+            <div className="w-full pt-16 flex flex-col gap-16">
                 {/* Horizontal Line Overflow */}
                 <div className="relative ">
                     <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
@@ -22,25 +22,47 @@ const Home = () => {
                     <hr className="absolute left-[-100%] right-[-100%] border-gray-950/5 bottom-0" />
                 </div>
 
-                <div className="relative text-center py-8">
+                <div className="relative text-center p">
                     {/* Top Decorative Line */}
                     <hr className="absolute left-[-100%] right-[-100%] top-0 border-gray-950/5" />
 
                     {/* Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-6">
-                        {[...Array(5)].map((_, index) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                        {[...Array(8)].map((_, index) => (
                             <div className="flex flex-col gap-0 w-full">
                                 <div className="flex gap-0 w-full">
                                     <div
-                                        key={index}
-                                        className="border border-gray-950/5 px-20 py-16 bg-white text-lg font-semibold min-w-max w-full"
-                                    >
-                                        Card {index + 1}
-                                    </div>
-                                    <div className="p-5 border-y border-gray-950/5 "></div>
+                                        className="p-2
+                                    "
+                                    ></div>
+                                    <div className="p-2 border-x border-gray-950/5 w-full"></div>
+                                    <div
+                                        className="p-2
+                                    "
+                                    ></div>
                                 </div>
-
-                                <div className="p-5 border-x border-gray-950/5"></div>
+                                <div className="flex gap-0 w-full">
+                                    <div className="p-2 border-y border-gray-950/5 "></div>
+                                    <div
+                                        key={index}
+                                        className="border border-gray-950/5 px-20 py-16  min-w-max w-full hover:bg-gray-950/2.5"
+                                    >
+                                        <div>Card {index + 1}</div>
+                                        <div>Hi</div>
+                                    </div>
+                                    <div className="p-2 border-y border-gray-950/5 "></div>
+                                </div>
+                                <div className="flex gap-0 w-full">
+                                    <div
+                                        className="p-2
+                                    "
+                                    ></div>
+                                    <div className="p-2 border-x border-gray-950/5 w-full"></div>
+                                    <div
+                                        className="p-2
+                                    "
+                                    ></div>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -63,5 +85,3 @@ const Home = () => {
 };
 
 export default Home;
-
-// col-start-4 row-span-full row-start-1 max-sm:hidden text-gray-950/5 border-x border-x-current bg-[size:10px_10px] bg-fixed bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)]
