@@ -10,12 +10,12 @@ import { ShoppingBagIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 const Cart = () => {
     return (
-        <main className="flex justify-between w-full overflow-hidden relative">
+        <main className="flex justify-between w-full overflow-hidden relative ">
             {/* Left Decoration */}
             <div className="bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed border-x text-gray-950/5 px-6"></div>
 
             {/* Center Content */}
-            <div className="flex flex-col w-full gap-8 pt-8">
+            <div className="flex flex-col w-full gap-8 pt-8 mt-16">
                 {/* Title Section */}
                 <div className="relative">
                     <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
