@@ -4,29 +4,33 @@ const cartSchema = new mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
             ref: "User",
+            default: null, // Null if it's a guest
+        },
+        uuid: {
+            type: String,
+            default: null, // Used for guest carts
         },
         cartItems: [
             {
                 product: {
                     type: mongoose.Schema.Types.ObjectId,
-                    required: true,
                     ref: "Product",
+                    required: true,
                 },
                 quantity: {
                     type: Number,
-                    required: true,
                     default: 1,
+                    min: 1, // Prevent negative or zero quantities
                 },
-                date: {
+                dateAdded: {
                     type: Date,
                     default: Date.now,
                 },
             },
         ],
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
+
+module.exports = mongoose.model("Cart", cartSchema);
