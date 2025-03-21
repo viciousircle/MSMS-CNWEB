@@ -10,7 +10,7 @@ MSMS CNWEB (Mobile Shop Management System) is a web-based platform designed to m
 -   **Shopping Cart Management**: Customers can add, update, and remove products from their cart.
 -   **Order Placement & Processing**: Customers can place orders, and administrators can manage order statuses.
 -   **Payment Management**: Integrated payment system for secure transactions.
--   **Product Management**: Admins can add, edit, and remove mobile products.
+-   **Product Management**: Admins can add, edit, and remove products.
 
 ## Technologies Used
 
