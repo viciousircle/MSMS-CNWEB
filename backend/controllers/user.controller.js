@@ -22,6 +22,7 @@ const generateToken = (id, role) => {
  */
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, role } = req.body;
+    console.log(req.body); // This helps debug missing fields
 
     if (!name || !email || !password) {
         res.status(400);
