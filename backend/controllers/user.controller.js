@@ -3,11 +3,25 @@ const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/user.model");
 
-// @desc: Register new user
-// @route: POST /api/users
-// @access: Public
+/**
+ * @description Generate JWT token
+ * @param {string} id - User ID
+ * @param {string} role - User role
+ * @returns {string} JWT
+ */
+const generateToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
+};
+
+/**
+ * @desc: Register new user
+ * @route: POST /api/users
+ * @access: Public
+ */
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
         res.status(400);
@@ -31,6 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role: role || "customer",
     });
 
     if (user) {
@@ -38,6 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            role: user.role,
             token: generateToken(user._id),
         });
     } else {
@@ -46,9 +62,11 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc: Authenticate user
-// @route: POST /api/users/login
-// @access: Public
+/**
+ * @desc: Authenticate user
+ * @route: POST /api/users/login
+ * @access: Public
+ */
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -68,24 +86,20 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc: Get user data
-// @route: GET /api/users/me
-// @access: Private
+/**
+ * @desc: Get user data
+ * @route: GET /api/users
+ * @access: Private
+ */
 const getMe = asyncHandler(async (req, res) => {
-    const { _id, name, email } = await User.findById(req.user._id);
+    const { _id, name, email, role } = await User.findById(req.user._id);
 
     res.status(200).json({
         id: _id,
         name,
         email,
+        role,
     });
 });
-
-// @ Genrate JWT
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
-    });
-};
 
 module.exports = { registerUser, loginUser, getMe };
