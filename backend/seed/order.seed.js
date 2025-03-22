@@ -75,10 +75,10 @@ const seedOrders = async () => {
         ];
 
         await Order.insertMany(fakeOrders);
-        console.log("✅ Fake Orders Added!");
+        console.log("Fake Orders Added!");
         process.exit();
     } catch (error) {
-        console.error("❌ Error seeding orders:", error);
+        console.error("Error seeding orders:", error);
         process.exit(1);
     }
 };
