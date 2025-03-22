@@ -2,18 +2,6 @@ const mongoose = require("mongoose");
 const Order = require("../models/order.model");
 const User = require("../models/user.model");
 const Product = require("../models/product.model");
-const connectDB = require("../config/db");
-
-mongoose
-    .connect(
-        "mongodb+srv://quyvtm227257:PKDTp2thaWfsp2wg@cluster0.vcmr7.mongodb.net/msms?retryWrites=true&w=majority&appName=Cluster0",
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        }
-    )
-    .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.error("MongoDB Connection Error:", err));
 
 const seedOrders = async () => {
     try {
@@ -24,13 +12,13 @@ const seedOrders = async () => {
         const products = await Product.find();
 
         if (users.length === 0 || products.length < 2) {
-            console.log("❌ Add users and products first!");
+            console.log("Add users and products first!");
             process.exit(1);
         }
 
         const fakeOrders = [
             {
-                user: users[0]._id, // Assign a random user
+                user: users[0]._id,
                 orderItems: [
                     {
                         product: products[0]._id,
@@ -44,8 +32,8 @@ const seedOrders = async () => {
                     },
                 ],
                 shippingAddress: {
-                    fullName: "John Doee",
-                    address: "123 Main Street",
+                    fullName: "John Doeee",
+                    address: "123 Main Streettttt",
                     city: "New York",
                     postalCode: "10001",
                     country: "USA",
@@ -81,19 +69,18 @@ const seedOrders = async () => {
                 orderStatus: "Processing",
                 totalPrice: products[1].price * 3,
                 isPaid: false,
-                rating: null, // Not yet rated
+                rating: null,
                 review: "",
             },
         ];
 
         await Order.insertMany(fakeOrders);
-        console.log("Fake Orders Added!");
+        console.log("✅ Fake Orders Added!");
         process.exit();
     } catch (error) {
-        console.error("Error seeding orders:", error);
+        console.error("❌ Error seeding orders:", error);
         process.exit(1);
     }
 };
 
-// Run the function
-seedOrders();
+module.exports = seedOrders;
