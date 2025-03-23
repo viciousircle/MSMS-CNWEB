@@ -1,8 +1,8 @@
 const express = require("express");
 const colors = require("colors");
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config({ path: "../.env" });
 const { errorHandler } = require("./middleware/error.middleware");
-const connectDB = require("./config/db");
+const { connectDB } = require("./config/db");
 const port = process.env.PORT || 5678;
 
 connectDB();
@@ -16,6 +16,10 @@ app.use("/api/users", require("./routes/user.routes"));
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-    console.log(`Server started on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+    app.listen(port, () => {
+        console.log(`Server started on http://localhost:${port}`);
+    });
+}
+
+module.exports = { app };

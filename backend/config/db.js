@@ -16,8 +16,10 @@ const connectDB = async () => {
         );
     } catch (error) {
         console.error(`Error: ${error.message}`.red.underline.bold);
-        process.exit(1);
+        if (process.env.NODE_ENV !== "test") {
+            process.exit(1);
+        }
     }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB }; // Export as an object
