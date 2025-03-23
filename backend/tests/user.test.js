@@ -1,5 +1,5 @@
 jest.mock("../config/db", () => ({
-    connectDB: jest.fn(), // Mock the DB connection to avoid conflicts
+    connectDB: jest.fn(), // - Mock the DB connection to avoid conflicts
 }));
 
 const request = require("supertest");
@@ -23,6 +23,8 @@ afterAll(async () => {
     await mongoose.connection.close();
     await mongoServer.stop();
 });
+
+// --- Test cases POST /api/users ----------------------------------------------
 
 describe("POST /api/users (Register User)", () => {
     it("should register a new user and return user details with token", async () => {
@@ -62,11 +64,11 @@ describe("POST /api/users (Register User)", () => {
             role: "customer",
         };
 
-        // Create user first
+        // - Create user first
         const hashedPassword = await bcrypt.hash(userData.password, 10);
         await User.create({ ...userData, password: hashedPassword });
 
-        // Attempt to register again
+        // - Attempt to register again
         const response = await request(app)
             .post("/api/users")
             .send(userData)
