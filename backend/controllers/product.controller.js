@@ -1,106 +1,106 @@
 const asyncHandler = require("express-async-handler");
-
 const Product = require("../models/product.model");
-const User = require("../models/user.model");
 
 /**
  * @desc: Get all products
  * @route: GET /api/products
- * @access: Private
+ * @access: Public
  */
 const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({
-        user: req.user.id,
-    });
-
+    const products = await Product.find({});
     res.status(200).json(products);
 });
 
 /**
- * @desc: Set a product
- * @route: POST /api/products
- * @access: Private
+ * @desc: Get a product by ID
+ * @route: GET /api/products/:id
+ * @access: Public
  */
-const setProduct = asyncHandler(async (req, res) => {
-    if (!req.body.name) {
-        return res.status(400).json({ error: "Please provide a name" });
+const getProductById = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        res.status(404);
+        throw new Error(`Product with id ${req.params.id} not found!`);
     }
-
-    const product = await Product.create({
-        name: req.body.name,
-        user: req.user.id,
-    });
-
     res.status(200).json(product);
 });
 
 /**
- * @desc: Update a product
+ * @desc: Update product details
  * @route: PUT /api/products/:id
- * @access: Private
+ * @access: Private (Only Seller)
  */
 const updateProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-        return res.status(404).json({ error: "Product not found" });
+        res.status(404);
+        throw new Error("Product not found!");
     }
 
-    const user = await User.findById(req.user.id);
+    const { name, image, price, stock, rate } = req.body;
+    let updated = false; // Track if any field is updated
 
-    // - Check for user
-    if (!user) {
-        return res.status(404).json({ error: "User not found" });
+    if (name && name !== product.name) {
+        product.name = name;
+        updated = true;
+    }
+    if (image && image !== product.image) {
+        product.image = image;
+        updated = true;
+    }
+    if (typeof price === "number" && price >= 0 && price !== product.price) {
+        product.price = price;
+        updated = true;
+    }
+    if (typeof stock === "number" && stock >= 0 && stock !== product.stock) {
+        product.stock = stock;
+        updated = true;
+    }
+    if (
+        typeof rate === "number" &&
+        rate >= 0 &&
+        rate <= 5 &&
+        rate !== product.rate
+    ) {
+        product.rate = rate;
+        updated = true;
     }
 
-    // - Make sure user is product owner
-    if (product.user.toString() !== req.user.id) {
-        return res.status(401).json({ error: "User not authorized" });
+    if (!updated) {
+        res.status(400);
+        throw new Error("No changes detected. Product remains the same!");
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-    );
-
+    const updatedProduct = await product.save();
     res.status(200).json(updatedProduct);
 });
 
 /**
  * @desc: Delete a product
  * @route: DELETE /api/products/:id
- * @access: Private
+ * @access: Private (Only Seller)
  */
-const deleteProducts = asyncHandler(async (req, res) => {
+const deleteProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-        return res.status(404).json({ error: "Product not found" });
+        res.status(404);
+        throw new Error("Product not found!");
     }
 
-    const user = await User.findById(req.user.id);
-
-    // - Check for user
-    if (!user) {
-        return res.status(404).json({ error: "User not found" });
-    }
-
-    // - Make sure user is product owner
-    if (product.user.toString() !== req.user.id) {
-        return res.status(401).json({ error: "User not authorized" });
-    }
-
-    await Product.findByIdAndDelete(req.params.id);
+    await product.deleteOne();
 
     res.status(200).json({
-        message: `Deleted data with id ${req.params.id}`,
+        message: `Product with id ${req.params.id} deleted successfully!`,
+        deletedProduct: product,
     });
 });
 
 module.exports = {
     getProducts,
-    setProduct,
+    getProductById,
     updateProduct,
-    deleteProducts,
+    deleteProduct,
 };

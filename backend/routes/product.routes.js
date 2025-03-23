@@ -2,17 +2,21 @@ const express = require("express");
 const router = express.Router();
 const {
     getProducts,
-    setProduct,
+    getProductById,
     updateProduct,
-    deleteProducts,
+    deleteProduct,
 } = require("../controllers/product.controller");
 
-const { protect } = require("../middleware/auth.middleware");
+const { protect, authorize } = require("../middleware/auth.middleware");
 
-router.route("/").get(protect, getProducts).post(protect, setProduct);
+//* Public Routes
+router.route("/").get(getProducts);
+router.route("/:id").get(getProductById);
+
+//* Private Routes (Only Seller)
 router
     .route("/:id")
-    .put(protect, updateProduct)
-    .delete(protect, deleteProducts);
+    .put(protect, authorize("seller"), updateProduct)
+    .delete(protect, authorize("seller"), deleteProduct);
 
 module.exports = router;

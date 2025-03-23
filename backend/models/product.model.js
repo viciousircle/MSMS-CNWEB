@@ -10,19 +10,26 @@ const productSchema = new mongoose.Schema(
         image: {
             type: String,
             required: true,
-            trim: true, // Prevents unnecessary spaces
+            trim: true,
         },
         price: {
             type: Number,
             required: true,
             default: 0,
-            min: 0, // Ensure non-negative prices
+            min: 0,
         },
         stock: {
             type: Number,
             required: true,
             default: 0,
-            min: 0, // Prevent negative stock
+            min: 0,
+        },
+        rate: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+            max: 5,
         },
     },
     { timestamps: true }
