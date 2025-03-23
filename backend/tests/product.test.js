@@ -67,3 +67,63 @@ describe("GET /api/products (Get all products)", () => {
         expect(response.body.message).toBe("Internal server error");
     });
 });
+
+describe("GET /api/products/:id (Get a product by ID)", () => {
+    it("should return a product when ID valid", async () => {
+        const product = await Product.create({
+            name: "Sample",
+            image: "https://example.com/sample.jpg",
+            price: 100,
+            stock: 2000,
+            rate: 4.5,
+        });
+
+        const response = await request(app)
+            .get(`/api/products/${product._id}`)
+            .expect(200);
+
+        expect(response.body).toMatchObject({
+            _id: product._id.toString(),
+            name: "Sample",
+            image: "https://example.com/sample.jpg",
+            price: 100,
+            stock: 2000,
+            rate: 4.5,
+        });
+    });
+
+    it("should return 404 if product is not found", async () => {
+        const nonExistId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .get(`/api/products/${nonExistId}`)
+            .expect(404);
+
+        expect(response.body.message).toBe(
+            `Product with id ${nonExistId} not found!`
+        );
+    });
+
+    it("should return 400 if the Id format is invalid", async () => {
+        const response = await request(app)
+            .get("/api/products/invalidID")
+            .expect(400);
+
+        expect(response.body.message).toBe("Invalid product ID");
+    });
+
+    it("should return 500 if there is a database error", async () => {
+        // Mock Product.findById to throw an error
+        jest.spyOn(Product, "findById").mockImplementationOnce(() => {
+            throw new Error("Database error");
+        });
+
+        const validId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .get(`/api/products/${validId}`)
+            .expect(500);
+
+        expect(response.body.message).toBe("Internal server error");
+    });
+});

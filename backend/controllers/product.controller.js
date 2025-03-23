@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/product.model");
+const mongoose = require("mongoose");
 
 /**
  * @desc: Get all products
@@ -22,13 +23,25 @@ const getProducts = asyncHandler(async (req, res, next) => {
  * @access: Public
  */
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id);
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
 
-    if (!product) {
-        res.status(404);
-        throw new Error(`Product with id ${req.params.id} not found!`);
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res
+                .status(404)
+                .json({
+                    message: `Product with id ${req.params.id} not found!`,
+                });
+        }
+        res.status(200).json(product);
+    } catch (error) {
+        console.error("Database error:", error.message);
+        res.status(500).json({ message: "Internal server error" });
     }
-    res.status(200).json(product);
 });
 
 /**
