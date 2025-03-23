@@ -6,9 +6,14 @@ const Product = require("../models/product.model");
  * @route: GET /api/products
  * @access: Public
  */
-const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({});
-    res.status(200).json(products);
+const getProducts = asyncHandler(async (req, res, next) => {
+    try {
+        const products = await Product.find({});
+        res.status(200).json(products);
+    } catch (error) {
+        console.log("Database error");
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
 
 /**
