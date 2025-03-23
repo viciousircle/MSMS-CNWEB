@@ -31,11 +31,9 @@ const getProductById = asyncHandler(async (req, res) => {
         const product = await Product.findById(req.params.id);
 
         if (!product) {
-            return res
-                .status(404)
-                .json({
-                    message: `Product with id ${req.params.id} not found!`,
-                });
+            return res.status(404).json({
+                message: `Product with id ${req.params.id} not found!`,
+            });
         }
         res.status(200).json(product);
     } catch (error) {
@@ -50,49 +48,70 @@ const getProductById = asyncHandler(async (req, res) => {
  * @access: Private (Only Seller)
  */
 const updateProduct = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id);
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
 
-    if (!product) {
-        res.status(404);
-        throw new Error("Product not found!");
-    }
+        const product = await Product.findById(req.params.id);
 
-    const { name, image, price, stock, rate } = req.body;
-    let updated = false; // Track if any field is updated
+        if (!product) {
+            return res.status(404).json({ message: "Product not found!" });
+        }
 
-    if (name && name !== product.name) {
-        product.name = name;
-        updated = true;
-    }
-    if (image && image !== product.image) {
-        product.image = image;
-        updated = true;
-    }
-    if (typeof price === "number" && price >= 0 && price !== product.price) {
-        product.price = price;
-        updated = true;
-    }
-    if (typeof stock === "number" && stock >= 0 && stock !== product.stock) {
-        product.stock = stock;
-        updated = true;
-    }
-    if (
-        typeof rate === "number" &&
-        rate >= 0 &&
-        rate <= 5 &&
-        rate !== product.rate
-    ) {
-        product.rate = rate;
-        updated = true;
-    }
+        const { name, image, price, stock, rate } = req.body;
+        let updated = false; // Track if any field is updated
 
-    if (!updated) {
-        res.status(400);
-        throw new Error("No changes detected. Product remains the same!");
-    }
+        if (name && name !== product.name) {
+            product.name = name;
+            updated = true;
+        }
+        if (image && image !== product.image) {
+            product.image = image;
+            updated = true;
+        }
+        if (
+            typeof price === "number" &&
+            price >= 0 &&
+            price !== product.price
+        ) {
+            product.price = price;
+            updated = true;
+        }
+        if (
+            typeof stock === "number" &&
+            stock >= 0 &&
+            stock !== product.stock
+        ) {
+            product.stock = stock;
+            updated = true;
+        }
+        if (
+            typeof rate === "number" &&
+            rate >= 0 &&
+            rate <= 5 &&
+            rate !== product.rate
+        ) {
+            product.rate = rate;
+            updated = true;
+        }
 
-    const updatedProduct = await product.save();
-    res.status(200).json(updatedProduct);
+        if (!updated) {
+            return res
+                .status(400)
+                .json({
+                    message: "No changes detected. Product remains the same!",
+                });
+        }
+
+        const updatedProduct = await product.save();
+        res.status(200).json(updatedProduct);
+    } catch (error) {
+        console.error("Database error:", error.message);
+        res.status(500).json({
+            message: "Internal server error.",
+        });
+    }
 });
 
 /**

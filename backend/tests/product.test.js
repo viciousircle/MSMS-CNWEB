@@ -127,3 +127,37 @@ describe("GET /api/products/:id (Get a product by ID)", () => {
         expect(response.body.message).toBe("Internal server error");
     });
 });
+
+describe("PUT /api/products/:id", () => {
+    it("should update the product successfully", async () => {
+        const product = await Product.create({
+            _id: new mongoose.Types.ObjectId(),
+            name: "Sample",
+            image: "https://example.com/sample.jpg",
+            price: 100,
+            stock: 2000,
+            rate: 4.5,
+        });
+
+        const respone = await request(app)
+            .put(`/api/products/${product._id}`)
+            .send({
+                name: "Updated",
+                price: 200,
+            })
+            .expect(200);
+
+        expect(respone.body.name).toBe("Updated");
+        expect(respone.body.price).toBe(200);
+    });
+
+    it("should return 404 if the product not found", async () => {});
+
+    it("should return 400 if no changes are detected", async () => {});
+
+    it("should return 400 if the provided Id is invalid", async () => {});
+
+    it("should return 400 if the provided values are invalid", async () => {});
+
+    it("should return 500 if there is a database error ", async () => {});
+});
