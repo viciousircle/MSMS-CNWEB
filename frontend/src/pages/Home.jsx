@@ -1,34 +1,24 @@
 import React from "react";
 import img2 from "../assets/img2.jpeg";
+import Decoration from "../components/Decoration";
+import { HrBot, HrTop } from "../components/HorizontalLine";
 
 const Home = () => {
     return (
         <main className="flex justify-between w-full overflow-hidden relative">
-            {/* Left Decoration */}
-            <div className="bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed border-x text-gray-950/5 px-6"></div>
+            <Decoration />
 
-            {/* Center Content */}
             <div className="flex flex-col w-full gap-16 pt-16 px-4">
-                {/* Title Section */}
-                <div className="text-center relative">
-                    <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
-                    <h1 className="text-5xl text-pretty gap-x-2 inline-flex max-w-none px-8 py-8 tracking-tight whitespace-nowrap">
-                        Vicious Store.
-                        <span className="text-gray-500">
-                            Cách tốt nhất để mua sản phẩm bạn thích
-                        </span>
-                    </h1>
-                    <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
-                </div>
+                <TitleSection />
 
                 {/* MacBook Section */}
                 <div className="flex flex-col gap-4">
                     <div className="relative">
-                        <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+                        <HrTop />
                         <div className="text-gray-700 text-pretty font-medium font-mono px-6 py-1 tracking-widest uppercase">
                             Macbook
                         </div>
-                        <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
+                        <HrBot />
                     </div>
 
                     {/* Product Grid */}
@@ -91,10 +81,24 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Right Decoration */}
-            <div className="bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed border-x text-gray-950/5 px-6"></div>
+            <Decoration />
         </main>
     );
 };
 
 export default Home;
+
+function TitleSection() {
+    return (
+        <div className="text-center relative">
+            <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+            <h1 className="text-5xl text-pretty gap-x-2 inline-flex max-w-none px-8 py-8 tracking-tight whitespace-nowrap">
+                Vicious Store.
+                <span className="text-gray-500">
+                    Cách tốt nhất để mua sản phẩm bạn thích
+                </span>
+            </h1>
+            <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
+        </div>
+    );
+}
