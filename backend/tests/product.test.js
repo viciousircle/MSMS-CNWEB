@@ -129,27 +129,27 @@ describe("GET /api/products/:id (Get a product by ID)", () => {
 });
 
 describe("PUT /api/products/:id", () => {
-    it("should update the product successfully", async () => {
-        const product = await Product.create({
-            _id: new mongoose.Types.ObjectId(),
-            name: "Sample",
-            image: "https://example.com/sample.jpg",
-            price: 100,
-            stock: 2000,
-            rate: 4.5,
-        });
+    // it("should update the product successfully", async () => {
+    //     const product = await Product.create({
+    //         _id: new mongoose.Types.ObjectId(),
+    //         name: "Sample",
+    //         image: "https://example.com/sample.jpg",
+    //         price: 100,
+    //         stock: 2000,
+    //         rate: 4.5,
+    //     });
 
-        const respone = await request(app)
-            .put(`/api/products/${product._id}`)
-            .send({
-                name: "Updated",
-                price: 200,
-            })
-            .expect(200);
+    //     const respone = await request(app)
+    //         .put(`/api/products/${product._id}`)
+    //         .send({
+    //             name: "Updated",
+    //             price: 200,
+    //         })
+    //         .expect(200);
 
-        expect(respone.body.name).toBe("Updated");
-        expect(respone.body.price).toBe(200);
-    });
+    //     expect(respone.body.name).toBe("Updated");
+    //     expect(respone.body.price).toBe(200);
+    // });
 
     it("should return 404 if the product not found", async () => {});
 

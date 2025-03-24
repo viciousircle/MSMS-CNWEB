@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/products", require("./routes/product.routes"));
 app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/cart", require("./routes/cart.routes"));
 
 app.use(errorHandler);
 
