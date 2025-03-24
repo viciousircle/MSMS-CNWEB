@@ -4,6 +4,7 @@ jest.mock("../config/db", () => ({
 
 const request = require("supertest");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const { app } = require("../server");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
@@ -20,6 +21,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
     await Product.deleteMany(); // Cleanup after each test
+    await User.deleteMany();
 });
 
 afterAll(async () => {
@@ -131,9 +133,7 @@ describe("GET /api/products/:id (Get a product by ID)", () => {
 });
 
 describe("PUT /api/products/:id", () => {
-    it("should update the product successfully", async () => {
-        const bcrypt = require("bcryptjs");
-
+    it("should return 200 if the product updated successfully", async () => {
         const seller = await User.create({
             name: "Seller",
             email: "seller@example.com",
@@ -170,14 +170,150 @@ describe("PUT /api/products/:id", () => {
         expect(response.body.name).toBe("Updated");
         expect(response.body.price).toBe(200);
     });
+    it("should return 400 if no changes are detected", async () => {
+        const seller = await User.create({
+            name: "Seller",
+            email: "seller@example.com",
+            password: await bcrypt.hash("password", 10),
+            role: "seller",
+        });
 
-    it("should return 404 if the product not found", async () => {});
+        const loginResponse = await request(app).post("/api/users/login").send({
+            email: "seller@example.com",
+            password: "password",
+        });
 
-    it("should return 400 if no changes are detected", async () => {});
+        const token = loginResponse.body.token;
+        expect(token).toBeDefined();
 
-    it("should return 400 if the provided Id is invalid", async () => {});
+        const product = await Product.create({
+            _id: new mongoose.Types.ObjectId(),
+            name: "Sample",
+            image: "https://example.com/sample.jpg",
+            price: 100,
+            stock: 2000,
+            rate: 4.5,
+        });
 
-    it("should return 400 if the provided values are invalid", async () => {});
+        const response = await request(app)
+            .put(`/api/products/${product._id}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                name: "Sample",
+                price: 100,
+            })
+            .expect(400);
+        expect(response.body.message).toBe(
+            "No changes detected. Product remains the same!"
+        );
+    });
+    it("should return 400 if the provided Id is invalid", async () => {
+        const seller = await User.create({
+            name: "Seller",
+            email: "seller@example.com",
+            password: await bcrypt.hash("password", 10),
+            role: "seller",
+        });
 
-    it("should return 500 if there is a database error ", async () => {});
+        const loginResponse = await request(app).post("/api/users/login").send({
+            email: "seller@example.com",
+            password: "password",
+        });
+
+        const token = loginResponse.body.token;
+        expect(token).toBeDefined();
+
+        // Using an obviously invalid ID format
+        const invalidId = "invalid123";
+
+        const response = await request(app)
+            .put(`/api/products/${invalidId}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                name: "Updated Name",
+                price: 200,
+            })
+            .expect(400);
+
+        expect(response.body.message).toBe("Invalid product ID");
+    });
+    it("should return 400 if the provided values are invalid", async () => {
+        const seller = await User.create({
+            name: "Seller",
+            email: "seller@example.com",
+            password: await bcrypt.hash("password", 10),
+            role: "seller",
+        });
+
+        const loginResponse = await request(app).post("/api/users/login").send({
+            email: "seller@example.com",
+            password: "password",
+        });
+
+        const token = loginResponse.body.token;
+        expect(token).toBeDefined();
+
+        const response = await request(app)
+            .put("/api/products/invalid123")
+            .set("Authorization", `Bearer ${token}`)
+            .send({ name: "Updated Name" })
+            .expect(400);
+
+        expect(response.body.message).toBe("Invalid product ID");
+    });
+    it("should return 404 if the product not found", async () => {
+        const seller = await User.create({
+            name: "Seller",
+            email: "seller@example.com",
+            password: await bcrypt.hash("password", 10),
+            role: "seller",
+        });
+
+        const loginResponse = await request(app).post("/api/users/login").send({
+            email: "seller@example.com",
+            password: "password",
+        });
+
+        const token = loginResponse.body.token;
+        expect(token).toBeDefined();
+
+        const nonExistId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .put(`/api/products/${nonExistId}`)
+            .set("Authorization", `Bearer ${token}`)
+            .expect(404);
+
+        expect(response.body.message).toBe("Product not found!");
+    });
+    it("should return 500 if there is a database error", async () => {
+        const seller = await User.create({
+            name: "Seller",
+            email: "seller@example.com",
+            password: await bcrypt.hash("password", 10),
+            role: "seller",
+        });
+
+        const loginResponse = await request(app).post("/api/users/login").send({
+            email: "seller@example.com",
+            password: "password",
+        });
+
+        const token = loginResponse.body.token;
+        expect(token).toBeDefined();
+
+        jest.spyOn(Product, "findById").mockImplementationOnce(() => {
+            throw new Error("Database error");
+        });
+
+        const response = await request(app)
+            .put(`/api/products/${new mongoose.Types.ObjectId()}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({ name: "Updated Name" })
+            .expect(500);
+
+        expect(response.body.message).toBe("Internal server error.");
+
+        jest.restoreAllMocks();
+    });
 });
