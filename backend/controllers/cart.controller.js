@@ -1,12 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/product.model");
 const Cart = require("../models/cart.model");
-const mongoose = require("mongoose");
 
 /**
  * @desc: Get all cart items
  * @route: GET /api/cart
- * @access: Private (only authenticated users can access)
+ * @access: Private
  */
 const getCartItems = asyncHandler(async (req, res) => {
     try {
@@ -14,9 +13,9 @@ const getCartItems = asyncHandler(async (req, res) => {
         const uuid = req.query.uuid || null;
 
         if (!userId && !uuid) {
-            return res.status(400).json({
-                message: "User ID or UUID is required",
-            });
+            return res
+                .status(400)
+                .json({ message: "User ID or UUID is required" });
         }
 
         const cart = await Cart.findOne({
@@ -29,7 +28,7 @@ const getCartItems = asyncHandler(async (req, res) => {
 
         res.status(200).json(cart);
     } catch (error) {
-        console.log("Database error");
+        console.error("Database error:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
@@ -37,23 +36,131 @@ const getCartItems = asyncHandler(async (req, res) => {
 /**
  * @desc: Add item to cart
  * @route: POST /api/cart
- * @access: Private (only authenticated users can access)
+ * @access: Private
  */
 const addItemToCart = asyncHandler(async (req, res) => {
     try {
-    } catch (error) {}
+        const { productId, quantity } = req.body;
+        const userId = req.user ? req.user._id : null;
+        const uuid = req.query.uuid || null;
+
+        if (!productId || typeof quantity !== "number" || quantity < 1) {
+            return res
+                .status(400)
+                .json({ message: "Invalid product ID or quantity" });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        let cart = await Cart.findOne({
+            $or: [{ user: userId }, { uuid: uuid }],
+        });
+
+        if (!cart) {
+            cart = new Cart({
+                user: userId,
+                uuid: uuid,
+                cartItems: [],
+            });
+        }
+
+        const existingItem = cart.cartItems.find(
+            (item) => item.product.toString() === productId
+        );
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.cartItems.push({ product: productId, quantity });
+        }
+
+        await cart.save();
+        res.status(200).json({ message: "Item added to cart", cart });
+    } catch (error) {
+        console.error("Error adding item to cart:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
 
 /**
- * @desc: Update cart item
+ * @desc: Update cart item quantity
  * @route: PUT /api/cart/:id
- * @access: Private (only authenticated users can access)
+ * @access: Private
  */
+const updateCartItem = asyncHandler(async (req, res) => {
+    try {
+        const { quantity } = req.body;
+        const userId = req.user ? req.user._id : null;
+        const uuid = req.body.uuid || null;
+
+        if (typeof quantity !== "number" || quantity < 1) {
+            return res.status(400).json({ message: "Invalid quantity" });
+        }
+
+        let cart = await Cart.findOne({ $or: [{ user: userId }, { uuid }] });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        const cartItem = cart.cartItems.find(
+            (item) => item._id.equals(req.params.id) // FIXED: Changed `req.params.itemId` to `req.params.id`
+        );
+
+        if (!cartItem) {
+            return res.status(404).json({ message: "Cart item not found" });
+        }
+
+        cartItem.quantity = quantity;
+        await cart.save();
+
+        res.status(200).json({ message: "Cart item updated", cart });
+    } catch (error) {
+        console.error("Error updating cart item:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 /**
  * @desc: Delete cart item
  * @route: DELETE /api/cart/:id
- * @access: Private (only authenticated users can access)
+ * @access: Private
  */
+const deleteCartItem = asyncHandler(async (req, res) => {
+    try {
+        const userId = req.user ? req.user._id : null;
+        const uuid = req.query.uuid || null;
 
-module.exports = { getCartItems };
+        let cart = await Cart.findOne({ $or: [{ user: userId }, { uuid }] });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        const cartItemIndex = cart.cartItems.findIndex((item) =>
+            item._id.equals(req.params.id)
+        );
+
+        if (cartItemIndex === -1) {
+            return res.status(404).json({ message: "Cart item not found" });
+        }
+
+        cart.cartItems.splice(cartItemIndex, 1);
+        await cart.save();
+
+        res.status(200).json({ message: "Cart item removed", cart });
+    } catch (error) {
+        console.error("Error deleting cart item:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+module.exports = {
+    getCartItems,
+    addItemToCart,
+    updateCartItem,
+    deleteCartItem,
+};
