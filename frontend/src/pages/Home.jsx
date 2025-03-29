@@ -2,6 +2,17 @@ import React from "react";
 import img2 from "../assets/img2.jpeg";
 import Decoration from "../components/Decoration";
 import { HrBot, HrTop } from "../components/HorizontalLine";
+import { Button } from "@/components/ui/button";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer";
 
 const Home = () => {
     return (
