@@ -1,7 +1,7 @@
 import React from "react";
 import img2 from "../assets/img2.jpeg";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import { CircleCheck, Minus, Plus } from "lucide-react";
 import {
     Drawer,
     DrawerClose,
@@ -20,6 +20,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+
+import { toast } from "sonner";
 
 const CardProduct = () => {
     return (
@@ -71,6 +73,18 @@ export function DrawerDemo() {
         setGoal((prev) => Math.max(1, Math.min(10, prev + adjustment)));
     }
 
+    function handleInputChange(event) {
+        let value = event.target.value;
+        if (value === "") {
+            setGoal("");
+            return;
+        }
+        let num = parseInt(value, 10);
+        if (!isNaN(num)) {
+            setGoal(Math.max(1, Math.min(10, num))); // Keep within bounds
+        }
+    }
+
     return (
         <Drawer>
             <DrawerTrigger asChild>
@@ -81,6 +95,7 @@ export function DrawerDemo() {
                     <DrawerHeader>
                         <DrawerTitle>Product Options</DrawerTitle>
                     </DrawerHeader>
+
                     {/* Color Selection */}
                     <div className="p-4 flex gap-4 items-center">
                         <div className="block text-sm font-medium text-gray-700">
@@ -91,24 +106,32 @@ export function DrawerDemo() {
                                 <SelectValue placeholder="Colors" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="light">
-                                    <div className="p-2 bg-black rounded-full"></div>
-                                    <div>Black</div>
+                                <SelectItem value="black">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-black rounded-full"></div>
+                                        <span>Black</span>
+                                    </div>
                                 </SelectItem>
-                                <SelectItem value="light">
-                                    <div className="p-2 bg-rose-600 rounded-full"></div>
-                                    <div>Rose</div>
+                                <SelectItem value="rose">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-rose-600 rounded-full"></div>
+                                        <span>Rose</span>
+                                    </div>
                                 </SelectItem>
-                                <SelectItem value="light">
-                                    <div className="p-2 bg-amber-500 rounded-full"></div>
-                                    <div>Amber</div>
+                                <SelectItem value="amber">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-amber-500 rounded-full"></div>
+                                        <span>Amber</span>
+                                    </div>
                                 </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
+
                     <div className="p-4 text-sm text-gray-500">
                         Available: 10
                     </div>
+
                     {/* Quantity Selection */}
                     <div className="p-4 pb-2">
                         <div className="flex items-center justify-center space-x-2">
@@ -122,14 +145,16 @@ export function DrawerDemo() {
                                 <Minus />
                                 <span className="sr-only">Decrease</span>
                             </Button>
-                            <div className="flex-1 text-center">
-                                <div className="text-7xl font-bold tracking-tighter">
-                                    {goal}
-                                </div>
-                                <div className="text-[0.70rem] uppercase text-muted-foreground">
-                                    Quantity
-                                </div>
-                            </div>
+
+                            <input
+                                type="number"
+                                className="w-16 text-center text-4xl font-bold bg-transparent border-none focus:outline-none no-spinner"
+                                value={goal}
+                                onChange={handleInputChange}
+                                min="1"
+                                max="10"
+                            />
+
                             <Button
                                 variant="outline"
                                 size="icon"
@@ -146,17 +171,27 @@ export function DrawerDemo() {
                     {/* Footer */}
                     <DrawerFooter>
                         <div className="flex w-full gap-2">
-                            <Button className="flex-1 hover:bg-emerald-600 hover:text-white bg-white border-emerald-600 border text-emerald-600">
+                            <Button
+                                className="flex-1 hover:bg-emerald-600 hover:text-white bg-white border-emerald-600 border text-emerald-600"
+                                onClick={() =>
+                                    toast(
+                                        <div className="flex items-center gap-2 text-green-600">
+                                            <CircleCheck />
+                                            <div>
+                                                Item added to cart successfully!
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            >
                                 Add to Cart
                             </Button>
-                            <Button className="flex-1 ">Order now</Button>
+                            <Button className="flex-1">Order now</Button>
                         </div>
                         <DrawerClose asChild>
                             <Button
                                 variant="outline"
-                                className={
-                                    "border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white"
-                                }
+                                className="border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white"
                             >
                                 Cancel
                             </Button>

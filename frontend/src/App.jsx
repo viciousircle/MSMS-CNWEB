@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Cart from "./pages/Cart";
 import Order from "./pages/Order";
 import Payment from "./pages/Payment";
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
     return (
@@ -24,7 +25,7 @@ function App() {
                 <Route path="/payment" element={<Payment />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
-
+            <Toaster />
             {/* <Footer /> */}
         </>
     );
