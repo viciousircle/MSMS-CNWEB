@@ -3,7 +3,8 @@ import { BanknotesIcon } from "@heroicons/react/24/outline";
 import Body from "@/components/Body";
 import { HeaderWithIcon } from "@/components/Header";
 import { BillCard, InformationCard } from "@/components/Card";
-import { PaymentCard, LinearCard } from "@/components/Card";
+import { PaymentCard } from "@/components/Card";
+import { LinearCard } from "@/components/Decoration";
 
 const Payment = () => {
     return (

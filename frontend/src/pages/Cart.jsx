@@ -4,10 +4,10 @@ import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Body from "@/components/Body";
 import { HeaderWithIcon } from "@/components/Header";
 import CheckBox from "@/components/Checkbox";
-import { LinearCard } from "@/components/Card";
+import { LinearCard } from "@/components/Decoration";
 import { CardCartItem } from "@/components/Card";
 import { CartTotal } from "@/components/Footer";
-import { InformationSection } from "@/components/Card";
+import { CartInformation } from "@/components/Card";
 
 const Cart = () => {
     return (
@@ -19,7 +19,7 @@ const Cart = () => {
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
-                        <InformationSection />
+                        <CartInformation date={"12/12/2025"} items={"4"} />
                         <LinearCard>
                             {[...Array(2)].map((_, index) => (
                                 <div key={index} className="">

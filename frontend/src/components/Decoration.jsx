@@ -27,4 +27,18 @@ const GridCard = ({ children }) => {
     );
 };
 
-export { Decoration, BorderRow, GridCard };
+const LinearCard = ({ children }) => {
+    return (
+        <div className="text-center relative">
+            <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
+
+            <div className="grid grid-cols-1 w-full lg:grid-cols-1">
+                {children}
+            </div>
+
+            <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
+        </div>
+    );
+};
+
+export { Decoration, BorderRow, GridCard, LinearCard };
