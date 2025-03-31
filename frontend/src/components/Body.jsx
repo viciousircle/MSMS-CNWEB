@@ -5,7 +5,7 @@ const Body = ({ children }) => {
         <>
             <main className="flex justify-between w-full overflow-hidden relative  ">
                 <div className="decoration-col"></div>
-                <div className="flex flex-col w-full gap-16 pt-16 px-4 pb-96">
+                <div className="flex flex-col w-full gap-8  pb-96 pt-24">
                     {children}
                 </div>
                 <div className="decoration-col"></div>

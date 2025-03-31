@@ -6,7 +6,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import Banner from "./components/Banner";
 import NavigationBar from "./components/NavigationBar";
-import Footer from "./components/Footer";
+import { Footer } from "./components/Footer";
 import Cart from "./pages/Cart";
 import Order from "./pages/Order";
 import Payment from "./pages/Payment";
