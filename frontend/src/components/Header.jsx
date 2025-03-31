@@ -18,7 +18,7 @@ function HeaderWithIcon({ icon: Icon, title }) {
             <hr className="hr-top" />
             <h1 className="text-5xl text-pretty gap-x-2 flex max-w-none  tracking-widest whitespace-nowrap items-center">
                 <div className="border-r border-gray-950/5 flex items-center">
-                    {Icon && <Icon className="size-20 py-1 px-4" />}
+                    {Icon && <Icon className="size-24 py-1 px-4" />}
                 </div>
                 <div className="px-2 font-serif">{title}</div>
             </h1>
