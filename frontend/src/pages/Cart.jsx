@@ -1,13 +1,6 @@
 import React from "react";
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import {
-    ChevronDownIcon,
-    PhoneIcon,
-    PlayCircleIcon,
-} from "@heroicons/react/20/solid";
-import { ShoppingBagIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
-import Decoration from "../components/Decoration";
-import { HrBot, HrTop } from "../components/HorizontalLine";
+
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Body from "@/components/Body";
 import { HeaderWithIcon } from "@/components/Header";
 import CheckBox from "@/components/Checkbox";
@@ -15,6 +8,7 @@ import { LinearCard } from "@/components/Card";
 import { CardCartItem } from "@/components/Card";
 import { CartTotal } from "@/components/Footer";
 import { InformationSection } from "@/components/Card";
+
 const Cart = () => {
     return (
         <>

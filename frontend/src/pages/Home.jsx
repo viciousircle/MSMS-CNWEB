@@ -1,8 +1,9 @@
 import React from "react";
-import { CardProduct } from "../components/Card";
+import { ProductCard } from "../components/Card";
 import { HeaderFullText } from "@/components/Header";
 import Body from "@/components/Body";
-import { GridCard } from "@/components/Card";
+import { GridCard } from "@/components/Decoration";
+import img2 from "../assets/img2.jpeg";
 
 const Home = () => {
     return (
@@ -16,7 +17,11 @@ const Home = () => {
             <GridCard>
                 {[...Array(8)].map((_, index) => (
                     <div key={index}>
-                        <CardProduct />
+                        <ProductCard
+                            img={img2}
+                            name={"MacBook Pro"}
+                            price={"39.000.000"}
+                        />
                     </div>
                 ))}
             </GridCard>
