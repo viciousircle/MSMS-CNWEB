@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CircleCheck, Minus, Plus } from "lucide-react";
+import { ChevronDown, CircleCheck, Minus, Plus } from "lucide-react";
 import {
     Drawer,
     DrawerClose,
@@ -103,7 +103,11 @@ const ColorSelection = () => (
         </span>
         <Select>
             <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Colors" />
+                {/* <SelectValue placeholder="Colors" /> */}
+                <Button>
+                    Black
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
             </SelectTrigger>
             <SelectContent>
                 {[

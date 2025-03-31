@@ -45,9 +45,11 @@ const ActionButtons = () => (
         >
             Add to Cart
         </Button>
-        <Button className="flex-1">
-            <Link to="/payment">Order now</Link>
-        </Button>
+        <div className="flex-1">
+            <Link to="/payment">
+                <Button className={"w-full"}>Order now</Button>
+            </Link>
+        </div>
     </div>
 );
 

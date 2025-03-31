@@ -6,6 +6,10 @@ import {
     PhoneIcon,
     PlayCircleIcon,
 } from "@heroicons/react/20/solid";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
 import {
     BanknotesIcon,
     CheckBadgeIcon,
@@ -15,6 +19,33 @@ import {
     ShoppingBagIcon,
     ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { SelectIcon, SelectItemIndicator } from "@radix-ui/react-select";
+import { ScanFaceIcon } from "lucide-react";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from "@/components/ui/dialog";
+
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const Payment = () => {
     return (
@@ -43,9 +74,95 @@ const Payment = () => {
                             <div className="flex border-gray-950/5 border-x  bg-gray-950/2.5 items-center px-4 py-2 justify-between w-full">
                                 <div className="">Infomation</div>
                             </div>
-                            <div className="flex border-gray-950/5 border-x gap-2 hover:bg-gray-950/2.5 items-center px-4 py-2">
-                                <PencilIcon className="size-6" />
-                            </div>
+
+                            <Dialog>
+                                <DialogTrigger className="focus:outline-none">
+                                    <div className="flex border-gray-950/5 border-x gap-2 hover:bg-gray-950/2.5 items-center px-4 py-2 focus:outline-none cursor-pointer">
+                                        <PencilIcon className="size-6" />
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[720px] px-8">
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Edit information
+                                        </DialogTitle>
+                                        <div className="flex flex-col gap-2 mt-4">
+                                            <div className="flex gap-2 items-center">
+                                                <div className=" min-w-[120px]">
+                                                    Receiver
+                                                </div>
+                                                <Input />
+                                            </div>
+                                            <div className="flex gap-2 items-center">
+                                                <div className=" min-w-[120px]">
+                                                    Phone
+                                                </div>
+                                                <div className="flex items-center justify-center">
+                                                    <InputOTP maxLength={10}>
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={0}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={1}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={2}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={3}
+                                                            />
+                                                        </InputOTPGroup>
+                                                        <InputOTPSeparator />
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={4}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={5}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={6}
+                                                            />
+                                                        </InputOTPGroup>
+                                                        <InputOTPSeparator />
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={7}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={8}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={9}
+                                                            />
+                                                        </InputOTPGroup>
+                                                    </InputOTP>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 items-center">
+                                                <div className=" min-w-[120px]">
+                                                    Address
+                                                </div>
+                                                <Input placeholder="Number" />
+                                                <Input placeholder="Street" />
+                                                <Input placeholder="District" />
+                                                <Input placeholder="City" />
+                                            </div>
+                                        </div>
+                                        <DialogDescription>
+                                            Make changes to your profile here.
+                                            Click save when you're done.
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    <DialogFooter>
+                                        <Button type="submit">
+                                            Save changes
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
 
@@ -126,12 +243,20 @@ const Payment = () => {
                                                     <div className="text-2xl font-medium hover:underline">
                                                         MacBook Pro
                                                     </div>
-                                                    <div className="flex gap-2 items-center">
-                                                        <div className="tracking-wider">
-                                                            Quantity
+                                                    <div className=" flex flex-col gap-2">
+                                                        <div className="flex gap-2 items-center">
+                                                            <div className="tracking-wider">
+                                                                Color
+                                                            </div>
+                                                            <div className="bg-black p-2 rounded-full"></div>
                                                         </div>
-                                                        <div className="">
-                                                            10
+                                                        <div className="flex gap-2 items-center">
+                                                            <div className="tracking-wider">
+                                                                Quantity
+                                                            </div>
+                                                            <div className="">
+                                                                10
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="font-mono">
@@ -186,11 +311,24 @@ const Payment = () => {
                                     <div className=" border-gray-950/5 flex    items-center px-8 border-r py-2 w-full ">
                                         Payment Method
                                     </div>
-                                    <div className=" border-gray-950/5 px-8 w-1/2 flex  justify-between  bg-gray-950/2.5 items-center">
-                                        <div className="font-mono text-sm text-black">
-                                            Cash on Delivery
-                                        </div>
-                                        <ChevronUpDownIcon className="size-5" />
+
+                                    <div className=" border-gray-950/5 flex justify-between  bg-gray-950/2.5 items-center w-1/2 px-8">
+                                        <Select>
+                                            <SelectTrigger className="w-full text-left ">
+                                                {/* <SelectValue placeholder="Cash on Delivery" /> */}
+                                                <div className=" border w-full ">
+                                                    Cash on Delivery
+                                                </div>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="cod">
+                                                    Cash on Delivery
+                                                </SelectItem>
+                                                <SelectItem value="momo">
+                                                    Momo
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-end text-amber-900 ">
