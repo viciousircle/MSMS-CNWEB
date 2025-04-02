@@ -22,7 +22,7 @@ import OrderButton from "./Buttons/OrderButton";
 
 const OptionDrawer = () => {
     const [quantity, setQuantity] = useState(1);
-    const [isOpen, setIsOpen] = useState(false); // Drawer State
+    const [isOpen, setIsOpen] = useState(false);
     const maxStock = 10;
 
     const updateQuantity = useCallback((amount) => {
