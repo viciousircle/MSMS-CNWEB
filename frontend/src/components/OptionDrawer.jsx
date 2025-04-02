@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, CircleCheck, Minus, Plus } from "lucide-react";
+// import { toast } from "sonner";
 import {
     Drawer,
     DrawerClose,
@@ -17,7 +18,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ActionButtons, CancelButton } from "@/components/Button";
+import CancelButton from "./Buttons/CancelButton";
+import AddToCartButton from "./Buttons/AddToCartButton";
+import OrderButton from "./Buttons/OrderButton";
 
 const OptionDrawer = () => {
     const [goal, setGoal] = useState(1);
@@ -52,7 +55,11 @@ const OptionDrawer = () => {
                         handleInputChange={handleInputChange}
                     />
                     <DrawerFooter>
-                        <ActionButtons />
+                        <div className="flex w-full gap-2">
+                            <AddToCartButton />
+                            <OrderButton />
+                        </div>
+
                         <CancelButton />
                     </DrawerFooter>
                 </div>
@@ -103,7 +110,6 @@ const ColorSelection = () => (
         </span>
         <Select>
             <SelectTrigger className="w-[180px]">
-                {/* <SelectValue placeholder="Colors" /> */}
                 <Button>
                     Black
                     <ChevronDown className="ml-auto h-4 w-4" />

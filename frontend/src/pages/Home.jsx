@@ -1,5 +1,5 @@
 import React from "react";
-import { ProductCard } from "../components/Card";
+import ProductCard from "@/components/Cards/ProductCard";
 import { HeaderFullText } from "@/components/Header";
 import Body from "@/components/Body";
 import { GridCard } from "@/components/Decoration";
