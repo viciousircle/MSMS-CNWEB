@@ -1,5 +1,4 @@
-import React from "react";
-import img2 from "@/assets/img2.jpeg";
+import React, { useEffect, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Body from "@/components/Body";
 import { HeaderWithIcon } from "@/components/Header";
@@ -10,12 +9,42 @@ import { CartInformation } from "@/components/Card";
 import CartProductCard from "@/components/Cards/CartProductCard";
 
 const Cart = () => {
-    const product = {
-        name: "MacBook Pro",
-        image: img2,
-        quantity: 10,
-        price: "39.000.000 VND",
-        inStock: 0,
+    const [products, setProducts] = useState([]);
+    const [checkedProducts, setCheckedProducts] = useState({}); // Track checked state
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const response = await fetch("/mock/cart.json");
+            const data = await response.json();
+            setProducts(data);
+            // Initialize checked state (false for all)
+            const initialCheckedState = data.reduce((acc, product) => {
+                acc[product.id] = false; // Assume each product has a unique `id`
+                return acc;
+            }, {});
+            setCheckedProducts(initialCheckedState);
+        };
+
+        fetchProducts();
+    }, []);
+
+    // Handle the "Products" checkbox
+    const handleProductsCheck = (isChecked) => {
+        const newCheckedState = { ...checkedProducts };
+        products.forEach((product) => {
+            if (product.inStock > 0) {
+                newCheckedState[product.id] = isChecked; // Only check if in stock
+            }
+        });
+        setCheckedProducts(newCheckedState);
+    };
+
+    // Handle individual product checkbox changes
+    const handleProductCheck = (productId, isChecked) => {
+        setCheckedProducts((prevState) => ({
+            ...prevState,
+            [productId]: isChecked,
+        }));
     };
 
     return (
@@ -23,16 +52,26 @@ const Cart = () => {
             <Body>
                 <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
 
-                <CheckBox title="Products" />
+                {/* Pass checked state and handler to CheckBox */}
+                <CheckBox
+                    title="Products"
+                    checked={Object.values(checkedProducts).every((v) => v)} // Check if all are checked
+                    onChange={(e) => handleProductsCheck(e.target.checked)}
+                />
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
                         <CartInformation date={"12/12/2025"} items={"4"} />
                         <LinearCard>
-                            {[...Array(2)].map((_, index) => (
-                                <div key={index} className="">
-                                    <CartProductCard product={product} />
-                                </div>
+                            {products.map((product) => (
+                                <CartProductCard
+                                    key={product.id}
+                                    product={product}
+                                    isChecked={
+                                        checkedProducts[product.id] || false
+                                    }
+                                    onCheckChange={handleProductCheck}
+                                />
                             ))}
                         </LinearCard>
                     </div>

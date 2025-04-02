@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { CheckSquare, Square } from "lucide-react";
 
-const CartProductCard = ({ product }) => {
-    const [isChecked, setIsChecked] = useState(false);
+const CartProductCard = ({ product, isChecked, onCheckChange }) => {
+    // const [isChecked, setIsChecked] = useState(false);
 
-    const isOutOfStock = product.inStock === 0; // Check if the product is out of stock
+    const isOutOfStock = product.inStock === 0;
 
     return (
         <div className="flex flex-col w-full">
@@ -26,11 +26,13 @@ const CartProductCard = ({ product }) => {
                                 ? "bg-gray-950/5 cursor-not-allowed"
                                 : "hover:bg-gray-950/2.5 cursor-pointer"
                         }`}
-                    onClick={() => !isOutOfStock && setIsChecked(!isChecked)} // Prevent changing state if out of stock
+                    onClick={() =>
+                        !isOutOfStock && onCheckChange(product.id, !isChecked)
+                    }
                 >
                     <Checkbox
                         isChecked={isChecked}
-                        onClick={() => setIsChecked(!isChecked)}
+                        onClick={() => onCheckChange(product.id, !isChecked)}
                         isOutOfStock={isOutOfStock}
                     />
                     <ProductImage
@@ -100,11 +102,20 @@ const ProductDetails = ({ product, isOutOfStock }) => (
                 {product.name}
             </span>
             <div className="flex gap-2 items-center">
-                <span className="tracking-wider">Quantity</span>
-                <div className="p-2 bg-gray-950/2.5 border rounded-sm">
-                    {product.quantity}
+                <div className="flex gap-2 items-center">
+                    <span className="tracking-wider">Color</span>
+                    <div className="p-2 bg-gray-950/2.5 border rounded-sm">
+                        {product.color}
+                    </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                    <span className="tracking-wider">Quantity</span>
+                    <div className="p-2 bg-gray-950/2.5 border rounded-sm">
+                        {product.quantity}
+                    </div>
                 </div>
             </div>
+
             <span className="font-mono">{product.price}</span>
         </div>
 

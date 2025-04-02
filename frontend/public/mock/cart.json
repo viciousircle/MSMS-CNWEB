@@ -1,0 +1,26 @@
+[
+    {
+        "name": "MacBook Pro",
+        "image": "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/iphone-card-40-iphone16hero-202409?wid=680&hei=528&fmt=p-jpg&qlt=95&.v=1723234230295",
+        "quantity": 10,
+        "price": "39.000.000 VND",
+        "inStock": 0,
+        "color": "blue"
+    },
+    {
+        "name": "iPhone 13",
+        "image": "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mac-studio-select-202503?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1739499054120",
+        "quantity": 5,
+        "price": "22.000.000 VND",
+        "inStock": 1,
+        "color": "red"
+    },
+    {
+        "name": "Apple Watch",
+        "image": "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipadpro11-digitalmat-gallery-2-202404?wid=728&hei=666&fmt=png-alpha&.v=1713308651870",
+        "quantity": 2,
+        "price": "7.000.000 VND",
+        "inStock": 1,
+        "color": "green"
+    }
+]
