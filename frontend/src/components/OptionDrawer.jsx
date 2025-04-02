@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, CircleCheck, Minus, Plus } from "lucide-react";
-// import { toast } from "sonner";
+import { ChevronDown, Minus, Plus } from "lucide-react";
 import {
     Drawer,
     DrawerClose,

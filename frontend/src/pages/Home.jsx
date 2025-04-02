@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "@/components/Cards/ProductCard";
 import { HeaderFullText } from "@/components/Header";
 import Body from "@/components/Body";
@@ -6,6 +6,15 @@ import { GridCard } from "@/components/Decoration";
 import img2 from "../assets/img2.jpeg";
 
 const Home = () => {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        fetch("mock/product.json")
+            .then((response) => response.json())
+            .then((data) => setProducts(data))
+            .catch((error) => console.error("Error loading mock data:", error));
+    }, []);
+
     return (
         <Body>
             <HeaderFullText>
@@ -15,12 +24,12 @@ const Home = () => {
                 </span>
             </HeaderFullText>
             <GridCard>
-                {[...Array(8)].map((_, index) => (
-                    <div key={index}>
+                {products.map((product) => (
+                    <div key={product.id}>
                         <ProductCard
-                            img={img2}
-                            name={"MacBook Pro"}
-                            price={"39.000.000"}
+                            img={product.img}
+                            name={product.name}
+                            price={product.price}
                         />
                     </div>
                 ))}
