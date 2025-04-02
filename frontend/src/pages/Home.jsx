@@ -3,7 +3,6 @@ import ProductCard from "@/components/Cards/ProductCard";
 import { HeaderFullText } from "@/components/Header";
 import Body from "@/components/Body";
 import { GridCard } from "@/components/Decoration";
-import img2 from "../assets/img2.jpeg";
 
 const Home = () => {
     const [products, setProducts] = useState([]);

@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { CircleCheck, AlertTriangle } from "lucide-react";
 import React, { useState } from "react";
 
-const AddToCartButton = () => {
+const AddToCartButton = ({ onClose }) => {
     const [lastClickTime, setLastClickTime] = useState(0);
-    const cooldown = 10000; // 1 second cooldown
+    const cooldown = 1000; // 1 second cooldown
 
     const handleClick = () => {
         const now = Date.now();
@@ -26,6 +26,8 @@ const AddToCartButton = () => {
                 <span>Item added to cart successfully!</span>
             </div>
         );
+
+        onClose(); // Close Drawer
     };
 
     return (
