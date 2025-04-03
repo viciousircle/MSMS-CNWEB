@@ -13,7 +13,7 @@ const Order = () => {
     return (
         <Body>
             <HeaderWithIcon icon={InboxArrowDownIcon} title="Order" />
-            <Label title={"Order Status"} />
+            <Label titles={["Order Status"]} />
             <OrderStatusGroup />
             <OrderSorter />
 

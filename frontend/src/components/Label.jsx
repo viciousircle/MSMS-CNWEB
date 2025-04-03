@@ -2,12 +2,6 @@ import React from "react";
 import {
     ArchiveBoxIcon,
     ArrowLongRightIcon,
-    BanknotesIcon,
-    CheckBadgeIcon,
-    ChevronDoubleDownIcon,
-    ChevronUpDownIcon,
-    InboxArrowDownIcon,
-    PencilIcon,
     ShieldCheckIcon,
     ShoppingBagIcon,
     ShoppingCartIcon,
@@ -17,20 +11,28 @@ import {
 } from "@heroicons/react/24/outline";
 
 import img2 from "../assets/img2.jpeg";
-
-const Label = ({ title }) => {
+const Label = ({ titles = [] }) => {
     return (
         <div className="relative">
             <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
-            <div className="text-gray-700 text-pretty font-medium font-mono px-4 tracking-widest uppercase flex gap-4">
-                <div className="flex border-gray-950/5 border-x  bg-gray-950/2.5 items-center px-4 py-2 justify-between w-full">
-                    <div className=""> {title}</div>
-                </div>
+            <div className="flex gap-4 px-4">
+                {titles.map((title, index) => (
+                    <div
+                        key={index}
+                        className="text-gray-700 text-pretty font-medium font-mono tracking-widest uppercase flex"
+                    >
+                        <div className="flex border-gray-950/5 border-x bg-gray-950/2.5 items-center px-4 py-2 justify-between w-full">
+                            <div>{title}</div>
+                        </div>
+                    </div>
+                ))}
             </div>
             <hr className="border-gray-950/5 absolute bottom-0 left-[-100%] right-[-100%]" />
         </div>
     );
 };
+
+export default Label;
 
 const OrderStatusGroup = () => {
     return (

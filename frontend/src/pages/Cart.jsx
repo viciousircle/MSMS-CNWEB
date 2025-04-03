@@ -5,7 +5,6 @@ import { HeaderWithIcon } from "@/components/Header";
 import CheckBox from "@/components/Checkbox";
 import { LinearCard } from "@/components/Decoration";
 import { CartTotal } from "@/components/Footer";
-import { CartInformation } from "@/components/Card";
 import CartProductCard from "@/components/Cards/CartProductCard";
 
 const Cart = () => {

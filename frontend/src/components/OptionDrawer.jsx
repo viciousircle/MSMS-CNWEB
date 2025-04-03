@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import CancelButton from "./Buttons/CancelButton";
 import AddToCartButton from "./Buttons/AddToCartButton";
-import OrderButton from "./Buttons/OrderButton";
+import BuyButton from "./Buttons/BuyButton";
 
 const OptionDrawer = () => {
     const [quantity, setQuantity] = useState(1);
@@ -58,7 +58,7 @@ const OptionDrawer = () => {
                     <DrawerFooter>
                         <div className="flex w-full gap-2">
                             <AddToCartButton onClose={() => setIsOpen(false)} />
-                            <OrderButton />
+                            <BuyButton />
                         </div>
                         <CancelButton onClose={() => setIsOpen(false)} />
                     </DrawerFooter>
