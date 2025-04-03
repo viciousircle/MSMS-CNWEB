@@ -1,23 +1,34 @@
-const { faker } = require("@faker-js/faker");
-const Product = require("../models/product.model");
+const { faker } = require('@faker-js/faker');
+const Product = require('../models/product.model');
+
+// Predefined images from JSON
+const productImages = [
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/iphone-card-40-iphone16hero-202409?wid=680&hei=528&fmt=p-jpg&qlt=95&.v=1723234230295',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mac-studio-select-202503?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1739499054120',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-mini-digitalmat-gallery-1-202410?wid=730&hei=666&fmt=png-alpha&.v=1727279895834',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipadpro11-digitalmat-gallery-2-202404?wid=728&hei=666&fmt=png-alpha&.v=1713308651870',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/airpods-max-select-202409-midnight?wid=400&hei=400&fmt=jpeg&qlt=90&.v=1724927451276',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/airpods-pro-2-hero-select-202409?wid=400&hei=400&fmt=jpeg&qlt=90&.v=1724041669458',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mbp-14-digitalmat-gallery-1-202410?wid=728&hei=666&fmt=png-alpha&.v=1728342371746',
+    'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/imac-digitalmat-gallery-2-202410?wid=728&hei=666&fmt=png-alpha&.v=1729266243103',
+];
 
 const seedProducts = async (count = 20) => {
     try {
         // Clear existing products
         await Product.deleteMany();
-        console.log("Existing products cleared".yellow);
+        console.log('Existing products cleared'.yellow);
 
         const products = [];
 
         for (let i = 0; i < count; i++) {
             const product = {
                 name: faker.commerce.productName(),
-                image: faker.image.urlLoremFlickr({
-                    category: "product",
-                    https: true,
-                }),
-                price: parseFloat(faker.commerce.price({ min: 10, max: 1000 })),
-                stock: faker.number.int({ min: 0, max: 100 }),
+                image: productImages[i % productImages.length],
+                price: parseFloat(
+                    faker.commerce.price({ min: 10000000, max: 1000000000 })
+                ),
+                stock: faker.number.int({ min: 0, max: 1000 }),
                 rate: faker.number.float({ min: 0, max: 5, precision: 0.1 }),
             };
             products.push(product);
@@ -30,7 +41,7 @@ const seedProducts = async (count = 20) => {
 
         return products;
     } catch (error) {
-        console.error("Error seeding products:".red, error);
+        console.error('Error seeding products:'.red, error);
         throw error;
     }
 };

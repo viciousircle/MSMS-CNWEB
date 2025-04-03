@@ -7,56 +7,56 @@ import { GridCard } from '@/components/Decoration';
 const Home = () => {
     const [products, setProducts] = useState([]);
 
-    useEffect(() => {
-        fetch('mock/product.json')
-            .then((response) => response.json())
-            .then((data) => setProducts(data))
-            .catch((error) => console.error('Error loading mock data:', error));
-    }, []);
-
-    // *REAL API
-    // const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState(null);
-
     // useEffect(() => {
-    //     fetch('http://localhost:5678/api/products')
-    //         .then((response) => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((data) => {
-    //             const cleanedProducts = data.map((product) => ({
-    //                 ...product,
-    //                 img: product.image.replace(/^"+|"+$/g, ''),
-    //             }));
-    //             setProducts(cleanedProducts);
-    //             console.log('Cleaned products data:', cleanedProducts);
-    //             setLoading(false);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching products:', error);
-    //             setError(error.message);
-    //             setLoading(false);
-    //         });
+    //     fetch('mock/product.json')
+    //         .then((response) => response.json())
+    //         .then((data) => setProducts(data))
+    //         .catch((error) => console.error('Error loading mock data:', error));
     // }, []);
 
-    // if (loading) {
-    //     return (
-    //         <Body>
-    //             <div>Loading products...</div>
-    //         </Body>
-    //     );
-    // }
+    // *REAL API
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // if (error) {
-    //     return (
-    //         <Body>
-    //             <div>Error: {error}</div>
-    //         </Body>
-    //     );
-    // }
+    useEffect(() => {
+        fetch('http://localhost:5678/api/products')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                const cleanedProducts = data.map((product) => ({
+                    ...product,
+                    img: product.image.replace(/^"+|"+$/g, ''),
+                }));
+                setProducts(cleanedProducts);
+                console.log('Cleaned products data:', cleanedProducts);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching products:', error);
+                setError(error.message);
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return (
+            <Body>
+                <div>Loading products...</div>
+            </Body>
+        );
+    }
+
+    if (error) {
+        return (
+            <Body>
+                <div>Error: {error}</div>
+            </Body>
+        );
+    }
 
     return (
         <Body>
@@ -73,6 +73,7 @@ const Home = () => {
                             img={product.img}
                             name={product.name}
                             price={product.price}
+                            stock={product.stock}
                         />
                     </div>
                 ))}

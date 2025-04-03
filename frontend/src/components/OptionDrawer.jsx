@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, Minus, Plus } from "lucide-react";
+import React, { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, Minus, Plus } from 'lucide-react';
 import {
     Drawer,
     DrawerContent,
@@ -8,22 +8,22 @@ import {
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
-} from "@/components/ui/drawer";
+} from '@/components/ui/drawer';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
-import CancelButton from "./Buttons/CancelButton";
-import AddToCartButton from "./Buttons/AddToCartButton";
-import BuyButton from "./Buttons/BuyButton";
+} from '@/components/ui/select';
+import CancelButton from './Buttons/CancelButton';
+import AddToCartButton from './Buttons/AddToCartButton';
+import BuyButton from './Buttons/BuyButton';
 
-const OptionDrawer = () => {
+const OptionDrawer = ({ maxStock }) => {
     const [quantity, setQuantity] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
-    const maxStock = 10;
+    // const maxStock = 10;
 
     const updateQuantity = useCallback((amount) => {
         setQuantity((prev) => Math.max(1, Math.min(maxStock, prev + amount)));
@@ -32,8 +32,8 @@ const OptionDrawer = () => {
     const handleInputChange = useCallback((event) => {
         const value = event.target.value;
         setQuantity(
-            value === ""
-                ? ""
+            value === ''
+                ? ''
                 : Math.max(1, Math.min(maxStock, parseInt(value, 10) || 1))
         );
     }, []);
@@ -41,7 +41,7 @@ const OptionDrawer = () => {
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
-                <Button variant="outline">View Detail</Button>
+                <Button variant="outline">View Details</Button>
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mx-auto w-full max-w-sm">
@@ -110,9 +110,9 @@ const StockInfo = React.memo(({ maxStock }) => (
 
 const ColorSelection = React.memo(() => {
     const colors = [
-        { value: "black", label: "Black", colorClass: "bg-black" },
-        { value: "rose", label: "Rose", colorClass: "bg-rose-600" },
-        { value: "amber", label: "Amber", colorClass: "bg-amber-500" },
+        { value: 'black', label: 'Black', colorClass: 'bg-black' },
+        { value: 'rose', label: 'Rose', colorClass: 'bg-rose-600' },
+        { value: 'amber', label: 'Amber', colorClass: 'bg-amber-500' },
     ];
 
     return (

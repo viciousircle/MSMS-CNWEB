@@ -2,13 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import OptionDrawer from '@/components/OptionDrawer';
 
-const ProductCard = ({ img, name, price }) => {
+const ProductCard = ({ img, name, price, stock }) => {
     return (
         <div className="flex flex-col w-full gap-0">
             <Divider horizontal />
             <div className="flex w-full gap-0">
                 <Divider vertical />
-                <CardContent img={img} name={name} price={price} />
+                <CardContent
+                    img={img}
+                    name={name}
+                    price={price}
+                    stock={stock}
+                />
                 <Divider vertical />
             </div>
             <Divider horizontal />
@@ -16,12 +21,12 @@ const ProductCard = ({ img, name, price }) => {
     );
 };
 
-const CardContent = ({ img, name, price }) => (
+const CardContent = ({ img, name, price, stock }) => (
     <div className="flex flex-col border border-gray-950/5 p-2 w-full gap-4 hover:bg-gray-950/2.5 min-w-max">
         <ProductImage img={img} />
         <div className="pb-2 flex justify-between items-center">
             <ProductInfo name={name} price={price} />
-            <OptionDrawer />
+            <OptionDrawer maxStock={stock} />
         </div>
     </div>
 );
@@ -34,13 +39,18 @@ const ProductImage = React.memo(({ img }) => (
 ProductImage.propTypes = {
     img: PropTypes.string.isRequired,
 };
-
 const ProductInfo = React.memo(({ name, price }) => (
-    <div className="flex flex-col gap-2 items-start">
-        <span className="font-medium ">{name}</span>
-        <span className="text-gray-400 text-xs font-mono">{price}</span>
+    <div className="flex flex-col gap-2 items-start w-full max-w-[150px]">
+        <span
+            className="font-medium truncate w-full whitespace-nowrap overflow-hidden block text-left"
+            title={name}
+        >
+            {name}
+        </span>
+        <span className="text-gray-400 text-sm font-mono">{price}</span>
     </div>
 ));
+
 ProductInfo.propTypes = {
     name: PropTypes.string.isRequired,
     price: PropTypes.string.isRequired,
