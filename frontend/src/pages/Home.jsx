@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import ProductCard from "@/components/Cards/ProductCard";
-import { HeaderFullText } from "@/components/Header";
-import Body from "@/components/Body";
-import { GridCard } from "@/components/Decoration";
+import React, { useEffect, useState } from 'react';
+import ProductCard from '@/components/Cards/ProductCard';
+import { HeaderFullText } from '@/components/Header';
+import Body from '@/components/Body';
+import { GridCard } from '@/components/Decoration';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        fetch("mock/product.json")
+        fetch('mock/product.json')
             .then((response) => response.json())
             .then((data) => setProducts(data))
-            .catch((error) => console.error("Error loading mock data:", error));
+            .catch((error) => console.error('Error loading mock data:', error));
     }, []);
 
     // *REAL API
@@ -19,19 +19,24 @@ const Home = () => {
     // const [error, setError] = useState(null);
 
     // useEffect(() => {
-    //     fetch("http://localhost:5678/api/products")
+    //     fetch('http://localhost:5678/api/products')
     //         .then((response) => {
     //             if (!response.ok) {
-    //                 throw new Error("Network response was not ok");
+    //                 throw new Error('Network response was not ok');
     //             }
     //             return response.json();
     //         })
     //         .then((data) => {
-    //             setProducts(data);
+    //             const cleanedProducts = data.map((product) => ({
+    //                 ...product,
+    //                 img: product.image.replace(/^"+|"+$/g, ''),
+    //             }));
+    //             setProducts(cleanedProducts);
+    //             console.log('Cleaned products data:', cleanedProducts);
     //             setLoading(false);
     //         })
     //         .catch((error) => {
-    //             console.error("Error fetching products:", error);
+    //             console.error('Error fetching products:', error);
     //             setError(error.message);
     //             setLoading(false);
     //         });

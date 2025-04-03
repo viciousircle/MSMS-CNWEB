@@ -1,6 +1,6 @@
-import React from "react";
-import PropTypes from "prop-types";
-import OptionDrawer from "@/components/OptionDrawer";
+import React from 'react';
+import PropTypes from 'prop-types';
+import OptionDrawer from '@/components/OptionDrawer';
 
 const ProductCard = ({ img, name, price }) => {
     return (
@@ -28,7 +28,7 @@ const CardContent = ({ img, name, price }) => (
 
 const ProductImage = React.memo(({ img }) => (
     <figure className="flex bg-white h-64 justify-center rounded-lg w-full items-center outline outline-gray-950/5">
-        <img src={img} alt="Product" className="w-64 object-contain" />
+        <img src={img} alt="Product" className="w-64 h-64 object-contain" />
     </figure>
 ));
 ProductImage.propTypes = {
@@ -37,7 +37,7 @@ ProductImage.propTypes = {
 
 const ProductInfo = React.memo(({ name, price }) => (
     <div className="flex flex-col gap-2 items-start">
-        <span className="font-medium">{name}</span>
+        <span className="font-medium ">{name}</span>
         <span className="text-gray-400 text-xs font-mono">{price}</span>
     </div>
 ));

@@ -18,6 +18,7 @@
     },
     "homepage": "https://github.com/viciousircle/MSMS-CNWEB#readme",
     "dependencies": {
+        "@faker-js/faker": "^9.6.0",
         "bcryptjs": "^3.0.2",
         "colors": "^1.4.0",
         "cors": "^2.8.5",
