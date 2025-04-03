@@ -14,6 +14,45 @@ const Home = () => {
             .catch((error) => console.error("Error loading mock data:", error));
     }, []);
 
+    // *REAL API
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(null);
+
+    // useEffect(() => {
+    //     fetch("http://localhost:5678/api/products")
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 throw new Error("Network response was not ok");
+    //             }
+    //             return response.json();
+    //         })
+    //         .then((data) => {
+    //             setProducts(data);
+    //             setLoading(false);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching products:", error);
+    //             setError(error.message);
+    //             setLoading(false);
+    //         });
+    // }, []);
+
+    // if (loading) {
+    //     return (
+    //         <Body>
+    //             <div>Loading products...</div>
+    //         </Body>
+    //     );
+    // }
+
+    // if (error) {
+    //     return (
+    //         <Body>
+    //             <div>Error: {error}</div>
+    //         </Body>
+    //     );
+    // }
+
     return (
         <Body>
             <HeaderFullText>

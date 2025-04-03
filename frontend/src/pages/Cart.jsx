@@ -6,6 +6,7 @@ import CheckBox from "@/components/Checkbox";
 import { LinearCard } from "@/components/Decoration";
 import { CartTotal } from "@/components/Footer";
 import CartProductCard from "@/components/Cards/CartProductCard";
+import Label from "@/components/Label";
 
 const Cart = () => {
     const [products, setProducts] = useState([]);
@@ -27,7 +28,6 @@ const Cart = () => {
         fetchProducts();
     }, []);
 
-    // Handle the "Products" checkbox
     const handleProductsCheck = (isChecked) => {
         const newCheckedState = { ...checkedProducts };
         products.forEach((product) => {
@@ -51,7 +51,6 @@ const Cart = () => {
             <Body>
                 <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
 
-                {/* Pass checked state and handler to CheckBox */}
                 <CheckBox
                     title="Products"
                     checked={Object.values(checkedProducts).every((v) => v)} // Check if all are checked
@@ -60,7 +59,9 @@ const Cart = () => {
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
-                        <CartInformation date={"12/12/2025"} items={"4"} />
+                        <Label
+                            titles={["Products", `${products.length} ITEMS`]}
+                        />
                         <LinearCard>
                             {products.map((product) => (
                                 <CartProductCard
