@@ -46,7 +46,7 @@ const LogIn = ({ className, ...props }) => {
             localStorage.setItem('customer', JSON.stringify(data));
 
             // Redirect to dashboard or homepage
-            navigate('/payment'); // Change to your desired route
+            navigate('/'); // Change to your desired route
         } catch (err) {
             setError(err.message);
         } finally {

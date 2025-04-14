@@ -32,11 +32,13 @@ const navLinks = [
     { path: '/about', label: 'About' },
     { path: '/notfound', label: 'Not Found' },
     { path: '/profile', label: 'Profile' },
-    { path: '/login', label: 'Log In' },
-    { path: '/signup', label: 'Sign Up' },
+    // Remove login and signup links since they'll be conditionally shown
 ];
 
 const NavigationBar = () => {
+    // Get user data from localStorage
+    const customer = JSON.parse(localStorage.getItem('customer'));
+
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-950/5">
             <div className="flex justify-center gap-4 items-center">
@@ -46,20 +48,34 @@ const NavigationBar = () => {
                     </div>
                 </Link>
                 {navLinks.map(({ path, label }) => (
-                    <Link to={path}>
-                        <div
-                            key={path}
-                            className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5"
-                        >
+                    <Link to={path} key={path}>
+                        <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
                             {label}
                         </div>
                     </Link>
                 ))}
-                <Link to="/profile">
-                    <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
-                        <UserCircleIcon className="size-6" />
-                    </div>
-                </Link>
+
+                {/* Conditionally show login/signup or user profile */}
+                {customer ? (
+                    <Link to="/profile">
+                        <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
+                            {customer.name}
+                        </div>
+                    </Link>
+                ) : (
+                    <>
+                        <Link to="/login">
+                            <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
+                                Log In
+                            </div>
+                        </Link>
+                        <Link to="/signup">
+                            <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
+                                Sign Up
+                            </div>
+                        </Link>
+                    </>
+                )}
             </div>
         </nav>
     );
