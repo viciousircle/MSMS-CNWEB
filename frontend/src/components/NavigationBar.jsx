@@ -1,11 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import {
     ChevronDownIcon,
     PhoneIcon,
     PlayCircleIcon,
-} from "@heroicons/react/20/solid";
+} from '@heroicons/react/20/solid';
 import {
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
@@ -21,17 +21,19 @@ import {
     RectangleGroupIcon,
     SquaresPlusIcon,
     UserCircleIcon,
-} from "@heroicons/react/24/outline";
-import cat from "../assets/cat.svg";
+} from '@heroicons/react/24/outline';
+import cat from '../assets/cat.svg';
 
 const navLinks = [
-    { path: "/", label: "Store" },
-    { path: "/cart", label: "Cart" },
-    { path: "/payment", label: "Payment" },
-    { path: "/order", label: "Order" },
-    { path: "/about", label: "About" },
-    { path: "/notfound", label: "Not Found" },
-    { path: "/profile", label: "Profile" },
+    { path: '/', label: 'Store' },
+    { path: '/cart', label: 'Cart' },
+    { path: '/payment', label: 'Payment' },
+    { path: '/order', label: 'Order' },
+    { path: '/about', label: 'About' },
+    { path: '/notfound', label: 'Not Found' },
+    { path: '/profile', label: 'Profile' },
+    { path: '/login', label: 'Log In' },
+    { path: '/signup', label: 'Sign Up' },
 ];
 
 const NavigationBar = () => {

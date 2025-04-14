@@ -1,16 +1,18 @@
-import "./styles/App.css";
+import './styles/App.css';
 
-import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
-import Banner from "./components/Banner";
-import NavigationBar from "./components/NavigationBar";
-import { Footer } from "./components/Footer";
-import Cart from "./pages/Cart";
-import Order from "./pages/Order";
-import Payment from "./pages/Payment";
-import { Toaster } from "@/components/ui/sonner";
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import NotFound from './pages/NotFound';
+import Banner from './components/Banner';
+import NavigationBar from './components/NavigationBar';
+import { Footer } from './components/Footer';
+import Cart from './pages/Cart';
+import Order from './pages/Order';
+import Payment from './pages/Payment';
+import { Toaster } from '@/components/ui/sonner';
+import LogIn from './pages/LogIn';
+import SignUp from './pages/SignUp';
 
 function App() {
     return (
@@ -24,6 +26,8 @@ function App() {
                 <Route path="/order" element={<Order />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="*" element={<NotFound />} />
+                <Route path="/login" element={<LogIn />} />
+                <Route path="/signup" element={<SignUp />} />
             </Routes>
             <Toaster />
             {/* <Footer /> */}
