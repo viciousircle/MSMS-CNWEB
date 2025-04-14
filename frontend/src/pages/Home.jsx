@@ -9,6 +9,7 @@ import { cleanImageUrl, getSafeImageUrl } from '/utils/formatImage';
 const Home = () => {
     const [products, setProducts] = useState([]);
 
+    //* MOCK API for development
     // useEffect(() => {
     //     fetch('mock/product.json')
     //         .then((response) => response.json())
@@ -16,7 +17,7 @@ const Home = () => {
     //         .catch((error) => console.error('Error loading mock data:', error));
     // }, []);
 
-    // *REAL API
+    // *REAL API for production
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -35,7 +36,7 @@ const Home = () => {
                     colors: product.colors,
                 }));
                 setProducts(cleanedProducts);
-                console.log('Cleaned products data:', cleanedProducts);
+                // console.log('Cleaned products data:', cleanedProducts);
                 setLoading(false);
             })
             .catch((error) => {

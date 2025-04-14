@@ -1,29 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import {
-    ChevronDownIcon,
-    PhoneIcon,
-    PlayCircleIcon,
-} from '@heroicons/react/20/solid';
-import {
-    ArrowPathIcon,
-    ArrowTopRightOnSquareIcon,
-    ChartPieIcon,
-    ComputerDesktopIcon,
-    CubeTransparentIcon,
-    CursorArrowRaysIcon,
-    DevicePhoneMobileIcon,
-    DeviceTabletIcon,
-    FingerPrintIcon,
-    GifIcon,
-    GiftIcon,
-    RectangleGroupIcon,
-    SquaresPlusIcon,
-    UserCircleIcon,
-    ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
-import cat from '../assets/cat.svg';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const navLinks = [
     { path: '/', label: 'Store' },
@@ -37,8 +15,11 @@ const navLinks = [
 
 const NavigationBar = () => {
     const navigate = useNavigate();
+
     // Get user data from localStorage
     const customer = JSON.parse(localStorage.getItem('customer'));
+
+    console.log('Customer:', customer);
 
     const handleLogout = () => {
         // Remove customer data from localStorage

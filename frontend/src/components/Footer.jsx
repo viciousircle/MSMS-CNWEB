@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -19,7 +19,7 @@ const CartTotal = () => {
                     Total: 312.000.000 VND
                 </div>
                 <div className="bg-white  text-black border-l border-gray-950/5 cursor-pointer duration-300 hover:bg-black hover:outline hover:text-gray-200  transition  px-16 uppercase tracking-widest font-medium  flex flex-col items-center justify-center">
-                    <Link to={"/payment"}>Order now</Link>
+                    <Link to={'/payment'}>Buy now</Link>
                 </div>
             </div>
         </div>
