@@ -3,6 +3,8 @@ import ProductCard from '@/components/Cards/ProductCard';
 import { HeaderFullText } from '@/components/Header';
 import Body from '@/components/Body';
 import { GridCard } from '@/components/Decoration';
+import { formatPrice } from '/utils/formatPrice';
+// import { cleanImageUrl, getSafeImageUrl } from 'utils/formatImage';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -72,7 +74,7 @@ const Home = () => {
                         <ProductCard
                             img={product.img}
                             name={product.name}
-                            price={product.price}
+                            price={formatPrice(product.price)}
                             stock={product.stock}
                         />
                     </div>
