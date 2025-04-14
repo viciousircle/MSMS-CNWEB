@@ -13,6 +13,7 @@ import Payment from './pages/Payment';
 import { Toaster } from '@/components/ui/sonner';
 import LogIn from './pages/LogIn';
 import SignUp from './pages/SignUp';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
     return (
@@ -22,7 +23,14 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/cart" element={<Cart />} />
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <Cart />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route path="/order" element={<Order />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="*" element={<NotFound />} />

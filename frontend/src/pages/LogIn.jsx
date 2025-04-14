@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,8 +10,50 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
 
-const LogIn = (className, ...props) => {
+const LogIn = ({ className, ...props }) => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const res = await fetch('http://localhost:5678/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            // Save token to localStorage
+            localStorage.setItem('customer', JSON.stringify(data));
+
+            // Redirect to dashboard or homepage
+            navigate('/payment'); // Change to your desired route
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
             <div className="w-full max-w-sm">
@@ -27,7 +69,7 @@ const LogIn = (className, ...props) => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form>
+                            <form onSubmit={handleSubmit}>
                                 <div className="flex flex-col gap-6">
                                     <div className="grid gap-2">
                                         <Label htmlFor="email">Email</Label>
@@ -36,6 +78,8 @@ const LogIn = (className, ...props) => {
                                             type="email"
                                             placeholder="abc@example.com"
                                             required
+                                            value={formData.email}
+                                            onChange={handleChange}
                                         />
                                     </div>
                                     <div className="grid gap-2">
@@ -54,14 +98,28 @@ const LogIn = (className, ...props) => {
                                             id="password"
                                             type="password"
                                             required
+                                            value={formData.password}
+                                            onChange={handleChange}
                                         />
                                     </div>
-                                    <Button type="submit" className="w-full">
-                                        Login
+
+                                    {error && (
+                                        <p className="text-red-500 text-sm">
+                                            {error}
+                                        </p>
+                                    )}
+
+                                    <Button
+                                        type="submit"
+                                        className="w-full"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Logging in...' : 'Login'}
                                     </Button>
                                     <Button
                                         variant="outline"
                                         className="w-full"
+                                        type="button"
                                     >
                                         Login with Google
                                     </Button>
@@ -69,7 +127,7 @@ const LogIn = (className, ...props) => {
                                 <div className="mt-4 text-center text-sm">
                                     Don&apos;t have an account?{' '}
                                     <a
-                                        href="#"
+                                        href="/signup"
                                         className="underline underline-offset-4"
                                     >
                                         Sign up
