@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import OptionDrawer from '@/components/OptionDrawer';
 
-const ProductCard = ({ img, name, price, stock }) => {
+const ProductCard = ({ img, name, price, colors }) => {
     return (
         <div className="flex flex-col w-full gap-0">
             <Divider horizontal />
@@ -12,7 +12,7 @@ const ProductCard = ({ img, name, price, stock }) => {
                     img={img}
                     name={name}
                     price={price}
-                    stock={stock}
+                    colors={colors}
                 />
                 <Divider vertical />
             </div>
@@ -21,12 +21,12 @@ const ProductCard = ({ img, name, price, stock }) => {
     );
 };
 
-const CardContent = ({ img, name, price, stock }) => (
+const CardContent = ({ img, name, price, colors }) => (
     <div className="flex flex-col border border-gray-950/5 p-2 w-full gap-4 hover:bg-gray-950/2.5 min-w-max">
         <ProductImage img={img} />
         <div className="pb-2 flex justify-between items-center">
             <ProductInfo name={name} price={price} />
-            <OptionDrawer maxStock={stock} />
+            <OptionDrawer colors={colors} />
         </div>
     </div>
 );

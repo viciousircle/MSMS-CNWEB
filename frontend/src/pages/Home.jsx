@@ -4,7 +4,7 @@ import { HeaderFullText } from '@/components/Header';
 import Body from '@/components/Body';
 import { GridCard } from '@/components/Decoration';
 import { formatPrice } from '/utils/formatPrice';
-// import { cleanImageUrl, getSafeImageUrl } from 'utils/formatImage';
+import { cleanImageUrl, getSafeImageUrl } from '/utils/formatImage';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -32,6 +32,7 @@ const Home = () => {
                 const cleanedProducts = data.map((product) => ({
                     ...product,
                     img: product.image.replace(/^"+|"+$/g, ''),
+                    colors: product.colors,
                 }));
                 setProducts(cleanedProducts);
                 console.log('Cleaned products data:', cleanedProducts);
@@ -75,7 +76,7 @@ const Home = () => {
                             img={product.img}
                             name={product.name}
                             price={formatPrice(product.price)}
-                            stock={product.stock}
+                            colors={product.colors}
                         />
                     </div>
                 ))}

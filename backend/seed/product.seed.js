@@ -1,5 +1,6 @@
 const { faker } = require('@faker-js/faker');
 const Product = require('../models/product.model');
+const colors = require('colors');
 
 // Predefined images from JSON
 const productImages = [
@@ -13,6 +14,20 @@ const productImages = [
     'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/imac-digitalmat-gallery-2-202410?wid=728&hei=666&fmt=png-alpha&.v=1729266243103',
 ];
 
+// Common product colors
+const availableColors = [
+    'Black',
+    'White',
+    'Silver',
+    'Gold',
+    'Space Gray',
+    'Blue',
+    'Red',
+    'Green',
+    'Pink',
+    'Purple',
+];
+
 const seedProducts = async (count = 20) => {
     try {
         // Clear existing products
@@ -22,13 +37,35 @@ const seedProducts = async (count = 20) => {
         const products = [];
 
         for (let i = 0; i < count; i++) {
+            const colorCount = faker.number.int({ min: 1, max: 3 });
+            const usedColors = new Set();
+            const colorVariants = [];
+
+            while (colorVariants.length < colorCount) {
+                const randomColor =
+                    availableColors[
+                        faker.number.int({
+                            min: 0,
+                            max: availableColors.length - 1,
+                        })
+                    ];
+
+                if (!usedColors.has(randomColor)) {
+                    usedColors.add(randomColor);
+                    colorVariants.push({
+                        color: randomColor,
+                        stock: faker.number.int({ min: 0, max: 100 }),
+                    });
+                }
+            }
+
             const product = {
                 name: faker.commerce.productName(),
                 image: productImages[i % productImages.length],
                 price: parseFloat(
                     faker.commerce.price({ min: 10000000, max: 1000000000 })
                 ),
-                stock: faker.number.int({ min: 0, max: 1000 }),
+                colors: colorVariants,
                 rate: faker.number.float({ min: 0, max: 5, precision: 0.1 }),
             };
             products.push(product);

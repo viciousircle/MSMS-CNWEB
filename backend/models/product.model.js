@@ -18,12 +18,21 @@ const productSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
-        stock: {
-            type: Number,
-            required: true,
-            default: 0,
-            min: 0,
-        },
+        colors: [
+            {
+                color: {
+                    type: String,
+                    required: [true, 'Color is required'],
+                    trim: true,
+                },
+                stock: {
+                    type: Number,
+                    required: true,
+                    default: 0,
+                    min: 0,
+                },
+            },
+        ],
         rate: {
             type: Number,
             required: true,
