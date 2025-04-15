@@ -1,17 +1,21 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
             required: true, // Only logged-in users can place orders
         },
         orderItems: [
             {
                 product: {
                     type: mongoose.Schema.Types.ObjectId,
-                    ref: "Product",
+                    ref: 'Product',
+                    required: true,
+                },
+                color: {
+                    type: String,
                     required: true,
                 },
                 quantity: {
@@ -19,34 +23,22 @@ const orderSchema = new mongoose.Schema(
                     required: true,
                     min: 1, // At least 1 item per product
                 },
-                price: {
-                    type: Number,
-                    required: true,
-                    min: 0, // Ensure no negative pricing
-                },
             },
         ],
         shippingAddress: {
-            fullName: { type: String, required: true },
-            address: { type: String, required: true },
-            city: { type: String, required: true },
-            postalCode: { type: String, required: true },
-            country: { type: String, required: true },
+            receiverName: { type: String, required: true },
+            receiverPhone: { type: String, required: true },
+            receiverAddress: { type: String, required: true },
         },
         paymentMethod: {
             type: String,
-            enum: ["COD", "Credit Card", "PayPal"],
+            enum: ['COD', 'Credit Card', 'QR'],
             required: true,
-        },
-        paymentStatus: {
-            type: String,
-            enum: ["Pending", "Paid", "Failed"],
-            default: "Pending",
         },
         orderStatus: {
             type: String,
-            enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
-            default: "Processing",
+            enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
+            default: 'Processing',
         },
         totalPrice: {
             type: Number,
@@ -63,7 +55,6 @@ const orderSchema = new mongoose.Schema(
         deliveredAt: {
             type: Date,
         },
-
         rating: {
             type: Number,
             min: 1,
@@ -73,10 +64,10 @@ const orderSchema = new mongoose.Schema(
         review: {
             type: String,
             trim: true,
-            default: "", // Optional review text
+            default: '', // Optional review text
         },
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model('Order', orderSchema);
