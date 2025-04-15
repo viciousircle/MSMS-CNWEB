@@ -43,10 +43,6 @@ const addItemToCart = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Invalid product ID' });
     }
 
-    // if (typeof quantity !== 'number' || quantity < 1) {
-    //     return res.status(400).json({ message: 'Invalid quantity' });
-    // }
-
     if (!quantityString || isNaN(quantity) || quantity < 1) {
         return res.status(400).json({ message: 'Invalid quantity' });
     }
