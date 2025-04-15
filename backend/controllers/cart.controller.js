@@ -6,18 +6,12 @@ const mongoose = require('mongoose');
 /**
  * @desc: Get all cart items
  * @route: GET /api/cart
- * @access: Private
+ * @access: Private (only for customers)
  */
 const getCartItems = asyncHandler(async (req, res) => {
     try {
         const userId = req.user ? req.user._id : null;
         const uuid = req.query.uuid || null;
-
-        if (!userId && !uuid) {
-            return res
-                .status(400)
-                .json({ message: 'User ID or UUID is required' });
-        }
 
         const cart = await Cart.findOne({
             $or: [{ user: userId }, { uuid: uuid }],
@@ -37,10 +31,10 @@ const getCartItems = asyncHandler(async (req, res) => {
 /**
  * @desc: Add item to cart
  * @route: POST /api/cart
- * @access: Private
+ * @access: Private (only for customers)
  */
 const addItemToCart = asyncHandler(async (req, res) => {
-    const { productId, color, quantity: quantityString } = req.body;
+    const { productId, color, quantity: quantityString, dateAdded } = req.body;
     const quantity = Number(quantityString);
     const userId = req.user?._id || null;
     const uuid = req.query.uuid || null;
@@ -49,7 +43,11 @@ const addItemToCart = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Invalid product ID' });
     }
 
-    if (typeof quantity !== 'number' || quantity < 1) {
+    // if (typeof quantity !== 'number' || quantity < 1) {
+    //     return res.status(400).json({ message: 'Invalid quantity' });
+    // }
+
+    if (!quantityString || isNaN(quantity) || quantity < 1) {
         return res.status(400).json({ message: 'Invalid quantity' });
     }
 
@@ -92,6 +90,7 @@ const addItemToCart = asyncHandler(async (req, res) => {
                 product: productId,
                 color,
                 quantity,
+                dateAdded: dateAdded || new Date(),
             });
         }
 

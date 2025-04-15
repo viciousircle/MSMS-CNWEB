@@ -42,6 +42,8 @@ const getProductById = asyncHandler(async (req, res) => {
     }
 });
 
+// TODO: No need
+
 /**
  * @desc: Update product details
  * @route: PUT /api/products/:id
@@ -49,11 +51,11 @@ const getProductById = asyncHandler(async (req, res) => {
  */
 const updateProduct = asyncHandler(async (req, res) => {
     try {
-        // if (!req.user || req.user.role !== "seller") {
-        //     return res.status(401).json({
-        //         message: "Unauthorized: Only sellers can update products",
-        //     });
-        // }
+        if (!req.user || req.user.role !== 'seller') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only sellers can update products',
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: 'Invalid product ID' });
