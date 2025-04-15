@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const asyncHandler = require("express-async-handler");
-const User = require("../models/user.model");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const asyncHandler = require('express-async-handler');
+const User = require('../models/user.model');
 
 /**
  * @description Generate JWT token
@@ -11,7 +11,7 @@ const User = require("../models/user.model");
  */
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
+        expiresIn: '30d',
     });
 };
 
@@ -22,11 +22,11 @@ const generateToken = (id, role) => {
  */
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, role } = req.body;
-    console.log(req.body); // This helps debug missing fields
+    console.log(req.body);
 
     if (!name || !email || !password) {
         res.status(400);
-        throw new Error("Please fill all the fields");
+        throw new Error('Please fill all the fields');
     }
 
     // - Check if user already exists
@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (userExists) {
         res.status(400);
-        throw new Error("User already exists");
+        throw new Error('User already exists');
     }
 
     // - Hash password
@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: role || "customer",
+        role: role || 'customer',
     });
 
     if (user) {
@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
         });
     } else {
         res.status(400);
-        throw new Error("Invalid user data");
+        throw new Error('Invalid user data');
     }
 });
 
@@ -83,7 +83,7 @@ const loginUser = asyncHandler(async (req, res) => {
         });
     } else {
         res.status(401);
-        throw new Error("Invalid credentials");
+        throw new Error('Invalid credentials');
     }
 });
 
