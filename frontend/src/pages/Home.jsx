@@ -5,6 +5,7 @@ import Body from '@/components/Body';
 import { GridCard } from '@/components/Decoration';
 import { formatPrice } from '/utils/formatPrice';
 import { cleanImageUrl, getSafeImageUrl } from '/utils/formatImage';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -36,7 +37,6 @@ const Home = () => {
                     colors: product.colors,
                 }));
                 setProducts(cleanedProducts);
-                // console.log('Cleaned products data:', cleanedProducts);
                 setLoading(false);
             })
             .catch((error) => {
@@ -46,13 +46,13 @@ const Home = () => {
             });
     }, []);
 
-    if (loading) {
-        return (
-            <Body>
-                <div>Loading products...</div>
-            </Body>
-        );
-    }
+    // if (loading) {
+    //     return (
+    //         <Body>
+    //             <div>Loading products...</div>
+    //         </Body>
+    //     );
+    // }
 
     if (error) {
         return (
@@ -71,19 +71,37 @@ const Home = () => {
                 </span>
             </HeaderFullText>
             <GridCard>
-                {products.map((product) => (
-                    <div key={product.id}>
-                        <ProductCard
-                            img={product.img}
-                            name={product.name}
-                            price={formatPrice(product.price)}
-                            colors={product.colors}
-                        />
-                    </div>
+                {loading
+                    ? Array.from({ length: 8 }).map((_, index) => (
+                          <SkeletonProductCard key={index} />
+                      ))
+                    : products.map((product) => (
+                          <div key={product.id}>
+                              <ProductCard
+                                  img={product.img}
+                                  name={product.name}
+                                  price={formatPrice(product.price)}
+                                  colors={product.colors}
+                              />
+                          </div>
+                      ))}
+            </GridCard>
+            <GridCard>
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <SkeletonProductCard key={index} />
                 ))}
             </GridCard>
         </Body>
     );
 };
+
+const SkeletonProductCard = () => (
+    <div className="p-4 rounded-lg border shadow-sm space-y-3">
+        <Skeleton className="w-full h-40 rounded-lg" />
+        <Skeleton className="w-3/4 h-5" />
+        <Skeleton className="w-1/2 h-5" />
+        <Skeleton className="w-1/2 h-5" />
+    </div>
+);
 
 export default Home;
