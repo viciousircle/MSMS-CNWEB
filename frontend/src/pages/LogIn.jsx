@@ -10,13 +10,10 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
-
+import { useLogin } from '@/hooks/useLogin.hook';
 const LogIn = ({ className, ...props }) => {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const { login, loading, error } = useLogin();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -24,34 +21,7 @@ const LogIn = ({ className, ...props }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            const res = await fetch('http://localhost:5678/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || 'Login failed');
-            }
-
-            // Save token to localStorage
-            localStorage.setItem('customer', JSON.stringify(data));
-
-            // Redirect to dashboard or homepage
-            navigate('/'); // Change to your desired route
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+        await login(formData);
     };
 
     return (
