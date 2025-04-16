@@ -1,3 +1,4 @@
+// Home.jsx
 import ProductCard from '@/components/Cards/ProductCard';
 import { HeaderFullText } from '@/components/Header';
 import Body from '@/components/Body';
@@ -33,10 +34,10 @@ const Home = () => {
                     : products.map((product) => (
                           <div key={product.id}>
                               <ProductCard
-                                  img={product.img}
-                                  name={product.name}
-                                  price={formatPrice(product.price)}
-                                  colors={product.colors}
+                                  product={{
+                                      ...product,
+                                      price: formatPrice(product.price),
+                                  }}
                               />
                           </div>
                       ))}

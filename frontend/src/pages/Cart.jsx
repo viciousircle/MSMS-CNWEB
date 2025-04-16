@@ -7,7 +7,7 @@ import { LinearCard } from '@/components/Decoration';
 import { CartTotal } from '@/components/Footer';
 import CartProductCard from '@/components/Cards/CartProductCard';
 import Label from '@/components/Label';
-import useCart from '@/hooks/useCart';
+import useCart from '@/hooks/useCart.hook';
 
 const Cart = () => {
     const {

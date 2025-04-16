@@ -1,11 +1,11 @@
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { CircleCheck, AlertTriangle } from "lucide-react";
-import React, { useState } from "react";
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { CircleCheck, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
 
-const AddToCartButton = ({ onClose }) => {
+const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
     const [lastClickTime, setLastClickTime] = useState(0);
-    const cooldown = 1000; // 1 second cooldown
+    const cooldown = 1000;
 
     const handleClick = () => {
         const now = Date.now();
@@ -27,7 +27,7 @@ const AddToCartButton = ({ onClose }) => {
             </div>
         );
 
-        onClose(); // Close Drawer
+        onClose();
     };
 
     return (
