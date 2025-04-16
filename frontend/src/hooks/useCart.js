@@ -13,6 +13,7 @@ const useCart = () => {
                 const items = data.cartItems.map((item) => ({
                     ...item.product,
                     quantity: item.quantity,
+                    color: item.color,
                 }));
                 setProducts(items);
 
