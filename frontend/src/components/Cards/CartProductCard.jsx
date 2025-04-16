@@ -1,10 +1,16 @@
-import React, { useState } from "react";
-import { CheckSquare, Square } from "lucide-react";
+import { CheckSquare, Square } from 'lucide-react';
 
 const CartProductCard = ({ product, isChecked, onCheckChange }) => {
     // const [isChecked, setIsChecked] = useState(false);
 
-    const isOutOfStock = product.inStock === 0;
+    const getColorStock = (product) => {
+        const match = product.colors.find((c) => c.color === product.color);
+        return match?.stock ?? 0;
+    };
+
+    const stock = getColorStock(product);
+
+    const isOutOfStock = stock === 0;
 
     return (
         <div className="flex flex-col w-full">
@@ -21,10 +27,10 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
                     className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-2 
                         ${
                             isChecked
-                                ? "bg-gray-950/2.5"
+                                ? 'bg-gray-950/2.5'
                                 : isOutOfStock
-                                ? "bg-gray-950/5 cursor-not-allowed"
-                                : "hover:bg-gray-950/2.5 cursor-pointer"
+                                ? 'bg-gray-950/5 cursor-not-allowed'
+                                : 'hover:bg-gray-950/2.5 cursor-pointer'
                         }`}
                     onClick={() =>
                         !isOutOfStock && onCheckChange(product.id, !isChecked)
@@ -42,6 +48,7 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
                     <ProductDetails
                         product={product}
                         isOutOfStock={isOutOfStock}
+                        stock={stock}
                     />
                 </div>
 
@@ -60,7 +67,7 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
 const Checkbox = ({ isChecked, onClick, isOutOfStock }) => (
     <div
         className={`flex items-center pl-2 ${
-            isOutOfStock ? "text-gray-100" : "text-gray-400"
+            isOutOfStock ? 'text-gray-100' : 'text-gray-400'
         }`}
         onClick={() => !isOutOfStock && onClick()} // Prevent changing state if out of stock
     >
@@ -69,7 +76,7 @@ const Checkbox = ({ isChecked, onClick, isOutOfStock }) => (
         ) : (
             <Square
                 className={`w-6 h-6 ${
-                    isOutOfStock ? "text-gray-100" : "text-gray-400 "
+                    isOutOfStock ? 'text-gray-100' : 'text-gray-400 '
                 }`}
             />
         )}
@@ -82,20 +89,20 @@ const ProductImage = ({ image, isOutOfStock }) => (
             src={image}
             alt="Product"
             className={`w-64 object-contain ${
-                isOutOfStock ? "opacity-70" : "opacity-100"
+                isOutOfStock ? 'opacity-70' : 'opacity-100'
             }`}
         />
     </div>
 );
 
-const ProductDetails = ({ product, isOutOfStock }) => (
+const ProductDetails = ({ product, stock, isOutOfStock }) => (
     <div
         className={`flex flex-col w-full gap-2 px-4 justify-center
         `}
     >
         <div
             className={`flex justify-between w-full items-center
-        ${isOutOfStock ? "opacity-70" : "opacity-100"}
+        ${isOutOfStock ? 'opacity-70' : 'opacity-100'}
         `}
         >
             <span className="text-2xl font-medium hover:underline">
@@ -121,9 +128,7 @@ const ProductDetails = ({ product, isOutOfStock }) => (
 
         <div className="flex justify-between w-full border-t border-gray-300 pt-2">
             <span className="text-gray-500 tracking-widest">
-                {product.inStock > 0
-                    ? "Available: " + product.inStock
-                    : "Out of stock"}
+                {stock > 0 ? 'Available: ' + stock : 'Out of stock'}
             </span>
             <span
                 className="text-red-500 hover:underline cursor-pointer opacity-100"
