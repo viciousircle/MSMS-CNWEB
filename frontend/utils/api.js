@@ -1,4 +1,3 @@
-// src/lib/utils/api.js
 export const api = async (endpoint, options = {}) => {
     const baseUrl = 'http://localhost:5678/api';
 
