@@ -7,7 +7,7 @@ export const api = async (endpoint, options = {}) => {
 
     const headers = {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }), // Add token if it exists
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...(options.headers || {}),
     };
 

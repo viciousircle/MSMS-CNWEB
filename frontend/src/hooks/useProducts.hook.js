@@ -1,31 +1,31 @@
 import { useEffect, useState } from 'react';
-import { fetchProducts } from '/utils/api/products.api';
-
+import { api } from '/utils/api';
 export const useProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    //* MOCK API for development
-    // useEffect(() => {
-    //     fetch('mock/product.json')
-    //         .then((response) => response.json())
-    //         .then((data) => setProducts(data))
-    //         .catch((error) => console.error('Error loading mock data:', error));
-    // }, []);
-
-    // *REAL API for production
     useEffect(() => {
-        fetchProducts()
-            .then((data) => {
-                setProducts(data);
+        const fetchProducts = async () => {
+            try {
+                const data = await api('/products');
+
+                const formattedData = data.map((product) => ({
+                    ...product,
+                    img: product.image.replace(/^"+|"+$/g, ''),
+                    colors: product.colors,
+                }));
+
+                setProducts(formattedData);
                 setLoading(false);
-            })
-            .catch((err) => {
+            } catch (err) {
                 console.error('Error fetching products:', err);
                 setError(err.message);
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchProducts();
     }, []);
 
     return { products, loading, error };
