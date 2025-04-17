@@ -1,23 +1,14 @@
-// ProductCard.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import OptionDrawer from '@/components/OptionDrawer';
 
 const ProductCard = ({ product }) => {
-    const { img, name, price, colors } = product;
-
     return (
-        <div className="flex flex-col w-full gap-0">
+        <div className="flex flex-col w-full">
             <Divider horizontal />
-            <div className="flex w-full gap-0">
+            <div className="flex w-full">
                 <Divider vertical />
-                <CardContent
-                    img={img}
-                    name={name}
-                    price={price}
-                    colors={colors}
-                    product={product}
-                />
+                <CardContent product={product} />
                 <Divider vertical />
             </div>
             <Divider horizontal />
