@@ -4,7 +4,7 @@ import { BanknotesIcon } from '@heroicons/react/24/outline';
 import Body from '@/components/Body';
 import { HeaderWithIcon } from '@/components/Header';
 import PaymentCard from '@/components/Cards/PaymentProductCard';
-import { LinearCard } from '@/components/Decoration';
+import CardLayout from '@/components/CardLayout';
 import Label from '@/components/Label';
 import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
 import PaymentBillCard from '@/components/Cards/PaymentBillCard';
@@ -45,11 +45,11 @@ const PaymentDetails = ({ products }) => {
                     `${products.length} ITEM${products.length > 1 ? 'S' : ''}`,
                 ]}
             />
-            <LinearCard>
+            <CardLayout variant="linear">
                 {products.map((product, index) => (
                     <PaymentCard key={index} product={product} />
                 ))}
-            </LinearCard>
+            </CardLayout>
         </div>
     );
 };

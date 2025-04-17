@@ -2,7 +2,7 @@ import React from 'react';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Body from '@/components/Body';
 import { HeaderWithIcon } from '@/components/Header';
-import { LinearCard } from '@/components/Decoration';
+import CardLayout from '@/components/CardLayout';
 import { CartTotal } from '@/components/Footer';
 import CartProductCard from '@/components/Cards/CartProductCard';
 import Label from '@/components/Label';
@@ -47,7 +47,7 @@ const Cart = () => {
 
                 <div className="flex flex-col gap-4">
                     <Label titles={['Products', `${products.length} ITEMS`]} />
-                    <LinearCard>
+                    <CardLayout variant="linear">
                         {products.map((product) => (
                             <CartProductCard
                                 key={product._id}
@@ -58,7 +58,7 @@ const Cart = () => {
                                 onCheckChange={handleProductCheck}
                             />
                         ))}
-                    </LinearCard>
+                    </CardLayout>
                 </div>
             </Body>
             <CartTotal />

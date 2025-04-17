@@ -2,7 +2,7 @@
 import ProductCard from '@/components/Cards/ProductCard';
 import { HeaderFullText } from '@/components/Header';
 import Body from '@/components/Body';
-import { GridCard } from '@/components/Decoration';
+import CardLayout from '@/components/CardLayout';
 import { formatPrice } from '/utils/formatPrice';
 import SkeletonProductCard from '@/components/Cards/SkeletonProductCard';
 import { useProducts } from '@/hooks/useProducts.hook';
@@ -26,7 +26,7 @@ const Home = () => {
                     Cách tốt nhất để mua sản phẩm bạn thích
                 </span>
             </HeaderFullText>
-            <GridCard>
+            <CardLayout variant="grid">
                 {loading
                     ? Array.from({ length: 8 }).map((_, index) => (
                           <SkeletonProductCard key={index} />
@@ -41,12 +41,7 @@ const Home = () => {
                               />
                           </div>
                       ))}
-            </GridCard>
-            <GridCard>
-                {Array.from({ length: 8 }).map((_, index) => (
-                    <SkeletonProductCard key={index} />
-                ))}
-            </GridCard>
+            </CardLayout>
         </Body>
     );
 };
