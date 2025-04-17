@@ -1,6 +1,18 @@
-import React from "react";
+import React from 'react';
+import { formatPrice } from '/utils/formatPrice';
 
 const PaymentProductCard = ({ product }) => {
+    const rawPrice =
+        typeof product.price === 'string'
+            ? Number(product.price.replace(/\./g, ''))
+            : product.price;
+
+    const productTotal = rawPrice * product.quantity;
+
+    const formattedPrice = formatPrice(productTotal);
+
+    console.log(product.price);
+
     return (
         <div className="flex flex-col w-full gap-0">
             <div className="flex w-full gap-0">
@@ -20,7 +32,7 @@ const PaymentProductCard = ({ product }) => {
                     </div>
                     <div className="flex flex-col justify-center w-full gap-2 items-center px-4">
                         <div className="flex justify-between w-full items-center">
-                            <div className="text-2xl font-medium hover:underline">
+                            <div className="text-2xl font-medium">
                                 {product.name}
                             </div>
                             <div className=" flex flex-col gap-2">
@@ -28,8 +40,7 @@ const PaymentProductCard = ({ product }) => {
                                     <div className="tracking-wider font-medium">
                                         Color
                                     </div>
-                                    {/* <div className="bg-black p-2 rounded-full"></div> */}
-                                    <div className="border px-2 py-1 rounded-lg bg-gray-950/5 text-gray-500 text-sm">
+                                    <div className="border px-4 py-1 rounded-lg text-sm bg-white text-gray-500 font-mono w-full cursor-not-allowed">
                                         {product.color}
                                     </div>
                                 </div>
@@ -37,13 +48,24 @@ const PaymentProductCard = ({ product }) => {
                                     <div className="tracking-wider font-medium">
                                         Quantity
                                     </div>
-                                    <div className="border px-2 py-1 rounded-lg bg-gray-950/5 text-gray-500 text-sm">
+                                    <div className="border px-4 py-1 rounded-lg text-sm bg-white text-gray-500 font-mono w-full cursor-not-allowed">
                                         {product.quantity}
                                     </div>
                                 </div>
                             </div>
-                            <div className="font-mono border px-2 py-1 rounded-lg bg-gray-950/5 text-gray-500 ">
-                                {product.price} VND
+                            <div className="flex flex-col gap-2">
+                                <div className="border px-4 py-1 rounded-lg text-sm bg-white text-gray-800 font-mono cursor-not-allowed flex justify-between">
+                                    <div className="font-medium text-gray-400 pr-2">
+                                        Price
+                                    </div>
+                                    {product.price} VND
+                                </div>
+                                <div className="border px-4 py-1 rounded-lg text-sm bg-white text-gray-800 font-mono cursor-not-allowed flex justify-between">
+                                    <div className="font-medium text-gray-400 pr-2">
+                                        Total
+                                    </div>
+                                    <div className="">{formattedPrice} VND</div>
+                                </div>
                             </div>
                         </div>
                     </div>

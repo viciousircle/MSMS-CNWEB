@@ -1,19 +1,24 @@
-import React from "react";
+import React from 'react';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
-import OrderButton from "../Buttons/OrderButton";
+} from '@/components/ui/select';
+import OrderButton from '../Buttons/OrderButton';
+import { formatPrice } from '/utils/formatPrice';
 
 const PaymentBillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
     const totalPayment = merchandiseSubtotal + shippingSubtotal;
     const paymentMethods = [
-        { value: "cod", label: "Cash on Delivery" },
-        { value: "momo", label: "Momo" },
+        { value: 'cod', label: 'Cash on Delivery' },
+        { value: 'momo', label: 'Momo' },
     ];
+
+    const formattedMerchandiseSubtotal = formatPrice(merchandiseSubtotal);
+    const formattedShippingSubtotal = formatPrice(shippingSubtotal);
+    const formattedTotalPayment = formatPrice(totalPayment);
 
     return (
         <>
@@ -33,12 +38,12 @@ const PaymentBillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
                         <div className="flex border-gray-950/5 border-x w-full flex-col text-gray-500 font-serif">
                             <BillRow
                                 label="Merchandise Subtotal"
-                                value={`${merchandiseSubtotal} VND`}
+                                value={`${formattedMerchandiseSubtotal} VND`}
                             />
 
                             <BillRow
                                 label="Shipping Subtotal"
-                                value={`${shippingSubtotal} VND`}
+                                value={`${formattedShippingSubtotal} VND`}
                             />
 
                             <div className="flex border-b border-gray-950/5 justify-end">
@@ -68,8 +73,8 @@ const PaymentBillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
                                 <div className="border-r border-gray-950/5 px-8 w-full font-bold py-4">
                                     Total Payment
                                 </div>
-                                <div className="border-gray-950/5 py-1 px-8 w-1/2 font-semibold">
-                                    {totalPayment} VND
+                                <div className="border-gray-950/5 py-1 px-8 w-1/2 font-semibold font-mono">
+                                    {formattedTotalPayment} VND
                                 </div>
                             </div>
                         </div>
@@ -94,7 +99,9 @@ const BillRow = ({ label, value }) => (
         <div className="border-r border-gray-950/5 py-1 px-8 w-full">
             {label}
         </div>
-        <div className="border-gray-950/5 py-1 px-8 w-1/2">{value}</div>
+        <div className="border-gray-950/5 py-1 px-8 w-1/2 font-mono">
+            {value}
+        </div>
     </div>
 );
 

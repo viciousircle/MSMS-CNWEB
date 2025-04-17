@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PencilIcon } from '@heroicons/react/24/outline';
 import {
     Dialog,
     DialogContent,
@@ -10,23 +10,23 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSeparator,
     InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from '@/components/ui/input-otp';
 
 const PaymentReceiverCard = () => {
     const [receiverInfo, setReceiverInfo] = useState({
-        name: "Vu Minh Quy",
-        phone: "0327589638",
+        name: 'Vu Minh Quy',
+        phone: '0327589638',
         address: {
-            number: "903",
-            street: "Minh Khai",
-            district: "Hai Ba Trung",
-            city: "Ha Noi",
+            number: '903',
+            street: 'Minh Khai',
+            district: 'Hai Ba Trung',
+            city: 'Ha Noi',
         },
     });
 

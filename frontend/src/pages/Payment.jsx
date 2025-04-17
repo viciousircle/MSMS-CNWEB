@@ -13,10 +13,13 @@ const Payment = () => {
     const location = useLocation();
     const products = location.state?.products || [];
 
-    const merchandiseSubtotal = products.reduce(
-        (acc, product) => acc + product.price * product.quantity,
-        0
-    );
+    const parsePrice = (price) =>
+        typeof price === 'string' ? Number(price.replace(/\./g, '')) : price;
+
+    const merchandiseSubtotal = products.reduce((acc, product) => {
+        const price = parsePrice(product.price);
+        return acc + price * product.quantity;
+    }, 0);
 
     const shippingSubtotal = 30000;
 
