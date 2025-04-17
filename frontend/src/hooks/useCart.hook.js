@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '/utils/api';
+
 const useCart = () => {
     const [products, setProducts] = useState([]);
     const [checkedProducts, setCheckedProducts] = useState({});
@@ -32,29 +33,38 @@ const useCart = () => {
         fetchCart();
     }, []);
 
-    const handleProductCheck = (productId, isChecked) => {
+    const handleProductCheck = (id, checked) => {
         setCheckedProducts((prev) => ({
             ...prev,
-            [productId]: isChecked,
+            [id]: checked,
         }));
     };
 
-    const handleAllProductsCheck = (isChecked) => {
-        const newChecked = { ...checkedProducts };
-        products.forEach((product) => {
-            if (product.inStock > 0) {
-                newChecked[product._id] = isChecked;
+    const handleCheckAll = (checked) => {
+        const updated = {};
+        products.forEach((p) => {
+            const stock = p.colors.find((c) => c.color === p.color)?.stock ?? 0;
+            if (stock > 0) {
+                updated[p._id] = checked;
             }
         });
-        setCheckedProducts(newChecked);
+        setCheckedProducts(updated);
     };
+
+    const allChecked =
+        products.length > 0 &&
+        products.every(
+            (p) =>
+                (checkedProducts[p._id] || false) &&
+                (p.colors.find((c) => c.color === p.color)?.stock ?? 0) > 0
+        );
 
     return {
         products,
         checkedProducts,
         handleProductCheck,
-        handleAllProductsCheck,
-        allChecked: Object.values(checkedProducts).every((v) => v),
+        handleCheckAll,
+        allChecked,
         loading,
         error,
     };

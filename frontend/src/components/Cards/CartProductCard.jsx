@@ -1,8 +1,6 @@
-import { CheckSquare, Square } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const CartProductCard = ({ product, isChecked, onCheckChange }) => {
-    // const [isChecked, setIsChecked] = useState(false);
-
     const getColorStock = (product) => {
         const match = product.colors.find((c) => c.color === product.color);
         return match?.stock ?? 0;
@@ -36,11 +34,17 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
                         !isOutOfStock && onCheckChange(product.id, !isChecked)
                     }
                 >
-                    <Checkbox
-                        isChecked={isChecked}
-                        onClick={() => onCheckChange(product.id, !isChecked)}
-                        isOutOfStock={isOutOfStock}
-                    />
+                    <div className="flex items-center">
+                        <Checkbox
+                            className="size-5"
+                            checked={isChecked}
+                            onCheckedChange={(checked) =>
+                                !isOutOfStock &&
+                                onCheckChange(product._id, checked)
+                            }
+                        />
+                    </div>
+
                     <ProductImage
                         image={product.image}
                         isOutOfStock={isOutOfStock}
@@ -63,25 +67,6 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
         </div>
     );
 };
-
-const Checkbox = ({ isChecked, onClick, isOutOfStock }) => (
-    <div
-        className={`flex items-center pl-2 ${
-            isOutOfStock ? 'text-gray-100' : 'text-gray-400'
-        }`}
-        onClick={() => !isOutOfStock && onClick()} // Prevent changing state if out of stock
-    >
-        {isChecked ? (
-            <CheckSquare className="text-emerald-600 w-6 h-6" />
-        ) : (
-            <Square
-                className={`w-6 h-6 ${
-                    isOutOfStock ? 'text-gray-100' : 'text-gray-400 '
-                }`}
-            />
-        )}
-    </div>
-);
 
 const ProductImage = ({ image, isOutOfStock }) => (
     <div className="flex w-1/5 h-64 items-center justify-center bg-white rounded-lg outline outline-gray-950/5">

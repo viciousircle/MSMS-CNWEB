@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
     ArchiveBoxIcon,
     ArrowLongRightIcon,
@@ -8,9 +8,10 @@ import {
     SparklesIcon,
     StarIcon,
     TruckIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
-import img2 from "../assets/img2.jpeg";
+import img2 from '../assets/img2.jpeg';
+
 const Label = ({ titles = [] }) => {
     return (
         <div className="relative">
