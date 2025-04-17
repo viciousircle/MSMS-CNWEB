@@ -22,7 +22,7 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
                 <div className="border-gray-950/5 border-y p-2" />
 
                 <div
-                    className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-2 
+                    className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-4 
                         ${
                             isChecked
                                 ? 'bg-gray-950/2.5'
@@ -30,14 +30,12 @@ const CartProductCard = ({ product, isChecked, onCheckChange }) => {
                                 ? 'bg-gray-950/5 cursor-not-allowed'
                                 : 'hover:bg-gray-950/2.5 cursor-pointer'
                         }`}
-                    onClick={() =>
-                        !isOutOfStock && onCheckChange(product.id, !isChecked)
-                    }
                 >
                     <div className="flex items-center">
                         <Checkbox
                             className="size-5"
                             checked={isChecked}
+                            onClick={(e) => e.stopPropagation()}
                             onCheckedChange={(checked) =>
                                 !isOutOfStock &&
                                 onCheckChange(product._id, checked)
