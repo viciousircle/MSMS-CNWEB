@@ -1,19 +1,19 @@
-import React from "react";
-import { InboxArrowDownIcon } from "@heroicons/react/24/outline";
-import Body from "@/components/Body";
-import { HeaderWithIcon } from "@/components/Header";
+import React from 'react';
+import { InboxArrowDownIcon } from '@heroicons/react/24/outline';
+import Body from '@/components/Structure/Body';
+import { HeaderWithIcon } from '@/components/Structure/Header';
 import {
     Label,
     OrderCard,
     OrderSorter,
     OrderStatusGroup,
-} from "@/components/Label";
+} from '@/components/Others/Label';
 
 const Order = () => {
     return (
         <Body>
             <HeaderWithIcon icon={InboxArrowDownIcon} title="Order" />
-            <Label titles={["Order Status"]} />
+            <Label titles={['Order Status']} />
             <OrderStatusGroup />
             <OrderSorter />
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { BanknotesIcon } from '@heroicons/react/24/outline';
-import Body from '@/components/Body';
-import { HeaderWithIcon } from '@/components/Header';
+import Body from '@/components/Structure/Body';
+import { HeaderWithIcon } from '@/components/Structure/Header';
 import PaymentCard from '@/components/Cards/PaymentProductCard';
-import CardLayout from '@/components/CardLayout';
-import Label from '@/components/Label';
+import CardLayout from '@/components/Layouts/CardLayout';
+import Label from '@/components/Others/Label';
 import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
 import PaymentBillCard from '@/components/Cards/PaymentBillCard';
 

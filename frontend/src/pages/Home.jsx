@@ -1,8 +1,8 @@
 // Home.jsx
 import ProductCard from '@/components/Cards/ProductCard';
-import { HeaderFullText } from '@/components/Header';
-import Body from '@/components/Body';
-import CardLayout from '@/components/CardLayout';
+import { HeaderFullText } from '@/components/Structure/Header';
+import Body from '@/components/Structure/Body';
+import CardLayout from '@/components/Layouts/CardLayout';
 import { formatPrice } from '/utils/formatPrice';
 import SkeletonProductCard from '@/components/Cards/SkeletonProductCard';
 import { useProducts } from '@/hooks/useProducts.hook';

@@ -2,17 +2,15 @@ import './styles/App.css';
 
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import About from './pages/About';
 import NotFound from './pages/NotFound';
-import NavigationBar from './components/NavigationBar';
-import { Footer } from './components/Footer';
+import NavigationBar from './components/Structure/NavigationBar';
 import Cart from './pages/Cart';
 import Order from './pages/Order';
 import Payment from './pages/Payment';
 import { Toaster } from '@/components/ui/sonner';
 import LogIn from './pages/LogIn';
 import SignUp from './pages/SignUp';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/Structure/ProtectedRoute';
 
 function App() {
     return (
@@ -21,7 +19,6 @@ function App() {
             {/* <Banner /> */}
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
                 <Route
                     path="/cart"
                     element={

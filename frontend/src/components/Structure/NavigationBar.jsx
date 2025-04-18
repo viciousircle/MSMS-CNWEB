@@ -8,7 +8,7 @@ const navLinks = [
     { path: '/cart', label: 'Cart' },
     { path: '/payment', label: 'Payment' },
     { path: '/order', label: 'Order' },
-    { path: '/about', label: 'About' },
+
     { path: '/notfound', label: 'Not Found' },
     { path: '/profile', label: 'Profile' },
 ];
@@ -33,7 +33,7 @@ const NavigationBar = () => {
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-950/5">
             <div className="flex justify-center gap-4 items-center">
-                <Link to="/about">
+                <Link to="/">
                     <div className="flex gap-4 items-center py-2 px-6 uppercase tracking-wider text-black border-x border-gray-950/5 bg-gray-950/2.5 font-medium font-serif">
                         <div className="text-gray-800">VICIOUSTORE</div>
                     </div>

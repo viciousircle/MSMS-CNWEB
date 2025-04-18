@@ -8,13 +8,12 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from '@/components/ui/drawer';
-import CancelButton from './Buttons/CancelButton';
-import AddToCartButton from './Buttons/AddToCartButton';
-import BuyButton from './Buttons/BuyButton';
-import QuantitySelector from './Selectors/QuantitySelector';
-import ColorSelector from './Selectors/ColorSelector';
+import CancelButton from '../Buttons/CancelButton';
+import AddToCartButton from '../Buttons/AddToCartButton';
+import BuyButton from '../Buttons/BuyButton';
+import QuantitySelector from '../Selectors/QuantitySelector';
+import ColorSelector from '../Selectors/ColorSelector';
 import useProductOptions from '@/hooks/useProductOption.hook';
-
 const OptionDrawer = ({ product }) => {
     const { name, colors } = product;
 

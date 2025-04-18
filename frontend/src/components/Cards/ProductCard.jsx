@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import OptionDrawer from '@/components/OptionDrawer';
+import OptionDrawer from '../Others/OptionDrawer';
 
 const ProductCard = ({ product }) => {
     return (
