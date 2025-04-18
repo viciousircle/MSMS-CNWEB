@@ -11,6 +11,7 @@ import { Toaster } from '@/components/ui/sonner';
 import LogIn from './pages/LogIn';
 import SignUp from './pages/SignUp';
 import ProtectedRoute from './components/Structure/ProtectedRoute';
+import Orders from './pages/Seller/Orders';
 
 function App() {
     return (
@@ -32,6 +33,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
                 <Route path="/login" element={<LogIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/orders" element={<Orders />} />
             </Routes>
             <Toaster />
             {/* <Footer /> */}

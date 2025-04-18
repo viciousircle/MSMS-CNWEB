@@ -1,4 +1,3 @@
-// Home.jsx
 import ProductCard from '@/components/Cards/ProductCard';
 import { HeaderFullText } from '@/components/Structure/Header';
 import Body from '@/components/Structure/Body';

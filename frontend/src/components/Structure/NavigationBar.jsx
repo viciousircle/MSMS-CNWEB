@@ -11,6 +11,7 @@ const navLinks = [
 
     { path: '/notfound', label: 'Not Found' },
     { path: '/profile', label: 'Profile' },
+    { path: '/orders', label: 'Orders' },
 ];
 
 const NavigationBar = () => {
