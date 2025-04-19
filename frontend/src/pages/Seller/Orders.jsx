@@ -7,9 +7,64 @@ import DatePicker from '@/components/Others/DatePicker';
 import { OrderTable } from '@/components/Others/OrderTable';
 import { OrderTabsMenu } from '@/components/Others/OrderTabsMenu';
 import { PaginationControls } from '@/components/Others/PaginationControls';
+import { Button } from '@/components/ui/button';
 
 const Orders = () => {
     const orders = [
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
+        {
+            order: 'INV001',
+            paymentStatus: 'Paid',
+            totalAmount: '$250.00',
+            paymentMethod: 'Credit Card',
+        },
         {
             order: 'INV001',
             paymentStatus: 'Paid',
@@ -26,9 +81,16 @@ const Orders = () => {
                     defaultValue="new"
                     className="w-full flex flex-col gap-4 justify-center items-center"
                 >
-                    <div className="flex items-center w-full gap-2 justify-end">
-                        <DatePicker />
-                        <OrderTabsMenu />
+                    <div className="flex items-center w-full justify-between">
+                        <div className="flex items-center w-full gap-2 justify-start">
+                            <Button variant="secondary">Button</Button>
+                            <Button variant="secondary">Button</Button>
+                            <Button variant="secondary">Button</Button>
+                        </div>
+                        <div className="flex items-center w-full gap-2 justify-end">
+                            <DatePicker />
+                            <OrderTabsMenu />
+                        </div>
                     </div>
 
                     <TabsContent value="all" className={'w-full'}>
