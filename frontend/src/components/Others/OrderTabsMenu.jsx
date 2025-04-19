@@ -10,7 +10,7 @@ export const OrderTabsMenu = () => {
             <TabsTrigger value="new" className="flex gap-2">
                 New
             </TabsTrigger>
-            <TabsTrigger value="preparing">Preparing</TabsTrigger>
+            <TabsTrigger value="preparing">Prepare</TabsTrigger>
             <TabsTrigger value="shipping">Shipping</TabsTrigger>
             <TabsTrigger value="shipped">Shipped</TabsTrigger>
             <TabsTrigger value="Rated">Rated</TabsTrigger>

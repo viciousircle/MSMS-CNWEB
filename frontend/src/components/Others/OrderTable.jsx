@@ -71,8 +71,8 @@ export const OrderTable = ({ orders }) => {
                         <TableCell className="">
                             {' '}
                             <div className="flex items-center justify-center">
-                                <div className="bg-yellow-100 text-yellow-800 rounded-lg px-4 py-1 text-sm font-medium w-fit ">
-                                    Accepting
+                                <div className="bg-green-100 text-green-800 rounded-lg px-4 py-1 text-sm font-medium w-fit ">
+                                    New
                                 </div>
                             </div>
                         </TableCell>
