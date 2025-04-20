@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -12,7 +12,6 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
-import { Select } from '@/components/ui/select'; // Or your select component
 
 import {
     Sheet,
@@ -32,7 +31,7 @@ const COLUMN_WIDTHS = {
     customer: 'w-[180px]',
     phone: 'w-[120px]',
     bill: 'w-[250px]',
-    items: 'w-[120px]',
+    dateOrdered: 'w-[120px]',
     payMethod: 'w-[120px]',
     paidStatus: 'w-[120px]',
     details: 'w-[120px]',
@@ -75,6 +74,7 @@ const TableHeaderCell = ({ children, className = '', align = 'center' }) => (
  * }>}} props
  */
 export const OrderTable = ({ orders }) => {
+    const [selectedRows, setSelectedRows] = useState(new Set());
     const totalAmount = useMemo(
         () =>
             orders
@@ -86,12 +86,37 @@ export const OrderTable = ({ orders }) => {
         [orders]
     );
 
+    const toggleRowSelection = (orderId) => {
+        const newSelection = new Set(selectedRows);
+        if (newSelection.has(orderId)) {
+            newSelection.delete(orderId);
+        } else {
+            newSelection.add(orderId);
+        }
+        setSelectedRows(newSelection);
+    };
+
+    const toggleAllRows = () => {
+        if (selectedRows.size === orders.length) {
+            setSelectedRows(new Set());
+        } else {
+            setSelectedRows(new Set(orders.map((order) => order.order)));
+        }
+    };
+
     return (
         <Table>
             <TableHeader className="bg-gray-100">
                 <TableRow>
                     <TableHeaderCell className={COLUMN_WIDTHS.checkbox}>
-                        <Checkbox className="size-4 bg-white" />
+                        <Checkbox
+                            className="size-4 bg-white"
+                            checked={
+                                selectedRows.size === orders.length &&
+                                orders.length > 0
+                            }
+                            onCheckedChange={toggleAllRows}
+                        />
                     </TableHeaderCell>
                     <TableHeaderCell className={COLUMN_WIDTHS.stage}>
                         Stage
@@ -108,8 +133,8 @@ export const OrderTable = ({ orders }) => {
                     <TableHeaderCell className={COLUMN_WIDTHS.bill}>
                         Bill
                     </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.items}>
-                        Items
+                    <TableHeaderCell className={COLUMN_WIDTHS.dateOrdered}>
+                        Date
                     </TableHeaderCell>
                     <TableHeaderCell className={COLUMN_WIDTHS.payMethod}>
                         Pay Method
@@ -135,12 +160,21 @@ export const OrderTable = ({ orders }) => {
                         totalAmount,
                         paymentMethod,
                         paymentStatus,
+                        dateOrdered,
                     } = order;
 
                     return (
                         <TableRow key={orderId}>
                             <TableCell>
-                                <Checkbox className="size-4 bg-white" />
+                                <div className="flex items-center justify-center">
+                                    <Checkbox
+                                        className="size-4 bg-white"
+                                        checked={selectedRows.has(orderId)}
+                                        onCheckedChange={() =>
+                                            toggleRowSelection(orderId)
+                                        }
+                                    />
+                                </div>
                             </TableCell>
                             <TableCell>
                                 <StageBadge status={stage} />
@@ -157,7 +191,9 @@ export const OrderTable = ({ orders }) => {
                             <TableCell className="text-center">
                                 ${totalAmount}
                             </TableCell>
-                            <TableCell className="text-center">1</TableCell>
+                            <TableCell className="text-center">
+                                {dateOrdered}
+                            </TableCell>
                             <TableCell className="text-center">
                                 {paymentMethod}
                             </TableCell>

@@ -1,25 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { HeaderWithIcon } from '@/components/Structure/Header';
-import Body from '@/components/Structure/Body';
 import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import DatePicker from '@/components/Others/DatePicker';
+import { format } from 'date-fns';
+
+import { HeaderWithIcon } from '@/components/Structure/Header';
+import Body from '@/components/Structure/Body';
 import { OrderTable } from '@/components/Others/OrderTable';
-import { OrderTabsMenu } from '@/components/Others/OrderTabsMenu';
 import { PaginationControls } from '@/components/Others/PaginationControls';
 import PrintButton from '@/components/Buttons/PrintButton';
 import ChangeStageMenu from '@/components/Others/ChangeStageMenu';
 import StageFlow from '@/components/Others/StageFlow';
+import { FilterControls } from '@/components/Others/FilterControls';
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-
-const ORDERS_PER_PAGE = 10;
+const DEFAULT_ORDERS_PER_PAGE = 10;
 
 const generateOrders = (count) => {
     const names = [
@@ -51,49 +44,19 @@ const generateOrders = (count) => {
             customerName: randomIndex(names),
             customerPhone: randomIndex(phones),
             stage: randomIndex(stages),
+            dateOrdered: new Date(
+                Date.now() - Math.floor(Math.random() * 10000000000)
+            ).toLocaleDateString(),
         };
     });
 };
 
-const ActionButtons = React.memo(() => (
-    <div className="flex items-center w-full gap-2 justify-start">
-        <PrintButton />
-        <ChangeStageMenu />
-
-        <StageFlow />
-    </div>
-));
-
-const FilterControls = React.memo(({ ordersPerPage, onItemsPerPageChange }) => (
-    <div className="flex items-center w-full gap-2 justify-end">
-        <div className="flex items-center gap-2 w-full">
-            <span className="text-sm text-gray-600">Showing</span>
-            <Select
-                value={ordersPerPage.toString()}
-                onValueChange={(value) => onItemsPerPageChange(value)}
-                className=""
-            >
-                <SelectTrigger className="w-[50px] h-8 border border-gray-300 rounded-md shadow-sm text-gray-500 text-sm">
-                    <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-        <DatePicker />
-        <OrderTabsMenu />
-    </div>
-));
-
 const Orders = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [ordersPerPage, setOrdersPerPage] = useState(10);
+    const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
     const [orders, setOrders] = useState(() => generateOrders(205));
+    const [activeTab, setActiveTab] = useState('all');
+    const [selectedDate, setSelectedDate] = useState(null);
 
     const updateOrder = (indexOnPage, updatedFields) => {
         const globalIndex = (currentPage - 1) * ordersPerPage + indexOnPage;
@@ -107,15 +70,35 @@ const Orders = () => {
         });
     };
 
-    const totalPages = Math.ceil(orders.length / ordersPerPage);
+    const filteredOrders = useMemo(() => {
+        let result = [...orders];
+
+        if (activeTab !== 'all') {
+            result = result.filter(
+                (order) => order.stage.toLowerCase() === activeTab.toLowerCase()
+            );
+        }
+        if (selectedDate) {
+            const selectedDateString = format(selectedDate, 'MM/dd/yyyy');
+            result = result.filter((order) => {
+                const orderDate = new Date(order.dateOrdered);
+                const orderDateString = format(orderDate, 'MM/dd/yyyy');
+                return orderDateString === selectedDateString;
+            });
+        }
+
+        return result;
+    }, [orders, activeTab, selectedDate]);
+
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
     const paginatedOrders = useMemo(() => {
         const start = (currentPage - 1) * ordersPerPage;
-        return orders.slice(start, start + ordersPerPage);
-    }, [orders, currentPage, ordersPerPage]);
+        return filteredOrders.slice(start, start + ordersPerPage);
+    }, [filteredOrders, currentPage, ordersPerPage]);
 
     const handleItemsPerPageChange = (value) => {
         setOrdersPerPage(Number(value));
-        setCurrentPage(1); // Reset to first page when changing items per page
+        setCurrentPage(1);
     };
 
     const renderTabsContent = (value) => (
@@ -128,22 +111,37 @@ const Orders = () => {
         <Body>
             <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
 
-            <div className="flex flex-col gap-4 px-4 items-center w-full">
+            <div className="flex flex-col gap-4 px-4 w-full">
                 <Tabs
-                    defaultValue="new"
-                    className="w-full flex flex-col gap-4 items-center"
+                    defaultValue="all"
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    className="w-full flex flex-col gap-4"
                 >
-                    <div className="flex w-full justify-between items-center">
-                        <ActionButtons />
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <PrintButton />
+                            <ChangeStageMenu />
+                            <StageFlow />
+                        </div>
                         <FilterControls
                             ordersPerPage={ordersPerPage}
                             onItemsPerPageChange={handleItemsPerPageChange}
+                            selectedDate={selectedDate}
+                            onDateChange={setSelectedDate}
                         />
                     </div>
 
                     {renderTabsContent('all')}
                     {renderTabsContent('new')}
+                    {renderTabsContent('prepare')}
+                    {renderTabsContent('shipping')}
+                    {renderTabsContent('shipped')}
+                    {renderTabsContent('rated')}
+                    {renderTabsContent('canceled')}
+                    {renderTabsContent('reject')}
                 </Tabs>
+
                 <PaginationControls
                     totalPages={totalPages}
                     currentPage={currentPage}
