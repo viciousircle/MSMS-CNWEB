@@ -15,48 +15,9 @@ import mockOrders from '/public/mock/order.json';
 
 const DEFAULT_ORDERS_PER_PAGE = 10;
 
-const generateOrders = (count) => {
-    const names = [
-        'Vicky Noa',
-        'James Reed',
-        'Ava Clarkson',
-        'Leo Tanaka',
-        'Sofia Mendes',
-    ];
-    const phones = [
-        '0327 - 589 - 638',
-        '0412 - 987 - 223',
-        '0301 - 456 - 789',
-        '0219 - 112 - 334',
-        '0456 - 789 - 123',
-    ];
-    const stages = ['New', 'Prepare', 'Shipping', 'Shipped', 'Reject'];
-    const paymentStatuses = ['Paid', 'Unpaid'];
-    const paymentMethods = ['Credit Card', 'Cash', 'Momo'];
-
-    return Array.from({ length: count }, (_, index) => {
-        const randomIndex = (arr) =>
-            arr[Math.floor(Math.random() * arr.length)];
-        return {
-            order: `INV00${index + 1}`,
-            paymentStatus: randomIndex(paymentStatuses),
-            totalAmount: (Math.random() * 200 + 50).toFixed(2),
-            paymentMethod: randomIndex(paymentMethods),
-            customerName: randomIndex(names),
-            customerPhone: randomIndex(phones),
-            stage: randomIndex(stages),
-            dateOrdered: new Date(
-                Date.now() - Math.floor(Math.random() * 10000000000)
-            ).toLocaleDateString(),
-        };
-    });
-};
-
 const Orders = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
-
-    // const [orders, setOrders] = useState(() => generateOrders(205));
 
     const [orders, setOrders] = useState(mockOrders);
 
@@ -80,13 +41,15 @@ const Orders = () => {
 
         if (activeTab !== 'all') {
             result = result.filter(
-                (order) => order.stage.toLowerCase() === activeTab.toLowerCase()
+                (order) =>
+                    order.stageOrder.toLowerCase() === activeTab.toLowerCase()
             );
         }
         if (selectedDate) {
             const selectedDateString = format(selectedDate, 'MM/dd/yyyy');
             result = result.filter((order) => {
-                const orderDate = new Date(order.dateOrdered);
+                const orderDate = new Date(order.dateOrder);
+
                 const orderDateString = format(orderDate, 'MM/dd/yyyy');
                 return orderDateString === selectedDateString;
             });

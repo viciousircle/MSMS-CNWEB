@@ -21,7 +21,7 @@ const COLUMN_WIDTHS = {
     customer: 'w-[180px]',
     phone: 'w-[120px]',
     bill: 'w-[250px]',
-    dateOrdered: 'w-[120px]',
+    dateOrder: 'w-[120px]',
     payMethod: 'w-[120px]',
     paidStatus: 'w-[120px]',
     details: 'w-[120px]',
@@ -34,24 +34,22 @@ const TableHeaderCell = ({ children, className = '', align = 'center' }) => (
 /**
  * Order Table Component
  * @param {{ orders: Array<{
- *   order: string,
- *   stage: string,
+ *   _id: string,
+ *   stageOrder: string,
  *   customerName: string,
  *   customerPhone: string,
- *   totalAmount: number|string,
+ *   totalBill: number|string,
  *   paymentMethod: string,
- *   paymentStatus: string
+ *   paymentStatus: string,
+ *  dateOrder: string,
  * }>}} props
  */
 export const OrderTable = ({ orders }) => {
     const [selectedRows, setSelectedRows] = useState(new Set());
-    const totalAmount = useMemo(
+    const totalBill = useMemo(
         () =>
             orders
-                .reduce(
-                    (sum, { totalAmount }) => sum + parseFloat(totalAmount),
-                    0
-                )
+                .reduce((sum, { totalBill }) => sum + parseFloat(totalBill), 0)
                 .toFixed(2),
         [orders]
     );
@@ -103,7 +101,7 @@ export const OrderTable = ({ orders }) => {
                     <TableHeaderCell className={COLUMN_WIDTHS.bill}>
                         Bill
                     </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.dateOrdered}>
+                    <TableHeaderCell className={COLUMN_WIDTHS.dateOrder}>
                         Date
                     </TableHeaderCell>
                     <TableHeaderCell className={COLUMN_WIDTHS.payMethod}>
@@ -123,14 +121,14 @@ export const OrderTable = ({ orders }) => {
             <TableBody>
                 {orders.map((order) => {
                     const {
-                        order: orderId,
-                        stage,
+                        _id: orderId,
+                        stageOrder: stage,
                         customerName,
                         customerPhone,
-                        totalAmount,
+                        totalBill: totalAmount,
                         paymentMethod,
                         paymentStatus,
-                        dateOrdered,
+                        dateOrder: dateOrder,
                     } = order;
 
                     return (
@@ -162,7 +160,7 @@ export const OrderTable = ({ orders }) => {
                                 ${totalAmount}
                             </TableCell>
                             <TableCell className="text-center">
-                                {dateOrdered}
+                                {dateOrder}
                             </TableCell>
                             <TableCell className="text-center">
                                 {paymentMethod}
@@ -171,7 +169,13 @@ export const OrderTable = ({ orders }) => {
                                 <PaidStatusBadge status={paymentStatus} />
                             </TableCell>
                             <TableCell className="text-right">
-                                <ViewDetailsSheet orderId={orderId} />
+                                <ViewDetailsSheet
+                                    orderId={orderId}
+                                    dateOrder={dateOrder}
+                                    stageOrder={stage}
+                                    paymentMethod={paymentMethod}
+                                    paymentStatus={paymentStatus}
+                                />
                             </TableCell>
                         </TableRow>
                     );
@@ -186,7 +190,7 @@ export const OrderTable = ({ orders }) => {
                     </TableCell>
                     <TableCell colSpan={3} />
                     <TableCell className="text-center font-medium">
-                        ${totalAmount}
+                        ${totalBill}
                     </TableCell>
                     <TableCell colSpan={4} />
                 </TableRow>

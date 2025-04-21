@@ -9,7 +9,6 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
-
 import {
     Table,
     TableBody,
@@ -22,80 +21,97 @@ import {
 } from '@/components/ui/table';
 import { PaidStatusBadge, StageBadge } from './StatusBadge';
 
-const ORDER_ITEMS = [
+// Assuming this is imported from your mock file
+const ORDER_DETAILS = [
     {
-        id: 'IT1001',
-        name: 'iPhone 15',
-        color: 'Black',
-        quantity: 1,
-        amount: 999,
-    },
-    {
-        id: 'IT1002',
-        name: 'MacBook Pro',
-        color: 'Silver',
-        quantity: 1,
-        amount: 1999,
-    },
-    {
-        id: 'IT1003',
-        name: 'AirPods Pro',
-        color: 'White',
-        quantity: 2,
-        amount: 499,
-    },
-    {
-        id: 'IT1004',
-        name: 'iPad Mini',
-        color: 'Space Gray',
-        quantity: 1,
-        amount: 599,
+        '_id': 'INV001',
+        'receiverName': 'Vicky Noa',
+        'receiverPhone': '0327 - 589 - 638',
+        'address': '3172 Minh khai',
+        'items': [
+            {
+                '_id': 'IT1001',
+                'name': 'Iphone',
+                'color': 'Red',
+                'quantity': '2',
+                'price': '299.00',
+            },
+        ],
+        'shippingSubtotal': '$29.00',
     },
 ];
 
-const TOTAL_AMOUNT = ORDER_ITEMS.reduce((sum, item) => sum + item.amount, 0);
+const TableDemo = ({ items, shippingSubtotal }) => {
+    const subtotal = items.reduce(
+        (sum, item) => sum + parseFloat(item.price),
+        0
+    );
+    const total = subtotal + parseFloat(shippingSubtotal.replace('$', ''));
 
-const TableDemo = () => (
-    <Table>
-        <TableCaption>List of items in the order</TableCaption>
-        <TableHeader>
-            <TableRow>
-                <TableHead className="text-center w-[100px]">Item</TableHead>
-                <TableHead className="text-center">Name</TableHead>
-                <TableHead className="text-center">Color</TableHead>
-                <TableHead className="text-center">Qty</TableHead>
-                <TableHead className="text-center">Amount</TableHead>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            {ORDER_ITEMS.map((item, index) => (
-                <TableRow key={index}>
-                    <TableCell className="text-center font-medium">
-                        {item.id}
+    return (
+        <Table>
+            <TableCaption>List of items in the order</TableCaption>
+            <TableHeader>
+                <TableRow>
+                    <TableHead className="text-center w-[100px]">
+                        Item
+                    </TableHead>
+                    <TableHead className="text-center">Name</TableHead>
+                    <TableHead className="text-center">Color</TableHead>
+                    <TableHead className="text-center">Qty</TableHead>
+                    <TableHead className="text-center">Amount</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {items.map((item, index) => (
+                    <TableRow key={index}>
+                        <TableCell className="text-center font-medium">
+                            {item._id}
+                        </TableCell>
+                        <TableCell className="text-center">
+                            {item.name}
+                        </TableCell>
+                        <TableCell className="text-center">
+                            {item.color}
+                        </TableCell>
+                        <TableCell className="text-center">
+                            {item.quantity}
+                        </TableCell>
+                        <TableCell className="text-center text-green-600">
+                            ${parseFloat(item.price).toFixed(2)}
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+            <TableFooter>
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center font-medium">
+                        Merchandise Subtotal
                     </TableCell>
-                    <TableCell className="text-center">{item.name}</TableCell>
-                    <TableCell className="text-center">{item.color}</TableCell>
-                    <TableCell className="text-center">
-                        {item.quantity}
-                    </TableCell>
-                    <TableCell className="text-center text-green-600">
-                        ${item.amount.toFixed(2)}
+                    <TableCell className="text-center font-bold text-green-700">
+                        ${subtotal.toFixed(2)}
                     </TableCell>
                 </TableRow>
-            ))}
-        </TableBody>
-        <TableFooter>
-            <TableRow>
-                <TableCell colSpan={4} className="text-center font-medium">
-                    Total
-                </TableCell>
-                <TableCell className="text-center font-bold text-green-700">
-                    ${TOTAL_AMOUNT.toFixed(2)}
-                </TableCell>
-            </TableRow>
-        </TableFooter>
-    </Table>
-);
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center font-medium">
+                        Shipping Subtotal
+                    </TableCell>
+                    <TableCell className="text-center font-bold text-green-700">
+                        {shippingSubtotal}
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center font-medium">
+                        Total Payment
+                    </TableCell>
+                    <TableCell className="text-center font-bold text-green-700">
+                        ${total.toFixed(2)}
+                    </TableCell>
+                </TableRow>
+            </TableFooter>
+        </Table>
+    );
+};
 
 const InfoRow = ({ label, value }) => (
     <div className="flex justify-between">
@@ -113,7 +129,18 @@ const InfoSection = ({ title, children }) => (
     </div>
 );
 
-export const ViewDetailsSheet = ({ orderId }) => {
+export const ViewDetailsSheet = ({
+    orderId,
+    dateOrder,
+    stageOrder,
+    paymentMethod,
+    paymentStatus,
+}) => {
+    // Find the order details based on the orderId
+    const orderDetails =
+        ORDER_DETAILS.find((order) => order._id === orderId) ||
+        ORDER_DETAILS[0];
+
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -132,33 +159,48 @@ export const ViewDetailsSheet = ({ orderId }) => {
                     <SheetDescription>
                         <div className="flex flex-col gap-6 mt-6">
                             <InfoSection title="Receiver Information">
-                                <InfoRow label="Full Name" value="John Doe" />
-                                <InfoRow label="Phone" value="0327-589-6382" />
+                                <InfoRow
+                                    label="Full Name"
+                                    value={orderDetails.receiverName}
+                                />
+                                <InfoRow
+                                    label="Phone"
+                                    value={orderDetails.receiverPhone}
+                                />
                                 <InfoRow
                                     label="Address"
-                                    value="123 Main St, Metropolis"
+                                    value={orderDetails.address}
                                 />
                             </InfoSection>
 
                             <InfoSection title="Order Summary">
                                 <InfoRow label="Order ID" value={orderId} />
-                                <InfoRow label="Date" value="2023-10-01" />
+                                <InfoRow label="Date" value={dateOrder} />
                                 <InfoRow
                                     label="Stage"
-                                    value={<StageBadge status="New" />}
+                                    value={<StageBadge status={stageOrder} />}
                                 />
                                 <InfoRow
                                     label="Payment Method"
-                                    value="Credit Card"
+                                    value={paymentMethod}
                                 />
                                 <InfoRow
                                     label="Payment Status"
-                                    value={<PaidStatusBadge status="Paid" />}
+                                    value={
+                                        <PaidStatusBadge
+                                            status={paymentStatus}
+                                        />
+                                    }
                                 />
                             </InfoSection>
 
                             <InfoSection title="Items Ordered">
-                                <TableDemo />
+                                <TableDemo
+                                    items={orderDetails.items}
+                                    shippingSubtotal={
+                                        orderDetails.shippingSubtotal
+                                    }
+                                />
                             </InfoSection>
 
                             <div className="flex gap-3">

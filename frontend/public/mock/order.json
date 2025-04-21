@@ -1,23 +1,13 @@
 [
     {
-        "order": "INV001",
-        "paymentStatus": "Paid",
-        "totalAmount": "125.50",
-        "paymentMethod": "Credit Card",
+        "_id": "INV001",
         "customerName": "Vicky Noa",
+        "totalBill": "156.25",
+        "paymentMethod": "Credit Card",
+        "paymentStatus": "Paid",
         "customerPhone": "0327 - 589 - 638",
-        "stage": "New",
-        "dateOrdered": "04/14/2025"
-    },
-    {
-        "order": "INV002",
-        "paymentStatus": "Unpaid",
-        "totalAmount": "98.75",
-        "paymentMethod": "Cash",
-        "customerName": "James Reed",
-        "customerPhone": "0412 - 987 - 223",
-        "stage": "Shipping",
-        "dateOrdered": "04/15/2025"
+        "stageOrder": "New",
+        "dateOrder": "04/20/2025"
     },
     {
         "_id": "INV002",
