@@ -10,22 +10,9 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ViewDetailsSheet } from './ViewDetailsSheet';
-
-import { PaidStatusBadge, StageBadge } from './StatusBadge';
-
-const COLUMN_WIDTHS = {
-    checkbox: 'w-[40px]',
-    stage: 'w-[180px]',
-    order: 'w-[120px]',
-    customer: 'w-[180px]',
-    phone: 'w-[120px]',
-    bill: 'w-[250px]',
-    dateOrder: 'w-[120px]',
-    payMethod: 'w-[120px]',
-    paidStatus: 'w-[120px]',
-    details: 'w-[120px]',
-};
+import { ViewDetailsSheet } from '../Others/ViewDetailsSheet';
+import { PaidStatusBadge, StageBadge } from '../Others/StatusBadge';
+import { ORDER_TABLE_COLUMNS } from '@/constants/orderTableConfig';
 
 const TableHeaderCell = ({ children, className = '', align = 'center' }) => (
     <TableHead className={`text-${align} ${className}`}>{children}</TableHead>
@@ -76,45 +63,28 @@ export const OrderTable = ({ orders }) => {
         <Table>
             <TableHeader className="bg-gray-100">
                 <TableRow>
-                    <TableHeaderCell className={COLUMN_WIDTHS.checkbox}>
-                        <Checkbox
-                            className="size-4 bg-white"
-                            checked={
-                                selectedRows.size === orders.length &&
-                                orders.length > 0
-                            }
-                            onCheckedChange={toggleAllRows}
-                        />
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.stage}>
-                        Stage
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.order}>
-                        Order
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.customer}>
-                        Customer
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.phone}>
-                        Phone
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.bill}>
-                        Bill
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.dateOrder}>
-                        Date
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.payMethod}>
-                        Pay Method
-                    </TableHeaderCell>
-                    <TableHeaderCell className={COLUMN_WIDTHS.paidStatus}>
-                        Paid Status
-                    </TableHeaderCell>
-                    <TableHeaderCell
-                        className={`${COLUMN_WIDTHS.details} text-right pr-4`}
-                    >
-                        Details
-                    </TableHeaderCell>
+                    {ORDER_TABLE_COLUMNS.map((col) => (
+                        <TableHeaderCell
+                            key={col.key}
+                            className={`${col.width} ${
+                                col.key === 'details' ? 'pr-4' : ''
+                            }`}
+                            align={col.align}
+                        >
+                            {col.isCheckbox ? (
+                                <Checkbox
+                                    className="size-4 bg-white"
+                                    checked={
+                                        selectedRows.size === orders.length &&
+                                        orders.length > 0
+                                    }
+                                    onCheckedChange={toggleAllRows}
+                                />
+                            ) : (
+                                col.header
+                            )}
+                        </TableHeaderCell>
+                    ))}
                 </TableRow>
             </TableHeader>
 

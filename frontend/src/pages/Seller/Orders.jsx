@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 import { HeaderWithIcon } from '@/components/Structure/Header';
 import Body from '@/components/Structure/Body';
-import { OrderTable } from '@/components/Others/OrderTable';
+import { OrderTable } from '@/components/Tables/OrderTable';
 import { PaginationControls } from '@/components/Others/PaginationControls';
 import PrintButton from '@/components/Buttons/PrintButton';
 import ChangeStageMenu from '@/components/Others/ChangeStageMenu';
