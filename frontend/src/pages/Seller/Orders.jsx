@@ -11,6 +11,7 @@ import PrintButton from '@/components/Buttons/PrintButton';
 import ChangeStageMenu from '@/components/Others/ChangeStageMenu';
 import StageFlow from '@/components/Others/StageFlow';
 import { FilterControls } from '@/components/Others/FilterControls';
+import mockOrders from '/public/mock/order.json';
 
 const DEFAULT_ORDERS_PER_PAGE = 10;
 
@@ -54,7 +55,11 @@ const generateOrders = (count) => {
 const Orders = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
-    const [orders, setOrders] = useState(() => generateOrders(205));
+
+    // const [orders, setOrders] = useState(() => generateOrders(205));
+
+    const [orders, setOrders] = useState(mockOrders);
+
     const [activeTab, setActiveTab] = useState('all');
     const [selectedDate, setSelectedDate] = useState(null);
 
