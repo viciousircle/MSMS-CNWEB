@@ -50,7 +50,7 @@ export const ORDER_TABLE_COLUMNS = [
     },
     {
         key: 'paidStatus',
-        header: 'Paid Status',
+        header: 'Pay Status',
         width: 'w-[120px]',
         align: 'center',
     },
