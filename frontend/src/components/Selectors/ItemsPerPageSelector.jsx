@@ -12,7 +12,7 @@ const ORDERS_PER_PAGE_OPTIONS = [5, 10, 20, 50, 100];
 
 export const ItemsPerPageSelector = ({ value, onChange }) => (
     <Select value={value.toString()} onValueChange={onChange}>
-        <SelectTrigger className="w-10 h-8">
+        <SelectTrigger className="px-4 py-1 border rounded-sm">
             <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -40,6 +40,7 @@ const orderSchema = new mongoose.Schema(
             enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
             default: 'Processing',
         },
+        // TODO: NO need
         totalPrice: {
             type: Number,
             required: true,

@@ -137,7 +137,6 @@ const Orders = () => {
                     {renderTabsContent('prepare')}
                     {renderTabsContent('shipping')}
                     {renderTabsContent('shipped')}
-                    {renderTabsContent('rated')}
                     {renderTabsContent('canceled')}
                     {renderTabsContent('reject')}
                 </Tabs>

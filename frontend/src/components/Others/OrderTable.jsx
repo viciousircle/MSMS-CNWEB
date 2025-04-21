@@ -10,17 +10,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { ArrowUpRight } from 'lucide-react';
-
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
+import { ViewDetailsSheet } from './ViewDetailsSheet';
 
 import { PaidStatusBadge, StageBadge } from './StatusBadge';
 
@@ -36,26 +26,6 @@ const COLUMN_WIDTHS = {
     paidStatus: 'w-[120px]',
     details: 'w-[120px]',
 };
-
-const ViewDetailsSheet = ({ orderId }) => (
-    <Sheet>
-        <SheetTrigger asChild>
-            <Button variant="link" className="cursor-pointer px-0">
-                <span className="flex items-center gap-2">
-                    View <ArrowUpRight className="h-4 w-4" />
-                </span>
-            </Button>
-        </SheetTrigger>
-        <SheetContent>
-            <SheetHeader>
-                <SheetTitle>Order #{orderId} Details</SheetTitle>
-                <SheetDescription>
-                    Here you can see all information about the selected order.
-                </SheetDescription>
-            </SheetHeader>
-        </SheetContent>
-    </Sheet>
-);
 
 const TableHeaderCell = ({ children, className = '', align = 'center' }) => (
     <TableHead className={`text-${align} ${className}`}>{children}</TableHead>
