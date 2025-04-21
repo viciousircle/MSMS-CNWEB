@@ -132,8 +132,9 @@ export const ViewDetailsSheet = ({
                     throw new Error('Failed to fetch order details');
                 }
                 const data = await response.json();
-                const order =
-                    data.find((order) => order._id === orderId) || data[0];
+                const order = data.find((order) => order._id === orderId);
+                if (!order) throw new Error('Order not found');
+
                 setOrderDetails(order);
             } catch (err) {
                 setError(err.message);
