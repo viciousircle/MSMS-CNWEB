@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
 import {
@@ -21,32 +21,13 @@ import {
 } from '@/components/ui/table';
 import { PaidStatusBadge, StageBadge } from './StatusBadge';
 
-// Assuming this is imported from your mock file
-const ORDER_DETAILS = [
-    {
-        '_id': 'INV001',
-        'receiverName': 'Vicky Noa',
-        'receiverPhone': '0327 - 589 - 638',
-        'address': '3172 Minh khai',
-        'items': [
-            {
-                '_id': 'IT1001',
-                'name': 'Iphone',
-                'color': 'Red',
-                'quantity': '2',
-                'price': '299.00',
-            },
-        ],
-        'shippingSubtotal': '$29.00',
-    },
-];
-
 const TableDemo = ({ items, shippingSubtotal }) => {
     const subtotal = items.reduce(
-        (sum, item) => sum + parseFloat(item.price),
+        (sum, item) => sum + parseFloat(item.price) * parseInt(item.quantity),
         0
     );
-    const total = subtotal + parseFloat(shippingSubtotal.replace('$', ''));
+    const shippingCost = parseFloat(shippingSubtotal.replace('$', ''));
+    const total = subtotal + shippingCost;
 
     return (
         <Table>
@@ -78,7 +59,10 @@ const TableDemo = ({ items, shippingSubtotal }) => {
                             {item.quantity}
                         </TableCell>
                         <TableCell className="text-center text-green-600">
-                            ${parseFloat(item.price).toFixed(2)}
+                            $
+                            {(
+                                parseFloat(item.price) * parseInt(item.quantity)
+                            ).toFixed(2)}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -136,10 +120,34 @@ export const ViewDetailsSheet = ({
     paymentMethod,
     paymentStatus,
 }) => {
-    // Find the order details based on the orderId
-    const orderDetails =
-        ORDER_DETAILS.find((order) => order._id === orderId) ||
-        ORDER_DETAILS[0];
+    const [orderDetails, setOrderDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            try {
+                const response = await fetch('/mock/orderdetails.json');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch order details');
+                }
+                const data = await response.json();
+                const order =
+                    data.find((order) => order._id === orderId) || data[0];
+                setOrderDetails(order);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrderDetails();
+    }, [orderId]);
+
+    if (loading) return <div>Loading order details...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!orderDetails) return <div>Order not found</div>;
 
     return (
         <Sheet>
