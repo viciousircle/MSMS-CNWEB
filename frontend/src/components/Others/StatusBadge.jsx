@@ -1,9 +1,3 @@
-/**
- * Reusable badge component with customizable styles.
- * @param {Object} props
- * @param {'Paid'|'Unpaid'|'New'|'Prepare'|'Reject'|'Shipping'|'Shipped'} props.status
- * @param {Object} props.colorMap - Mapping of status to color classes
- */
 const StatusBadge = ({ status, colorMap }) => {
     const defaultClasses = 'bg-gray-100 text-gray-800';
 
