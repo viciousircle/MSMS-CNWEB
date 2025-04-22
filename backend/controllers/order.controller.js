@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const mongoose = require('mongoose'); // Add this line
 const Order = require('../models/order.model');
 const User = require('../models/user.model');
 const Product = require('../models/product.model');
@@ -65,6 +66,84 @@ const getOrdersForSeller = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @desc: Get order details for seller by order id
+ * @route: GET /api/seller/orders/:id
+ * @access: Private (seller only)
+ */
+const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
+    try {
+        // Verify user is seller
+        if (!req.user || req.user.role !== 'seller') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only sellers can view order details',
+            });
+        }
+
+        const orderId = req.params.id;
+
+        // Validate order ID format
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                message: 'Invalid order ID format',
+            });
+        }
+
+        // Get order with populated user and product information
+        const order = await Order.findById(orderId)
+            .populate({
+                path: 'user',
+                select: 'name email',
+            })
+            .populate({
+                path: 'orderItems.product',
+                select: 'name price',
+            });
+
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found',
+            });
+        }
+
+        // Format order items
+        const formattedOrderItems = order.orderItems.map((item) => {
+            const itemPrice = item.product?.price || 0;
+            return {
+                itemId: item.product?._id,
+                itemName: item.product?.name,
+                itemColor: item.color,
+                itemQuantity: item.quantity,
+                itemAmount: (item.quantity * itemPrice).toFixed(2),
+            };
+        });
+
+        // Calculate shipping subtotal (sum of all item amounts)
+        const shippingSubtotal = order.orderItems.reduce((total, item) => {
+            const itemPrice = item.product?.price || 0;
+            return total + item.quantity * itemPrice;
+        }, 0);
+
+        // Format the response
+        const response = {
+            receiverName: order.receiverInfomation.receiverName,
+            receiverPhone: order.receiverInfomation.receiverPhone,
+            receiverAddress: order.receiverInfomation.receiverAddress,
+            orderItems: formattedOrderItems,
+            shippingSubtotal: shippingSubtotal.toFixed(2),
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
 module.exports = {
     getOrdersForSeller,
+    getOrderDetailsForSeller,
 };

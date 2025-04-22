@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { getOrdersForSeller } = require('../controllers/order.controller');
+const {
+    getOrdersForSeller,
+    getOrderDetailsForSeller,
+} = require('../controllers/order.controller');
 
 const { protect, authorize } = require('../middleware/auth.middleware');
-const { ro } = require('@faker-js/faker');
 
 // //* Public Routes
 
 // //* Private Routes (Only Seller)
 router.route('/').get(protect, authorize('seller'), getOrdersForSeller);
+router
+    .route('/:id')
+    .get(protect, authorize('seller'), getOrderDetailsForSeller);
 
 module.exports = router;
