@@ -1,4 +1,3 @@
-// components/ViewDetailsSheet.js
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
@@ -39,9 +38,61 @@ export const ViewDetailsSheet = ({
 }) => {
     const { orderDetails, loading, error } = useOrderDetails(orderId);
 
-    if (loading) return <div>Loading order details...</div>;
+    if (loading)
+        return (
+            <div>
+                <Button variant="link" className="px-0 text-sm text-gray-300">
+                    <span className="flex items-center gap-1">
+                        View <ArrowUpRight className="h-4 w-4" />
+                    </span>
+                </Button>
+            </div>
+        );
     if (error) return <div>Error: {error}</div>;
     if (!orderDetails) return <div>Order not found</div>;
+
+    const renderActionButtons = () => {
+        switch (orderStage) {
+            case 'New':
+                return (
+                    <div className="flex gap-3">
+                        <Button className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                            Prepare
+                        </Button>
+                        <Button className="flex-1 bg-red-100 text-red-700 hover:bg-red-200">
+                            Reject
+                        </Button>
+                    </div>
+                );
+            case 'Prepare':
+                return (
+                    <div className="flex gap-3">
+                        <Button className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                            New
+                        </Button>
+                        <Button className="flex-1 bg-green-100 text-green-800 hover:bg-green-200">
+                            Shipping
+                        </Button>
+                    </div>
+                );
+            case 'Shipping':
+                return (
+                    <div className="flex gap-3">
+                        <Button className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                            Prepare
+                        </Button>
+                        <Button className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200">
+                            Shipped
+                        </Button>
+                    </div>
+                );
+            case 'Reject':
+            case 'Shipped':
+                return null;
+            default:
+                return null;
+        }
+    };
 
     return (
         <Sheet>
@@ -106,14 +157,7 @@ export const ViewDetailsSheet = ({
                                 />
                             </InfoSection>
 
-                            <div className="flex gap-3">
-                                <Button className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                                    Prepare
-                                </Button>
-                                <Button className="flex-1 bg-red-100 text-red-700 hover:bg-red-200">
-                                    Reject
-                                </Button>
-                            </div>
+                            {renderActionButtons()}
                         </div>
                     </SheetDescription>
                 </SheetHeader>
