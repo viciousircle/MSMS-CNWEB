@@ -13,8 +13,14 @@ connectDB()
         return seedProducts(); // Seed products first
     })
     .then(() => {
+        console.log('Products seeded successfully'.bgGreen);
         return seedOrders(); // Then seed orders
     })
+    .then(() => {
+        console.log('Orders seeded successfully'.bgGreen);
+        process.exit(0);
+    })
+
     .catch((err) => {
         console.error('Seeding error:', err);
         process.exit(1);

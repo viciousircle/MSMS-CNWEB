@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true, // Only logged-in users can place orders
+            required: true,
         },
         orderItems: [
             {
@@ -21,51 +21,43 @@ const orderSchema = new mongoose.Schema(
                 quantity: {
                     type: Number,
                     required: true,
-                    min: 1, // At least 1 item per product
+                    min: 1,
                 },
             },
         ],
-        shippingAddress: {
+        receiverInfomation: {
             receiverName: { type: String, required: true },
             receiverPhone: { type: String, required: true },
             receiverAddress: { type: String, required: true },
         },
         paymentMethod: {
             type: String,
-            enum: ['COD', 'Credit Card', 'QR'],
+            enum: ['COD', 'QR'],
             required: true,
         },
-        orderStatus: {
-            type: String,
-            enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
-            default: 'Processing',
-        },
-        // TODO: NO need
-        totalPrice: {
-            type: Number,
-            required: true,
-            min: 0,
-        },
+        orderStage: [
+            {
+                stage: {
+                    type: String,
+                    enum: [
+                        'New',
+                        'Prepare',
+                        'Shipping',
+                        'Shipped',
+                        'Cancelled',
+                        'Reject',
+                    ],
+                    default: 'New',
+                },
+                date: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
         isPaid: {
             type: Boolean,
             default: false,
-        },
-        paidAt: {
-            type: Date,
-        },
-        deliveredAt: {
-            type: Date,
-        },
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5,
-            default: null, // Users can rate after delivery
-        },
-        review: {
-            type: String,
-            trim: true,
-            default: '', // Optional review text
         },
     },
     { timestamps: true }

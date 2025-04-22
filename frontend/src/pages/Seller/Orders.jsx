@@ -32,7 +32,7 @@ const Orders = () => {
         'prepare',
         'shipping',
         'shipped',
-        'canceled',
+        'cancelled',
         'reject',
     ];
 

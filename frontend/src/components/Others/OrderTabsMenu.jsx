@@ -13,7 +13,7 @@ export const OrderTabsMenu = () => {
             <TabsTrigger value="prepare">Prepare</TabsTrigger>
             <TabsTrigger value="shipping">Shipping</TabsTrigger>
             <TabsTrigger value="shipped">Shipped</TabsTrigger>
-            <TabsTrigger value="canceled">Canceled</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
             <TabsTrigger value="reject">Reject</TabsTrigger>
         </TabsList>
     );
