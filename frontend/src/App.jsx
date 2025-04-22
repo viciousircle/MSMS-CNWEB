@@ -15,29 +15,30 @@ import Orders from './pages/Seller/Orders';
 import { useAuth } from './contexts/AuthContext';
 import SellerNavigationBar from './components/Structure/NavigationBar/SellerNavigationBar';
 import CustomerNavigationBar from './components/Structure/NavigationBar/CustomerNavigationBar';
+import AdminNavigationBar from './components/Structure/NavigationBar/AdminNavigationBar';
 
 function App() {
-    const { user } = useAuth(); // Assuming you have an auth context
+    const { user, isAuthenticated } = useAuth();
 
+    const getNavigationBar = () => {
+        if (!isAuthenticated()) return <div>Hi</div>;
+        switch (user?.role) {
+            case 'seller':
+                return <SellerNavigationBar />;
+            case 'admin':
+                return <AdminNavigationBar />;
+            default:
+                return <CustomerNavigationBar />;
+        }
+    };
     return (
         <>
-            {user?.role === 'seller' ? (
-                <SellerNavigationBar />
-            ) : (
-                <CustomerNavigationBar />
-            )}
+            {getNavigationBar()}
 
             <NavigationBar />
             <Routes>
                 <Route path="/" element={<Store />} />
-                <Route
-                    path="/cart"
-                    element={
-                        <ProtectedRoute>
-                            <Cart />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route path="/cart" element={<Cart />} />
                 <Route path="/order" element={<Order />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="*" element={<NotFound />} />
