@@ -1,25 +1,35 @@
 import './styles/App.css';
 
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
+import { Toaster } from '@/components/ui/sonner';
+import Store from './pages/Customer/Store';
 import NotFound from './pages/NotFound';
 import NavigationBar from './components/Structure/NavigationBar';
-import Cart from './pages/Cart';
-import Order from './pages/Order';
+import Cart from './pages/Customer/Cart';
+import Order from './pages/Customer/Order';
 import Payment from './pages/Payment';
-import { Toaster } from '@/components/ui/sonner';
-import LogIn from './pages/LogIn';
-import SignUp from './pages/SignUp';
+import LogIn from './pages/Auth/LogIn';
+import SignUp from './pages/Auth/SignUp';
 import ProtectedRoute from './components/Structure/ProtectedRoute';
 import Orders from './pages/Seller/Orders';
+import { useAuth } from './contexts/AuthContext';
+import SellerNavigationBar from './components/Structure/NavigationBar/SellerNavigationBar';
+import CustomerNavigationBar from './components/Structure/NavigationBar/CustomerNavigationBar';
 
 function App() {
+    const { user } = useAuth(); // Assuming you have an auth context
+
     return (
         <>
+            {user?.role === 'seller' ? (
+                <SellerNavigationBar />
+            ) : (
+                <CustomerNavigationBar />
+            )}
+
             <NavigationBar />
-            {/* <Banner /> */}
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Store />} />
                 <Route
                     path="/cart"
                     element={

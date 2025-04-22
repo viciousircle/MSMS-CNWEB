@@ -6,7 +6,7 @@ import { formatPrice } from '/utils/formatPrice';
 import SkeletonProductCard from '@/components/Cards/SkeletonProductCard';
 import { useProducts } from '@/hooks/useProducts.hook';
 
-const Home = () => {
+const Store = () => {
     const { products, loading, error } = useProducts();
 
     if (error) {
@@ -45,4 +45,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Store;
