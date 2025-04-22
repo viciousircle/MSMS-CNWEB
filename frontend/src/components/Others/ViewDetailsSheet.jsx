@@ -12,6 +12,8 @@ import {
 import { PaidStatusBadge, StageBadge } from './StatusBadge';
 import { OrderItemsTable } from '../Tables/OrderItemsTable/OrderItemsTable';
 import { useOrderDetails } from '@/hooks/seller/useOrderDetails.hook';
+import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
+import { toast } from 'sonner';
 
 const InfoRow = ({ label, value }) => (
     <div className="flex justify-between">
@@ -29,16 +31,92 @@ const InfoSection = ({ title, children }) => (
     </div>
 );
 
+const ActionButtons = ({ orderStage, isUpdating, handleStageUpdate }) => {
+    switch (orderStage) {
+        case 'New':
+            return (
+                <div className="flex gap-3">
+                    <Button
+                        className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                        onClick={() => handleStageUpdate('Prepare')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Prepare'}
+                    </Button>
+                    <Button
+                        className="flex-1 bg-red-100 text-red-700 hover:bg-red-200"
+                        onClick={() => handleStageUpdate('Reject')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Reject'}
+                    </Button>
+                </div>
+            );
+        case 'Prepare':
+            return (
+                <div className="flex gap-3">
+                    <Button
+                        className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                        onClick={() => handleStageUpdate('New')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Revert to New'}
+                    </Button>
+                    <Button
+                        className="flex-1 bg-green-100 text-green-800 hover:bg-green-200"
+                        onClick={() => handleStageUpdate('Shipping')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Mark as Shipping'}
+                    </Button>
+                </div>
+            );
+        case 'Shipping':
+            return (
+                <div className="flex gap-3">
+                    <Button
+                        className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                        onClick={() => handleStageUpdate('Prepare')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Revert to Prepare'}
+                    </Button>
+                    <Button
+                        className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200"
+                        onClick={() => handleStageUpdate('Shipped')}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? 'Processing...' : 'Mark as Shipped'}
+                    </Button>
+                </div>
+            );
+        default:
+            return null;
+    }
+};
+
 export const ViewDetailsSheet = ({
     orderId,
     dateOrder,
     orderStage,
     paymentMethod,
     paymentStatus,
+    onStageUpdated,
 }) => {
     const { orderDetails, loading, error } = useOrderDetails(orderId);
+    const { updateOrderStage, isUpdating } = useUpdateOrderStage();
 
-    if (loading)
+    const handleStageUpdate = async (newStage) => {
+        try {
+            await updateOrderStage(orderId, newStage);
+            toast.success(`Order status updated to ${newStage}`);
+            onStageUpdated?.(newStage);
+        } catch (error) {
+            toast.error(`Failed to update status: ${error.message}`);
+        }
+    };
+
+    if (loading) {
         return (
             <div>
                 <Button variant="link" className="px-0 text-sm text-gray-300">
@@ -48,51 +126,10 @@ export const ViewDetailsSheet = ({
                 </Button>
             </div>
         );
+    }
+
     if (error) return <div>Error: {error}</div>;
     if (!orderDetails) return <div>Order not found</div>;
-
-    const renderActionButtons = () => {
-        switch (orderStage) {
-            case 'New':
-                return (
-                    <div className="flex gap-3">
-                        <Button className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                            Prepare
-                        </Button>
-                        <Button className="flex-1 bg-red-100 text-red-700 hover:bg-red-200">
-                            Reject
-                        </Button>
-                    </div>
-                );
-            case 'Prepare':
-                return (
-                    <div className="flex gap-3">
-                        <Button className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200">
-                            New
-                        </Button>
-                        <Button className="flex-1 bg-green-100 text-green-800 hover:bg-green-200">
-                            Shipping
-                        </Button>
-                    </div>
-                );
-            case 'Shipping':
-                return (
-                    <div className="flex gap-3">
-                        <Button className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                            Prepare
-                        </Button>
-                        <Button className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200">
-                            Shipped
-                        </Button>
-                    </div>
-                );
-            case 'Reject':
-            case 'Shipped':
-                return null;
-            default:
-                return null;
-        }
-    };
 
     return (
         <Sheet>
@@ -137,7 +174,6 @@ export const ViewDetailsSheet = ({
                                     label="Stage"
                                     value={<StageBadge status={orderStage} />}
                                 />
-
                                 <InfoRow
                                     label="Payment Status"
                                     value={
@@ -157,7 +193,11 @@ export const ViewDetailsSheet = ({
                                 />
                             </InfoSection>
 
-                            {renderActionButtons()}
+                            <ActionButtons
+                                orderStage={orderStage}
+                                isUpdating={isUpdating}
+                                handleStageUpdate={handleStageUpdate}
+                            />
                         </div>
                     </SheetDescription>
                 </SheetHeader>
