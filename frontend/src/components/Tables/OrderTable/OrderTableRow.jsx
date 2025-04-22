@@ -4,9 +4,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ViewDetailsSheet } from '../../Others/ViewDetailsSheet';
 import { PaidStatusBadge, StageBadge } from '../../Others/StatusBadge';
 
-export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
+export const OrderTableRow = ({
+    order,
+    isSelected,
+    onToggleSelection,
+    onStageUpdated, // Add this prop
+}) => {
+    // Extract the current stage (assuming orderStage is an array)
+    const currentStage = Array.isArray(order.orderStage)
+        ? order.orderStage.slice(-1)[0]?.stage
+        : order.orderStage;
+
     const cells = [
-        <StageBadge status={order.orderStage} />,
+        <StageBadge status={currentStage} />, // Use currentStage here
         order._id,
         order.customerName,
         order.customerEmail,
@@ -15,6 +25,10 @@ export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
         order.paymentMethod,
         <PaidStatusBadge status={order.isPaid ? 'Paid' : 'Unpaid'} />,
     ];
+
+    const handleStageUpdate = (newStage) => {
+        onStageUpdated?.(order._id, newStage);
+    };
 
     return (
         <TableRow>
@@ -42,9 +56,10 @@ export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
                 <ViewDetailsSheet
                     orderId={order._id}
                     dateOrder={order.dateOrder}
-                    orderStage={order.orderStage}
+                    orderStage={currentStage} // Pass currentStage here
                     paymentMethod={order.paymentMethod}
                     paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
+                    onStageUpdated={handleStageUpdate}
                 />
             </TableCell>
         </TableRow>

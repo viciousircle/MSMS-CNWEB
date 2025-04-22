@@ -103,16 +103,24 @@ export const ViewDetailsSheet = ({
     paymentStatus,
     onStageUpdated,
 }) => {
-    const { orderDetails, loading, error } = useOrderDetails(orderId);
+    const { orderDetails, loading, error, refetch } = useOrderDetails(orderId);
     const { updateOrderStage, isUpdating } = useUpdateOrderStage();
 
     const handleStageUpdate = async (newStage) => {
         try {
-            await updateOrderStage(orderId, newStage);
-            toast.success(`Order status updated to ${newStage}`);
+            // Optimistically update parent state first
             onStageUpdated?.(newStage);
+
+            // Then make the API call
+            await updateOrderStage(orderId, newStage);
+
+            toast.success(`Order status updated to ${newStage}`);
+
+            // Optional: Refetch to ensure complete sync with server
+            await refetch();
         } catch (error) {
             toast.error(`Failed to update status: ${error.message}`);
+            // You might want to revert the optimistic update here
         }
     };
 

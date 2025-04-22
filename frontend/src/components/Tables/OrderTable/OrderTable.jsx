@@ -1,4 +1,4 @@
-import React from 'react';
+import { React, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -21,6 +21,26 @@ export const OrderTable = ({ orders }) => {
         toggleRowSelection,
         toggleAllRows,
     } = useOrderTable(orders);
+
+    const [orderList, setOrderList] = useState(orders);
+
+    const handleStageUpdate = (orderId, newStage) => {
+        setOrderList((prevOrders) =>
+            prevOrders.map((order) =>
+                order._id === orderId
+                    ? {
+                          ...order,
+                          orderStage: [
+                              ...(Array.isArray(order.orderStage)
+                                  ? order.orderStage
+                                  : []),
+                              { stage: newStage, date: new Date() },
+                          ],
+                      }
+                    : order
+            )
+        );
+    };
 
     return (
         <Table>
@@ -51,12 +71,13 @@ export const OrderTable = ({ orders }) => {
             </TableHeader>
 
             <TableBody>
-                {orders.map((order) => (
+                {orderList.map((order) => (
                     <OrderTableRow
                         key={order._id}
                         order={order}
                         isSelected={selectedRows.has(order._id)}
                         onToggleSelection={() => toggleRowSelection(order._id)}
+                        onStageUpdated={handleStageUpdate}
                     />
                 ))}
             </TableBody>
