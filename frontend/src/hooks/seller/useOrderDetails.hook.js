@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { api } from '/utils/api';
 
 export const useOrderDetails = (orderId) => {
     const [orderDetails, setOrderDetails] = useState(null);
@@ -8,13 +9,16 @@ export const useOrderDetails = (orderId) => {
     useEffect(() => {
         const fetchOrderDetails = async () => {
             try {
-                const response = await fetch('/mock/orderdetails.json');
-                if (!response.ok)
-                    throw new Error('Failed to fetch order details');
-                const data = await response.json();
-                const order = data.find((order) => order._id === orderId);
-                if (!order) throw new Error('Order not found');
-                setOrderDetails(order);
+                setLoading(true);
+                const data = await api(`/seller/orders/${orderId}`);
+
+                const transformedData = {
+                    ...data,
+                    items: data.orderItems,
+                    address: data.receiverAddress,
+                };
+
+                setOrderDetails(transformedData);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -22,7 +26,9 @@ export const useOrderDetails = (orderId) => {
             }
         };
 
-        fetchOrderDetails();
+        if (orderId) {
+            fetchOrderDetails();
+        }
     }, [orderId]);
 
     return { orderDetails, loading, error };

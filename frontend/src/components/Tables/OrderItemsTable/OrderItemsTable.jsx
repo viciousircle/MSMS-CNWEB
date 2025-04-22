@@ -14,7 +14,7 @@ const formatPrice = (price) => `$${price.toFixed(2)}`;
 
 export const OrderItemsTable = ({ items, shippingSubtotal }) => {
     const subtotal = items.reduce(
-        (sum, item) => sum + parseFloat(item.price) * parseInt(item.quantity),
+        (sum, item) => sum + parseFloat(item.itemAmount.replace('$', '')),
         0
     );
     const shipping = parseFloat(shippingSubtotal.replace('$', ''));
@@ -30,7 +30,7 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                     </TableHead>
                     <TableHead className="text-center">Name</TableHead>
                     <TableHead className="text-center">Color</TableHead>
-                    <TableHead className="text-center">Qty</TableHead>
+                    <TableHead className="text-center">Quantity</TableHead>
                     <TableHead className="text-center">Amount</TableHead>
                 </TableRow>
             </TableHeader>
@@ -38,28 +38,26 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                 {items.map((item, index) => (
                     <TableRow key={index}>
                         <TableCell className="text-center font-medium">
-                            {item._id}
+                            {item.itemId}
                         </TableCell>
                         <TableCell className="text-center">
-                            {item.name}
+                            {item.itemName}
                         </TableCell>
                         <TableCell className="text-center">
-                            {item.color}
+                            {item.itemColor}
                         </TableCell>
                         <TableCell className="text-center">
-                            {item.quantity}
+                            {item.itemQuantity}
                         </TableCell>
                         <TableCell className="text-center text-green-600">
-                            {formatPrice(
-                                parseFloat(item.price) * parseInt(item.quantity)
-                            )}
+                            {item.itemAmount}
                         </TableCell>
                     </TableRow>
                 ))}
             </TableBody>
             <TableFooter>
                 <TableRow>
-                    <TableCell colSpan={4} className="text-center font-medium">
+                    <TableCell colSpan={4} className="text-left font-medium">
                         Merchandise Subtotal
                     </TableCell>
                     <TableCell className="text-center font-bold text-green-700">
@@ -67,15 +65,15 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                     </TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell colSpan={4} className="text-center font-medium">
+                    <TableCell colSpan={4} className="text-left font-medium">
                         Shipping Subtotal
                     </TableCell>
                     <TableCell className="text-center font-bold text-green-700">
-                        {shippingSubtotal}
+                        ${shippingSubtotal}
                     </TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell colSpan={4} className="text-center font-medium">
+                    <TableCell colSpan={4} className="text-left font-medium">
                         Total Payment
                     </TableCell>
                     <TableCell className="text-center font-bold text-green-700">

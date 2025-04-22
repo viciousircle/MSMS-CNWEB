@@ -1,3 +1,4 @@
+// components/ViewDetailsSheet.js
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
@@ -32,7 +33,7 @@ const InfoSection = ({ title, children }) => (
 export const ViewDetailsSheet = ({
     orderId,
     dateOrder,
-    stageOrder,
+    orderStage,
     paymentMethod,
     paymentStatus,
 }) => {
@@ -70,7 +71,7 @@ export const ViewDetailsSheet = ({
                                 />
                                 <InfoRow
                                     label="Address"
-                                    value={orderDetails.address}
+                                    value={orderDetails.receiverAddress}
                                 />
                             </InfoSection>
 
@@ -78,13 +79,14 @@ export const ViewDetailsSheet = ({
                                 <InfoRow label="Order ID" value={orderId} />
                                 <InfoRow label="Date" value={dateOrder} />
                                 <InfoRow
-                                    label="Stage"
-                                    value={<StageBadge status={stageOrder} />}
-                                />
-                                <InfoRow
                                     label="Payment Method"
                                     value={paymentMethod}
                                 />
+                                <InfoRow
+                                    label="Stage"
+                                    value={<StageBadge status={orderStage} />}
+                                />
+
                                 <InfoRow
                                     label="Payment Status"
                                     value={
@@ -97,7 +99,7 @@ export const ViewDetailsSheet = ({
 
                             <InfoSection title="Items Ordered">
                                 <OrderItemsTable
-                                    items={orderDetails.items}
+                                    items={orderDetails.orderItems}
                                     shippingSubtotal={
                                         orderDetails.shippingSubtotal
                                     }

@@ -42,7 +42,7 @@ export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
                 <ViewDetailsSheet
                     orderId={order._id}
                     dateOrder={order.dateOrder}
-                    stageOrder={order.stageOrder}
+                    orderStage={order.orderStage}
                     paymentMethod={order.paymentMethod}
                     paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
                 />

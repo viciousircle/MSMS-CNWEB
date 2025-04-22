@@ -24,7 +24,6 @@ export const useOrdersLogic = () => {
         try {
             const data = await api('/seller/orders');
             setOrders(data.orders);
-            console.log('Fetched orders:', data.orders);
         } catch (err) {
             setStatus({
                 loading: false,
