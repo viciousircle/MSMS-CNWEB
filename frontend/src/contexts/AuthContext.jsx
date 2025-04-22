@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }) => {
     const isAuthenticated = () => !!user;
     const isCustomer = () => role === 'customer';
     const isSeller = () => role === 'seller';
+    const isAdmin = () => role === 'admin';
 
     return (
         <AuthContext.Provider
@@ -73,6 +74,7 @@ export const AuthProvider = ({ children }) => {
                 isAuthenticated,
                 isCustomer,
                 isSeller,
+                isAdmin,
             }}
         >
             {children}
