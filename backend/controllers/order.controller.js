@@ -11,14 +11,12 @@ const Product = require('../models/product.model');
  */
 const getOrdersForSeller = asyncHandler(async (req, res) => {
     try {
-        // Verify user is seller
         if (!req.user || req.user.role !== 'seller') {
             return res.status(401).json({
                 message: 'Unauthorized: Only sellers can view orders',
             });
         }
 
-        // Get orders with populated user and product information
         const orders = await Order.find()
             .populate({
                 path: 'user',
@@ -143,7 +141,96 @@ const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @desc: Update order stage for seller
+ * @route: PUT /api/seller/orders/:id
+ * @access: Private (seller only)
+ */
+const updateOrderStage = asyncHandler(async (req, res) => {
+    try {
+        // Verify user is seller
+        if (!req.user || req.user.role !== 'seller') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only sellers can update order stages',
+            });
+        }
+
+        const orderId = req.params.id;
+        const { stage } = req.body;
+
+        // Validate order ID format
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                message: 'Invalid order ID format',
+            });
+        }
+
+        // Validate stage input
+        const validStages = [
+            'New',
+            'Prepare',
+            'Shipping',
+            'Shipped',
+            'Cancelled',
+            'Reject',
+        ];
+        if (!stage || !validStages.includes(stage)) {
+            return res.status(400).json({
+                message: 'Invalid stage value',
+                validStages: validStages,
+            });
+        }
+
+        // Find the order
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found',
+            });
+        }
+
+        // Get current stage
+        const currentStage = order.orderStage.slice(-1)[0]?.stage;
+
+        // Check if the stage is being changed
+        if (currentStage === stage) {
+            return res.status(400).json({
+                message: `Order is already in ${stage} stage`,
+            });
+        }
+
+        // Add new stage to the orderStage array
+        order.orderStage.push({
+            stage: stage,
+            date: new Date(),
+        });
+
+        // Special case: if stage is Cancelled or Reject, mark as not paid
+        if (stage === 'Cancelled' || stage === 'Reject') {
+            order.isPaid = false;
+        }
+
+        // Save the updated order
+        const updatedOrder = await order.save();
+
+        res.status(200).json({
+            message: 'Order stage updated successfully',
+            orderId: updatedOrder._id,
+            previousStage: currentStage,
+            newStage: stage,
+            updatedAt: updatedOrder.updatedAt,
+        });
+    } catch (error) {
+        console.error('Error updating order stage:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
 module.exports = {
     getOrdersForSeller,
     getOrderDetailsForSeller,
+    updateOrderStage,
 };
