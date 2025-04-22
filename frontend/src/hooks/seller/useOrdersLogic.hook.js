@@ -5,47 +5,53 @@ import { api } from '/utils/api';
 const DEFAULT_ORDERS_PER_PAGE = 10;
 
 export const useOrdersLogic = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
     const [orders, setOrders] = useState([]);
-    const [activeTab, setActiveTab] = useState('all');
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        ordersPerPage: DEFAULT_ORDERS_PER_PAGE,
+    });
+    const [filters, setFilters] = useState({
+        activeTab: 'all',
+        selectedDate: null,
+    });
+    const [status, setStatus] = useState({
+        loading: true,
+        error: null,
+    });
 
-    // Fetch orders from API
+    const fetchOrders = async () => {
+        setStatus({ loading: true, error: null });
+        try {
+            const data = await api('/seller/orders');
+            setOrders(data.orders);
+            console.log('Fetched orders:', data.orders);
+        } catch (err) {
+            setStatus({
+                loading: false,
+                error: err.message || 'Failed to fetch orders',
+            });
+            console.error('Error fetching orders:', err);
+            return;
+        }
+        setStatus({ loading: false, error: null });
+    };
+
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                setLoading(true);
-                const data = await api('/seller/orders');
-                setOrders(data.orders);
-                setError(null);
-
-                console.log('Fetched orders:', data.orders);
-            } catch (err) {
-                setError(err.message || 'Failed to fetch orders');
-                console.error('Error fetching orders:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchOrders();
     }, []);
 
     const updateOrder = async (indexOnPage, updatedFields) => {
-        const globalIndex = (currentPage - 1) * ordersPerPage + indexOnPage;
+        const globalIndex =
+            (pagination.currentPage - 1) * pagination.ordersPerPage +
+            indexOnPage;
         const orderId = orders[globalIndex]._id;
 
         try {
-            // Make API call to update the order
             const updatedOrder = await api(`/seller/orders/${orderId}`, {
                 method: 'PATCH',
                 body: JSON.stringify(updatedFields),
             });
 
-            // Update local state if API call succeeds
             setOrders((prev) => {
                 const newOrders = [...prev];
                 newOrders[globalIndex] = {
@@ -56,52 +62,57 @@ export const useOrdersLogic = () => {
             });
         } catch (err) {
             console.error('Error updating order:', err);
-            throw err; // Re-throw to handle in the component if needed
+            throw err;
         }
     };
 
     const filteredOrders = useMemo(() => {
-        let result = [...orders];
+        return orders.filter((order) => {
+            const matchesTab =
+                filters.activeTab === 'all' ||
+                order.orderStage.toLowerCase() ===
+                    filters.activeTab.toLowerCase();
 
-        if (activeTab !== 'all') {
-            result = result.filter(
-                (order) =>
-                    order.orderStage.toLowerCase() === activeTab.toLowerCase()
-            );
-        }
-        if (selectedDate) {
-            const selectedDateString = format(selectedDate, 'dd-MM-yyyy');
-            result = result.filter((order) => {
-                return order.dateOrder === selectedDateString;
-            });
-        }
+            const matchesDate =
+                !filters.selectedDate ||
+                order.dateOrder === format(filters.selectedDate, 'dd-MM-yyyy');
 
-        return result;
-    }, [orders, activeTab, selectedDate]);
+            return matchesTab && matchesDate;
+        });
+    }, [orders, filters]);
 
-    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+    const totalPages = Math.ceil(
+        filteredOrders.length / pagination.ordersPerPage
+    );
+
     const paginatedOrders = useMemo(() => {
-        const start = (currentPage - 1) * ordersPerPage;
-        return filteredOrders.slice(start, start + ordersPerPage);
-    }, [filteredOrders, currentPage, ordersPerPage]);
+        const start = (pagination.currentPage - 1) * pagination.ordersPerPage;
+        return filteredOrders.slice(start, start + pagination.ordersPerPage);
+    }, [filteredOrders, pagination]);
 
     const handleItemsPerPageChange = (value) => {
-        setOrdersPerPage(Number(value));
-        setCurrentPage(1);
+        setPagination({
+            ...pagination,
+            ordersPerPage: Number(value),
+            currentPage: 1,
+        });
     };
 
     return {
-        currentPage,
-        ordersPerPage,
-        activeTab,
-        selectedDate,
+        currentPage: pagination.currentPage,
+        ordersPerPage: pagination.ordersPerPage,
+        activeTab: filters.activeTab,
+        selectedDate: filters.selectedDate,
         paginatedOrders,
         totalPages,
-        loading,
-        error,
-        setCurrentPage,
-        setActiveTab,
-        setSelectedDate,
+        loading: status.loading,
+        error: status.error,
+        setCurrentPage: (page) =>
+            setPagination((prev) => ({ ...prev, currentPage: page })),
+        setActiveTab: (tab) =>
+            setFilters((prev) => ({ ...prev, activeTab: tab })),
+        setSelectedDate: (date) =>
+            setFilters((prev) => ({ ...prev, selectedDate: date })),
         updateOrder,
         handleItemsPerPageChange,
     };

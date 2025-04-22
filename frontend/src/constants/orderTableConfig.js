@@ -25,8 +25,8 @@ export const ORDER_TABLE_COLUMNS = [
         align: 'center',
     },
     {
-        key: 'phone',
-        header: 'Phone',
+        key: 'email',
+        header: 'Email',
         width: 'w-[120px]',
         align: 'center',
     },
