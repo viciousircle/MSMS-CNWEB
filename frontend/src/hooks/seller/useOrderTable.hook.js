@@ -3,9 +3,12 @@ import { useMemo, useState } from 'react';
 export const useOrderTable = (orders) => {
     const [selectedRows, setSelectedRows] = useState(new Set());
 
-    const totalBill = useMemo(() => {
+    const totalPayment = useMemo(() => {
         return orders
-            .reduce((sum, { totalBill }) => sum + parseFloat(totalBill), 0)
+            .reduce(
+                (sum, { totalPayment }) => sum + parseFloat(totalPayment),
+                0
+            )
             .toFixed(2);
     }, [orders]);
 
@@ -32,7 +35,7 @@ export const useOrderTable = (orders) => {
 
     return {
         selectedRows,
-        totalBill,
+        totalPayment,
         toggleRowSelection,
         toggleAllRows,
         allSelected,

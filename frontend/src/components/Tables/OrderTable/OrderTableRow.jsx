@@ -6,14 +6,14 @@ import { PaidStatusBadge, StageBadge } from '../../Others/StatusBadge';
 
 export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
     const cells = [
-        <StageBadge status={order.stageOrder} />,
+        <StageBadge status={order.orderStage} />,
         order._id,
         order.customerName,
-        order.customerPhone,
-        `$${order.totalBill}`,
+        order.customerEmail,
+        `$${order.totalPayment}`,
         order.dateOrder,
         order.paymentMethod,
-        <PaidStatusBadge status={order.paymentStatus} />,
+        <PaidStatusBadge status={order.isPaid ? 'Paid' : 'Unpaid'} />,
     ];
 
     return (
@@ -44,7 +44,7 @@ export const OrderTableRow = ({ order, isSelected, onToggleSelection }) => {
                     dateOrder={order.dateOrder}
                     stageOrder={order.stageOrder}
                     paymentMethod={order.paymentMethod}
-                    paymentStatus={order.paymentStatus}
+                    paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
                 />
             </TableCell>
         </TableRow>

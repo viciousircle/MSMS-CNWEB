@@ -1,26 +1,63 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import mockOrders from '/public/mock/order.json';
+import { api } from '/utils/api';
 
 const DEFAULT_ORDERS_PER_PAGE = 10;
 
 export const useOrdersLogic = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
-    const [orders, setOrders] = useState(mockOrders);
+    const [orders, setOrders] = useState([]);
     const [activeTab, setActiveTab] = useState('all');
     const [selectedDate, setSelectedDate] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const updateOrder = (indexOnPage, updatedFields) => {
+    // Fetch orders from API
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                setLoading(true);
+                const data = await api('/seller/orders');
+                setOrders(data.orders);
+                setError(null);
+
+                console.log('Fetched orders:', data.orders);
+            } catch (err) {
+                setError(err.message || 'Failed to fetch orders');
+                console.error('Error fetching orders:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
+    const updateOrder = async (indexOnPage, updatedFields) => {
         const globalIndex = (currentPage - 1) * ordersPerPage + indexOnPage;
-        setOrders((prev) => {
-            const newOrders = [...prev];
-            newOrders[globalIndex] = {
-                ...newOrders[globalIndex],
-                ...updatedFields,
-            };
-            return newOrders;
-        });
+        const orderId = orders[globalIndex]._id;
+
+        try {
+            // Make API call to update the order
+            const updatedOrder = await api(`/seller/orders/${orderId}`, {
+                method: 'PATCH',
+                body: JSON.stringify(updatedFields),
+            });
+
+            // Update local state if API call succeeds
+            setOrders((prev) => {
+                const newOrders = [...prev];
+                newOrders[globalIndex] = {
+                    ...newOrders[globalIndex],
+                    ...updatedOrder,
+                };
+                return newOrders;
+            });
+        } catch (err) {
+            console.error('Error updating order:', err);
+            throw err; // Re-throw to handle in the component if needed
+        }
     };
 
     const filteredOrders = useMemo(() => {
@@ -29,15 +66,13 @@ export const useOrdersLogic = () => {
         if (activeTab !== 'all') {
             result = result.filter(
                 (order) =>
-                    order.stageOrder.toLowerCase() === activeTab.toLowerCase()
+                    order.orderStage.toLowerCase() === activeTab.toLowerCase()
             );
         }
         if (selectedDate) {
-            const selectedDateString = format(selectedDate, 'MM/dd/yyyy');
+            const selectedDateString = format(selectedDate, 'dd-MM-yyyy');
             result = result.filter((order) => {
-                const orderDate = new Date(order.dateOrder);
-                const orderDateString = format(orderDate, 'MM/dd/yyyy');
-                return orderDateString === selectedDateString;
+                return order.dateOrder === selectedDateString;
             });
         }
 
@@ -62,6 +97,9 @@ export const useOrdersLogic = () => {
         selectedDate,
         paginatedOrders,
         totalPages,
+        loading,
+        error,
+        setCurrentPage,
         setActiveTab,
         setSelectedDate,
         updateOrder,

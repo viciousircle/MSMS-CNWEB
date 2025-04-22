@@ -19,6 +19,8 @@ const Orders = () => {
         selectedDate,
         paginatedOrders,
         totalPages,
+        loading,
+        error,
         setCurrentPage,
         setActiveTab,
         setSelectedDate,
@@ -35,6 +37,14 @@ const Orders = () => {
         'cancelled',
         'reject',
     ];
+
+    if (loading) {
+        return <div>Loading orders...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <Body>

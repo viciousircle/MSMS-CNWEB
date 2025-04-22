@@ -7,7 +7,7 @@ export const ORDER_TABLE_COLUMNS = [
         isCheckbox: true,
     },
     {
-        key: 'stage',
+        key: 'orderStage',
         header: 'Stage',
         width: 'w-[180px]',
         align: 'center',
@@ -49,7 +49,7 @@ export const ORDER_TABLE_COLUMNS = [
         align: 'center',
     },
     {
-        key: 'paidStatus',
+        key: 'payStatus',
         header: 'Pay Status',
         width: 'w-[120px]',
         align: 'center',

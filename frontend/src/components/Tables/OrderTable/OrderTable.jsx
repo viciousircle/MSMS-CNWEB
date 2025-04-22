@@ -16,7 +16,7 @@ import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 export const OrderTable = ({ orders }) => {
     const {
         selectedRows,
-        totalBill,
+        totalPayment,
         allSelected,
         toggleRowSelection,
         toggleAllRows,
@@ -69,7 +69,7 @@ export const OrderTable = ({ orders }) => {
                     </TableCell>
                     <TableCell colSpan={3} />
                     <TableCell className="text-center font-medium">
-                        ${totalBill}
+                        ${totalPayment}
                     </TableCell>
                     <TableCell colSpan={4} />
                 </TableRow>
