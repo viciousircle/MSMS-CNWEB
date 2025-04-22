@@ -13,7 +13,7 @@ import { OrderTableRow } from './OrderTableRow';
 import { OrderTableHeaderCell } from './OrderTableHeaderCell';
 import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 
-export const OrderTable = ({ orders }) => {
+export const OrderTable = ({ orders, onUpdate }) => {
     const {
         selectedRows,
         totalPayment,
@@ -51,12 +51,15 @@ export const OrderTable = ({ orders }) => {
             </TableHeader>
 
             <TableBody>
-                {orders.map((order) => (
+                {orders.map((order, index) => (
                     <OrderTableRow
                         key={order._id}
                         order={order}
                         isSelected={selectedRows.has(order._id)}
                         onToggleSelection={() => toggleRowSelection(order._id)}
+                        onUpdate={(updatedFields) =>
+                            onUpdate(index, updatedFields)
+                        }
                     />
                 ))}
             </TableBody>

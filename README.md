@@ -75,3 +75,7 @@ MSMS CNWEB (Mobile Shop Management System) is a web-based platform designed to m
 ## License
 
 This project is licensed under the MIT License.
+
+## Bug
+
+Chua right update when click button in seller order
