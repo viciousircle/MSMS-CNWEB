@@ -1,14 +1,5 @@
-import { Checkbox } from '@/components/ui/checkbox';
 import React from 'react';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 
 const CartProductCard = ({
@@ -17,29 +8,23 @@ const CartProductCard = ({
     onCheckChange = () => {},
     onQuantityChange = () => {},
 }) => {
-    // Safely handle product data
-    const safeProduct = {
-        _id: product._id || '',
-        name: product.name || '',
-        price: product.price || 0,
-        image: product.image || '',
-        color: product.color || '',
-        quantity: product.quantity || 1,
-        colors: Array.isArray(product.colors) ? product.colors : [],
-    };
+    const {
+        _id = '',
+        name = '',
+        price = 0,
+        image = '',
+        quantity = 1,
+        stock = 0,
+    } = product;
 
-    // Find stock for selected color
-    const selectedColor =
-        safeProduct.colors.find((c) => c.color === safeProduct.color) || {};
-    const stock = selectedColor.stock || 0;
     const isOutOfStock = stock <= 0;
 
-    const handleQuantityChange = (newQuantity) => {
-        if (isOutOfStock) return;
-        onQuantityChange?.(
-            safeProduct._id,
-            Math.max(1, Math.min(stock, newQuantity))
-        );
+    const handleQuantityChange = (newQty) => {
+        if (!isOutOfStock) {
+            const clampedQty = Math.max(1, Math.min(stock, newQty));
+            console.log(`Changing quantity of ${_id} to`, clampedQty); // 👈 debug
+            onQuantityChange(_id, clampedQty);
+        }
     };
 
     return (
@@ -48,12 +33,16 @@ const CartProductCard = ({
             <div className="flex w-full">
                 <Divider vertical />
                 <CardContent
-                    product={safeProduct}
+                    id={_id}
+                    name={name}
+                    image={image}
+                    price={price}
+                    quantity={quantity}
+                    stock={stock}
                     isChecked={isChecked}
                     isOutOfStock={isOutOfStock}
                     onCheckChange={onCheckChange}
-                    handleQuantityChange={handleQuantityChange}
-                    stock={stock}
+                    onQuantityChange={handleQuantityChange}
                 />
                 <Divider vertical />
             </div>
@@ -63,13 +52,22 @@ const CartProductCard = ({
 };
 
 const CardContent = ({
-    product,
+    id,
+    name,
+    image,
+    price,
+    quantity,
+    stock,
     isChecked,
     isOutOfStock,
     onCheckChange,
-    handleQuantityChange,
-    stock,
+    onQuantityChange,
 }) => {
+    const updateQuantity = (delta) => {
+        const newQuantity = quantity + delta;
+        onQuantityChange(id, newQuantity); // Pass `id` here
+    };
+
     return (
         <div
             className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-4 ${
@@ -86,137 +84,84 @@ const CardContent = ({
                     checked={isChecked}
                     onClick={(e) => e.stopPropagation()}
                     onCheckedChange={(checked) =>
-                        !isOutOfStock && onCheckChange(product._id, checked)
+                        !isOutOfStock && onCheckChange(id, checked)
                     }
                 />
             </div>
-            <ProductImage image={product.image} isOutOfStock={isOutOfStock} />
-            <ProductDetails
-                product={{
-                    ...product,
-                    onQuantityChange: handleQuantityChange,
-                }}
-                isOutOfStock={isOutOfStock}
+            <ProductImage src={image} dimmed={isOutOfStock} />
+            <ProductInfo
+                name={name}
+                price={price}
+                quantity={quantity}
                 stock={stock}
+                dimmed={isOutOfStock}
+                updateQuantity={updateQuantity}
             />
         </div>
     );
 };
 
-const Divider = React.memo(({ horizontal }) =>
-    horizontal ? (
-        <div className="flex w-full">
-            <div className="p-2" />
-            <div className="border-gray-950/5 border-x p-2 w-full" />
-            <div className="p-2" />
-        </div>
-    ) : (
-        <div className="border-gray-950/5 border-y p-2"></div>
-    )
-);
-
-const ProductImage = React.memo(({ image, isOutOfStock }) => (
+const ProductImage = React.memo(({ src, dimmed }) => (
     <div className="flex w-1/5 h-64 items-center justify-center bg-white rounded-lg outline outline-gray-950/5">
         <img
-            src={image}
+            src={src}
             alt="Product"
             className={`w-64 object-contain ${
-                isOutOfStock ? 'opacity-70' : 'opacity-100'
+                dimmed ? 'opacity-70' : 'opacity-100'
             }`}
         />
     </div>
 ));
 
-const ProductDetails = ({ product, stock, isOutOfStock }) => {
-    const changeQuantity = (delta) =>
-        product.onQuantityChange(product.quantity + delta);
+const ProductInfo = ({
+    name,
+    price,
+    quantity,
+    stock,
+    dimmed,
+    updateQuantity,
+}) => {
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        // Allow empty value for better UX when user is typing
+        if (value === '') {
+            updateQuantity(0 - quantity); // This will be clamped by parent
+            return;
+        }
+
+        const newQty = parseInt(value, 10);
+        if (!isNaN(newQty)) {
+            // Calculate the difference from current quantity
+            const diff = newQty - quantity;
+            updateQuantity(diff);
+        }
+    };
 
     return (
-        <div className={`flex flex-col w-full gap-2 px-4 justify-center`}>
+        <div className="flex flex-col w-full gap-2 px-4 justify-center">
             <div
-                className={`flex justify-between w-full items-center ${
-                    isOutOfStock ? 'opacity-70' : 'opacity-100'
+                className={`flex justify-between items-center ${
+                    dimmed ? 'opacity-70' : 'opacity-100'
                 }`}
             >
                 <span className="text-2xl font-medium hover:underline">
-                    {product.name}
+                    {name}
                 </span>
                 <div className="flex gap-2 items-center">
-                    <div className="flex gap-2 items-center">
-                        <span className="tracking-wider">Color</span>
-                        <Select>
-                            <SelectTrigger className="px-4 py-2 rounded-lg border bg-white shadow-xs cursor-pointer">
-                                <SelectValue placeholder={product.color} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Colors</SelectLabel>
-                                    {(product.colors || []).map((color) => (
-                                        <SelectItem
-                                            key={color.color}
-                                            value={color.color}
-                                            className="capitalize"
-                                        >
-                                            {color.color}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                        <span className="tracking-wider">Quantity</span>
-                        <div className="flex items-center">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => (
-                                    e.stopPropagation(), changeQuantity(-1)
-                                )}
-                                disabled={isOutOfStock || product.quantity <= 1}
-                                className="h-10 px-3 rounded-r-none border-r-0"
-                            >
-                                -
-                            </Button>
-                            <input
-                                type="number"
-                                min={1}
-                                max={stock}
-                                value={product.quantity}
-                                disabled={isOutOfStock}
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) =>
-                                    changeQuantity(
-                                        (parseInt(e.target.value) || 1) -
-                                            product.quantity
-                                    )
-                                }
-                                className="w-16 h-10 text-center border-t border-b border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
-                            />
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => (
-                                    e.stopPropagation(), changeQuantity(1)
-                                )}
-                                disabled={
-                                    isOutOfStock || product.quantity >= stock
-                                }
-                                className="h-10 px-3 rounded-l-none border-l-0"
-                            >
-                                +
-                            </Button>
-                        </div>
-                    </div>
+                    <span className="tracking-wider">Quantity</span>
+                    <QuantityControls
+                        quantity={quantity}
+                        stock={stock}
+                        dimmed={dimmed}
+                        onChange={updateQuantity}
+                        onInputChange={handleInputChange}
+                    />
                 </div>
-                <span className="font-mono">{product.price}</span>
+                <span className="font-mono">{price}</span>
             </div>
-
-            <div className="flex justify-between w-full border-t border-gray-300 pt-2">
-                <span className="text-gray-500 ">
+            <div className="flex justify-between border-t border-gray-300 pt-2">
+                <span className="text-gray-500">
                     {stock > 0 ? `Available: ${stock}` : 'Out of stock'}
-                    {/* TODO: This is wrong Avail must match with the color select */}
                 </span>
                 <span
                     className="text-red-500 hover:underline cursor-pointer opacity-100"
@@ -228,5 +173,68 @@ const ProductDetails = ({ product, stock, isOutOfStock }) => {
         </div>
     );
 };
+
+const QuantityControls = ({
+    quantity,
+    stock,
+    dimmed,
+    onChange,
+    onInputChange,
+}) => (
+    <div className="flex items-center">
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+                e.stopPropagation();
+                onChange(-1);
+            }}
+            disabled={dimmed || quantity <= 1}
+            className="h-10 px-3 rounded-r-none border-r-0"
+        >
+            -
+        </Button>
+        <input
+            type="number"
+            min={1}
+            max={stock}
+            value={quantity}
+            disabled={dimmed}
+            onClick={(e) => e.stopPropagation()}
+            onChange={onInputChange}
+            onBlur={(e) => {
+                // If input is empty or invalid, reset to current quantity
+                if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                    onInputChange({ target: { value: quantity.toString() } });
+                }
+            }}
+            className="w-16 h-10 text-center border-t border-b border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
+        />
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+                e.stopPropagation();
+                onChange(1);
+            }}
+            disabled={dimmed || quantity >= stock}
+            className="h-10 px-3 rounded-l-none border-l-0"
+        >
+            +
+        </Button>
+    </div>
+);
+
+const Divider = React.memo(({ horizontal }) =>
+    horizontal ? (
+        <div className="flex w-full">
+            <div className="p-2" />
+            <div className="border-gray-950/5 border-x p-2 w-full" />
+            <div className="p-2" />
+        </div>
+    ) : (
+        <div className="border-gray-950/5 border-y p-2" />
+    )
+);
 
 export default CartProductCard;
