@@ -1,25 +1,25 @@
+// utils/api.js
 export const api = async (endpoint, options = {}) => {
-    const baseUrl = 'http://localhost:5678/api';
-
-    const customer = JSON.parse(localStorage.getItem('customer'));
-    const token = customer?.token;
+    const token = localStorage.getItem('token');
 
     const headers = {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...(options.headers || {}),
+        ...options.headers,
     };
 
-    const res = await fetch(`${baseUrl}${endpoint}`, {
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`http://localhost:5678/api${endpoint}`, {
         ...options,
         headers,
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-        throw new Error(data.message || 'Something went wrong');
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Request failed');
     }
 
-    return data;
+    return await response.json();
 };
