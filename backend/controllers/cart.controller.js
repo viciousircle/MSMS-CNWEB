@@ -14,7 +14,7 @@ const getCartItems = asyncHandler(async (req, res) => {
         const uuid = req.query.uuid || null;
 
         const cart = await Cart.findOne({
-            $or: [{ user: userId }, { uuid: uuid }],
+            user: userId,
         }).populate({
             path: 'cartItems.product',
             select: 'name price image colors rate',
@@ -87,7 +87,7 @@ const addItemToCart = asyncHandler(async (req, res) => {
 
         // Find or create cart
         let cart = await Cart.findOne({
-            $or: [{ user: userId }, { uuid: uuid }],
+            user: userId,
         }).populate('cartItems.product');
 
         if (!cart) {
