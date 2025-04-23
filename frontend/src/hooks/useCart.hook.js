@@ -1,46 +1,57 @@
-import { useEffect, useState } from 'react';
-import { api } from '/utils/api';
+import { useState } from 'react';
 
 const useCart = () => {
-    const [products, setProducts] = useState([]);
-    const [checkedProducts, setCheckedProducts] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const mockProducts = [
+        {
+            _id: '1',
+            name: 'Premium Wireless Headphones',
+            price: '2.500.000 VND',
+            image: 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mac-card-40-macbookpro-14-16-202410?wid=680&hei=528&fmt=p-jpg&qlt=95&.v=1731974949535',
+            color: 'Black',
+            quantity: 1,
+            colors: [
+                { color: 'Black', stock: 5 },
+                { color: 'White', stock: 3 },
+                { color: 'Blue', stock: 2 },
+            ],
+        },
+        {
+            _id: '2',
+            name: 'Ultra HD Smart TV',
+            price: '15.000.000 VND',
+            image: 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mac-card-40-macbookpro-14-16-202410?wid=680&hei=528&fmt=p-jpg&qlt=95&.v=1731974949535',
+            color: 'Silver',
+            quantity: 1,
+            colors: [
+                { color: 'Black', stock: 0 },
+                { color: 'Silver', stock: 8 },
+                { color: 'Gold', stock: 1 },
+            ],
+        },
+        {
+            _id: '3',
+            name: 'Ergonomic Office Chair',
+            price: '3.200.000 VND',
+            image: 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mac-card-40-macbookpro-14-16-202410?wid=680&hei=528&fmt=p-jpg&qlt=95&.v=1731974949535',
+            color: 'Blue',
+            quantity: 2,
+            colors: [
+                { color: 'Black', stock: 10 },
+                { color: 'Blue', stock: 4 },
+                { color: 'Red', stock: 0 },
+            ],
+        },
+    ];
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const data = await api('/cart');
-                const items = data.cartItems.map((item) => ({
-                    ...item.product,
-                    _id: item.product?._id,
-                    quantity: item.quantity,
-                    color: item.color,
-                    colors: Array.isArray(item.product?.colors)
-                        ? item.product.colors
-                        : [],
-                    image: item.product?.image || '',
-                    name: item.product?.name || 'Unknown Product',
-                    price: item.product?.price || 0,
-                }));
-                setProducts(items);
-
-                const initialChecked = items.reduce((acc, product) => {
-                    if (product._id) {
-                        acc[product._id] = false;
-                    }
-                    return acc;
-                }, {});
-                setCheckedProducts(initialChecked);
-            } catch (err) {
-                setError(err.message || 'Failed to fetch cart');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCart();
-    }, []);
+    const [products, setProducts] = useState(mockProducts);
+    const [checkedProducts, setCheckedProducts] = useState(
+        mockProducts.reduce((acc, product) => {
+            acc[product._id] = false;
+            return acc;
+        }, {})
+    );
+    const [loading] = useState(false);
+    const [error] = useState(null);
 
     const handleProductCheck = (id, checked) => {
         setCheckedProducts((prev) => ({

@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
  * @route: GET /api/cart
  * @access: Private (only for customers)
  */
-// cart.controller.js
 const getCartItems = asyncHandler(async (req, res) => {
     try {
         const userId = req.user ? req.user._id : null;
