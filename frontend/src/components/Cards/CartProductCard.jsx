@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import DeleteCartItemButton from '../Buttons/DeleteCartItemButton';
 
 const CartProductCard = ({
     product = {},
@@ -24,7 +25,7 @@ const CartProductCard = ({
     const handleQuantityChange = (newQty) => {
         if (!isOutOfStock) {
             const clampedQty = Math.max(1, Math.min(stock, newQty));
-            console.log(`Changing quantity of ${_id} to`, clampedQty); // 👈 debug
+            console.log(`Changing quantity of ${_id} to`, clampedQty);
             onQuantityChange(_id, clampedQty);
         }
     };
@@ -69,22 +70,9 @@ const CardContent = ({
     color,
     onDelete,
 }) => {
-    const [isDeleting, setIsDeleting] = useState(false);
-
     const updateQuantity = (delta) => {
         const newQuantity = quantity + delta;
-        onQuantityChange(id, newQuantity); // Pass `id` here
-    };
-    const handleDelete = async () => {
-        try {
-            setIsDeleting(true);
-            await onDelete(id); // Call the delete function with the ID
-        } catch (error) {
-            console.error('Error deleting item:', error);
-            // Error is already handled in the hook, but you could show a toast here
-        } finally {
-            setIsDeleting(false);
-        }
+        onQuantityChange(id, newQuantity);
     };
 
     return (
@@ -116,8 +104,8 @@ const CardContent = ({
                 stock={stock}
                 dimmed={isOutOfStock}
                 updateQuantity={updateQuantity}
-                onDelete={handleDelete}
-                isDeleting={isDeleting}
+                id={id}
+                onDelete={onDelete}
             />
         </div>
     );
@@ -144,19 +132,17 @@ const ProductInfo = ({
     updateQuantity,
     color,
     onDelete,
-    isDeleting = false,
+    id,
 }) => {
     const handleInputChange = (e) => {
         const value = e.target.value;
-        // Allow empty value for better UX when user is typing
         if (value === '') {
-            updateQuantity(0 - quantity); // This will be clamped by parent
+            updateQuantity(0 - quantity);
             return;
         }
 
         const newQty = parseInt(value, 10);
         if (!isNaN(newQty)) {
-            // Calculate the difference from current quantity
             const diff = newQty - quantity;
             updateQuantity(diff);
         }
@@ -196,18 +182,8 @@ const ProductInfo = ({
                 <span className="text-gray-500">
                     {stock > 0 ? `Available: ${stock}` : 'Out of stock'}
                 </span>
-                <button
-                    className={`text-red-500 hover:underline cursor-pointer ${
-                        isDeleting ? 'opacity-50' : 'opacity-100'
-                    }`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                    }}
-                    disabled={isDeleting}
-                >
-                    {isDeleting ? 'Deleting...' : 'Delete'}
-                </button>
+
+                <DeleteCartItemButton id={id} onDelete={onDelete} />
             </div>
         </div>
     );
@@ -242,7 +218,6 @@ const QuantityControls = ({
             onClick={(e) => e.stopPropagation()}
             onChange={onInputChange}
             onBlur={(e) => {
-                // If input is empty or invalid, reset to current quantity
                 if (e.target.value === '' || parseInt(e.target.value) < 1) {
                     onInputChange({ target: { value: quantity.toString() } });
                 }

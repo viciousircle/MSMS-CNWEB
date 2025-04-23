@@ -31,7 +31,8 @@ const getCartItems = asyncHandler(async (req, res) => {
                 product.colors?.find((c) => c.color === item.color) || {};
 
             return {
-                _id: product._id,
+                _id: item._id, // Now using the cart item's ID instead of product ID
+                productId: product._id, // Explicitly adding product ID if needed
                 name: product.name,
                 price: product.price,
                 image: product.image,
