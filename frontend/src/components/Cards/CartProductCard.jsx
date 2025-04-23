@@ -12,19 +12,32 @@ import {
 import { Button } from '@/components/ui/button';
 
 const CartProductCard = ({
-    product,
-    isChecked,
-    onCheckChange,
-    onQuantityChange,
+    product = {},
+    isChecked = false,
+    onCheckChange = () => {},
+    onQuantityChange = () => {},
 }) => {
-    const { stock } =
-        product.colors.find((c) => c.color === product.color) || {};
-    const isOutOfStock = !stock;
+    // Safely handle product data
+    const safeProduct = {
+        _id: product._id || '',
+        name: product.name || '',
+        price: product.price || 0,
+        image: product.image || '',
+        color: product.color || '',
+        quantity: product.quantity || 1,
+        colors: Array.isArray(product.colors) ? product.colors : [],
+    };
+
+    // Find stock for selected color
+    const selectedColor =
+        safeProduct.colors.find((c) => c.color === safeProduct.color) || {};
+    const stock = selectedColor.stock || 0;
+    const isOutOfStock = stock <= 0;
 
     const handleQuantityChange = (newQuantity) => {
         if (isOutOfStock) return;
-        onQuantityChange(
-            product._id,
+        onQuantityChange?.(
+            safeProduct._id,
             Math.max(1, Math.min(stock, newQuantity))
         );
     };
@@ -35,7 +48,7 @@ const CartProductCard = ({
             <div className="flex w-full">
                 <Divider vertical />
                 <CardContent
-                    product={product}
+                    product={safeProduct}
                     isChecked={isChecked}
                     isOutOfStock={isOutOfStock}
                     onCheckChange={onCheckChange}
@@ -138,7 +151,7 @@ const ProductDetails = ({ product, stock, isOutOfStock }) => {
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Colors</SelectLabel>
-                                    {product.colors.map((color) => (
+                                    {(product.colors || []).map((color) => (
                                         <SelectItem
                                             key={color.color}
                                             value={color.color}

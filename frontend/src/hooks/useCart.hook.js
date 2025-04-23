@@ -13,13 +13,22 @@ const useCart = () => {
                 const data = await api('/cart');
                 const items = data.cartItems.map((item) => ({
                     ...item.product,
+                    _id: item.product?._id,
                     quantity: item.quantity,
                     color: item.color,
+                    colors: Array.isArray(item.product?.colors)
+                        ? item.product.colors
+                        : [],
+                    image: item.product?.image || '',
+                    name: item.product?.name || 'Unknown Product',
+                    price: item.product?.price || 0,
                 }));
                 setProducts(items);
 
                 const initialChecked = items.reduce((acc, product) => {
-                    acc[product._id] = false;
+                    if (product._id) {
+                        acc[product._id] = false;
+                    }
                     return acc;
                 }, {});
                 setCheckedProducts(initialChecked);

@@ -9,6 +9,7 @@ import useCart from '@/hooks/useCart.hook';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Section, SectionItem } from '@/components/Layouts/SectionLayout';
 import { Link } from 'react-router-dom';
+
 const Cart = () => {
     const {
         products,

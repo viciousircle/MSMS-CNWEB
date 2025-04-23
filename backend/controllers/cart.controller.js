@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
  * @route: GET /api/cart
  * @access: Private (only for customers)
  */
+// cart.controller.js
 const getCartItems = asyncHandler(async (req, res) => {
     try {
         const userId = req.user ? req.user._id : null;
@@ -15,13 +16,25 @@ const getCartItems = asyncHandler(async (req, res) => {
 
         const cart = await Cart.findOne({
             $or: [{ user: userId }, { uuid: uuid }],
-        }).populate('cartItems.product');
+        }).populate({
+            path: 'cartItems.product',
+            select: 'name price image colors', // Ensure we get the colors field
+        });
 
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        res.status(200).json(cart);
+        // Ensure each cart item has proper product data
+        const sanitizedCart = {
+            ...cart.toObject(),
+            cartItems: cart.cartItems.map((item) => ({
+                ...item,
+                product: item.product || { _id: null, colors: [] },
+            })),
+        };
+
+        res.status(200).json(sanitizedCart);
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -74,7 +87,9 @@ const addItemToCart = asyncHandler(async (req, res) => {
         // Check if item already exists in cart with same color
         const existingItemIndex = cart.cartItems.findIndex(
             (item) =>
-                item.product.toString() === productId && item.color === color
+                item.product &&
+                item.product._id.toString() === productId.toString() &&
+                item.color === color
         );
 
         if (existingItemIndex !== -1) {
