@@ -23,3 +23,9 @@ export const api = async (endpoint, options = {}) => {
 
     return await response.json();
 };
+
+export const deleteCartItem = async (id) => {
+    return api(`/cart/${id}`, {
+        method: 'DELETE',
+    });
+};

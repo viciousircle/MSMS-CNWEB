@@ -7,32 +7,50 @@ const initializeCheckedProducts = (products) =>
         return acc;
     }, {});
 
+// In useCart.js
 const useCart = () => {
     const [products, setProducts] = useState([]);
     const [checkedProducts, setCheckedProducts] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const fetchCart = async () => {
+        try {
+            setLoading(true);
+            const data = await api('/cart');
+
+            const cartProducts = Array.isArray(data.items) ? data.items : [];
+
+            setProducts(cartProducts);
+            setCheckedProducts(initializeCheckedProducts(cartProducts));
+        } catch (err) {
+            setError(err.message);
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteCartItem = async (id) => {
+        try {
+            await api(`/cart/${id}`, {
+                method: 'DELETE',
+            });
+            // Remove the deleted item from local state
+            setProducts((prev) => prev.filter((item) => item._id !== id));
+            // Remove from checked products
+            setCheckedProducts((prev) => {
+                const newChecked = { ...prev };
+                delete newChecked[id];
+                return newChecked;
+            });
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+            throw error; // Re-throw to handle in component
+        }
+    };
+
     useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                setLoading(true);
-                const data = await api('/cart');
-
-                const cartProducts = Array.isArray(data.items)
-                    ? data.items
-                    : [];
-
-                setProducts(cartProducts);
-                setCheckedProducts(initializeCheckedProducts(cartProducts));
-            } catch (err) {
-                setError(err.message);
-                setProducts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCart();
     }, []);
 
@@ -68,7 +86,8 @@ const useCart = () => {
         allChecked,
         loading,
         error,
-        setProducts,
+        refetchCart: fetchCart,
+        deleteCartItem,
     };
 };
 
