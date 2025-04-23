@@ -152,35 +152,88 @@ const addItemToCart = asyncHandler(async (req, res) => {
  */
 const updateCartItem = asyncHandler(async (req, res) => {
     try {
-        const { quantity } = req.body;
+        const { quantity: quantityString } = req.body;
+        const quantity = Number(quantityString);
         const userId = req.user ? req.user._id : null;
-        const uuid = req.body.uuid || null;
+        const uuid = req.query.uuid || null;
 
-        if (typeof quantity !== 'number' || quantity < 1) {
+        if (isNaN(quantity) || quantity < 1) {
             return res.status(400).json({ message: 'Invalid quantity' });
         }
 
-        let cart = await Cart.findOne({ $or: [{ user: userId }, { uuid }] });
+        // Find the cart
+        let cart = await Cart.findOne({
+            $or: [{ user: userId }, { uuid }],
+        }).populate({
+            path: 'cartItems.product',
+            select: 'name price image colors rate',
+        });
 
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        const cartItem = cart.cartItems.find(
-            (item) => item._id.equals(req.params.id) // FIXED: Changed `req.params.itemId` to `req.params.id`
+        // Find the cart item
+        const cartItem = cart.cartItems.find((item) =>
+            item._id.equals(req.params.id)
         );
 
         if (!cartItem) {
             return res.status(404).json({ message: 'Cart item not found' });
         }
 
+        // Check if the requested quantity exceeds available stock
+        const product = cartItem.product;
+        if (product) {
+            const selectedColor = product.colors.find(
+                (c) => c.color === cartItem.color
+            );
+            if (selectedColor && quantity > selectedColor.stock) {
+                return res.status(400).json({
+                    message: `Requested quantity exceeds available stock (${selectedColor.stock})`,
+                });
+            }
+        }
+
+        // Update quantity
         cartItem.quantity = quantity;
         await cart.save();
 
-        res.status(200).json({ message: 'Cart item updated', cart });
+        // Transform the cart items for response
+        const transformedCartItems = cart.cartItems.map((item) => {
+            const product = item.product || {};
+            const selectedColor =
+                product.colors?.find((c) => c.color === item.color) || {};
+
+            return {
+                _id: product._id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                color: item.color,
+                stock: selectedColor.stock || 0,
+                quantity: item.quantity,
+            };
+        });
+
+        res.status(200).json({
+            _id: cart._id,
+            user: cart.user,
+            uuid: cart.uuid,
+            items: transformedCartItems,
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt,
+            message: 'Cart item updated successfully',
+        });
     } catch (error) {
         console.error('Error updating cart item:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({
+            message: 'Internal server error',
+            error:
+                process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : undefined,
+        });
     }
 });
 
