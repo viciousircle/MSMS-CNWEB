@@ -147,10 +147,91 @@ const addItemToCart = asyncHandler(async (req, res) => {
 
 /**
  * @desc: Update cart item quantity
- * @route:
- * @access: Private
+ * @route: PUT /api/cart/:id
+ * @access: Private (only for customers)
  */
-const updateCartItem = asyncHandler(async (req, res) => {});
+const updateCartItem = asyncHandler(async (req, res) => {
+    const { quantity: quantityString } = req.body;
+    const quantity = Number(quantityString);
+    const itemId = req.params.id;
+    const userId = req.user?._id || null;
+
+    if (!mongoose.Types.ObjectId.isValid(itemId)) {
+        return res.status(400).json({ message: 'Invalid cart item ID' });
+    }
+
+    if (!quantityString || isNaN(quantity) || quantity < 1) {
+        return res.status(400).json({ message: 'Invalid quantity' });
+    }
+
+    try {
+        // Find the user's cart
+        const cart = await Cart.findOne({ user: userId });
+
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        // Find the item in the cart
+        const cartItem = cart.cartItems.find(
+            (item) => item._id.toString() === itemId
+        );
+
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Cart item not found' });
+        }
+
+        // Get the product to check stock availability
+        const product = await Product.findById(cartItem.product);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Find the selected color in the product
+        const selectedColor = product.colors.find(
+            (c) => c.color === cartItem.color
+        );
+        if (!selectedColor) {
+            return res
+                .status(400)
+                .json({ message: 'Selected color not available' });
+        }
+
+        // Check if requested quantity exceeds available stock
+        if (quantity > selectedColor.stock) {
+            return res.status(400).json({
+                message: `Only ${selectedColor.stock} items available in stock for this color`,
+                maxQuantity: selectedColor.stock,
+            });
+        }
+
+        // Update the quantity
+        cartItem.quantity = quantity;
+        await cart.save();
+
+        // Populate product details for the response
+        const populatedCart = await Cart.findById(cart._id).populate({
+            path: 'cartItems.product',
+            select: 'name price image colors rate',
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Cart item quantity updated',
+            cart: populatedCart,
+        });
+    } catch (error) {
+        console.error('Error updating cart item:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error:
+                process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : undefined,
+        });
+    }
+});
 
 /**
  * @desc: Delete cart item
