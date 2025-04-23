@@ -11,6 +11,92 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/useLogin.hook';
+
+const LoginForm = ({ formData, handleChange, loading, error, onSubmit }) => (
+    <form onSubmit={onSubmit}>
+        <div className="flex flex-col gap-6">
+            <FormField
+                id="email"
+                label="Email"
+                type="email"
+                placeholder="abc@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+            />
+
+            <FormField
+                id="password"
+                label="Password"
+                type="password"
+                placeholder="Enter password here"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                extraLabel={
+                    <a
+                        href="#"
+                        className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
+                    >
+                        Forgot your password?
+                    </a>
+                }
+            />
+
+            {error && <ErrorMessage message={error} />}
+
+            <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+            </Button>
+
+            <Button variant="outline" className="w-full" type="button">
+                Login with Google
+            </Button>
+
+            <SignupLink />
+        </div>
+    </form>
+);
+
+const FormField = ({
+    id,
+    label,
+    type,
+    value,
+    onChange,
+    placeholder,
+    required,
+    extraLabel,
+}) => (
+    <div className="grid gap-2">
+        <div className="flex items-center">
+            <Label htmlFor={id}>{label}</Label>
+            {extraLabel}
+        </div>
+        <Input
+            id={id}
+            type={type}
+            placeholder={placeholder}
+            required={required}
+            value={value}
+            onChange={onChange}
+        />
+    </div>
+);
+
+const ErrorMessage = ({ message }) => (
+    <p className="text-red-500 text-sm">{message}</p>
+);
+
+const SignupLink = () => (
+    <div className="mt-4 text-center text-sm">
+        Don&apos;t have an account?{' '}
+        <a href="/signup" className="underline underline-offset-4">
+            Sign up
+        </a>
+    </div>
+);
+
 const LogIn = ({ className, ...props }) => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const { login, loading, error } = useLogin();
@@ -39,71 +125,13 @@ const LogIn = ({ className, ...props }) => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit}>
-                                <div className="flex flex-col gap-6">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            placeholder="abc@example.com"
-                                            required
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <div className="flex items-center">
-                                            <Label htmlFor="password">
-                                                Password
-                                            </Label>
-                                            <a
-                                                href="#"
-                                                className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
-                                            >
-                                                Forgot your password?
-                                            </a>
-                                        </div>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            required
-                                            value={formData.password}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-
-                                    {error && (
-                                        <p className="text-red-500 text-sm">
-                                            {error}
-                                        </p>
-                                    )}
-
-                                    <Button
-                                        type="submit"
-                                        className="w-full"
-                                        disabled={loading}
-                                    >
-                                        {loading ? 'Logging in...' : 'Login'}
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full"
-                                        type="button"
-                                    >
-                                        Login with Google
-                                    </Button>
-                                </div>
-                                <div className="mt-4 text-center text-sm">
-                                    Don&apos;t have an account?{' '}
-                                    <a
-                                        href="/signup"
-                                        className="underline underline-offset-4"
-                                    >
-                                        Sign up
-                                    </a>
-                                </div>
-                            </form>
+                            <LoginForm
+                                formData={formData}
+                                handleChange={handleChange}
+                                loading={loading}
+                                error={error}
+                                onSubmit={handleSubmit}
+                            />
                         </CardContent>
                     </Card>
                 </div>
