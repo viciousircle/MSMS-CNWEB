@@ -82,3 +82,5 @@ This project is licensed under the MIT License.
 2. Cancelled badge wrong color
 3. Cart controller have many problems
 4. Want to have sign up & log in with google
+5. API tinh thanh pho VN
+6. API thanh toan QR
