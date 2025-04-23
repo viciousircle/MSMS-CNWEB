@@ -19,45 +19,67 @@ const Cart = () => {
         allChecked,
         handleProductCheck,
         handleCheckAll,
+        loading,
+        error,
     } = useCart();
+
+    if (loading) {
+        return <div>Loading cart...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading cart: {error}</div>;
+    }
 
     return (
         <>
             <Body>
                 <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
 
-                <Section>
-                    <SectionItem
-                        className="cursor-pointer"
-                        onClick={() => handleCheckAll(!allChecked)}
-                    >
-                        <Checkbox
-                            className="size-6"
-                            checked={allChecked}
-                            onCheckedChange={handleCheckAll}
-                        />
-                        <div>Select All</div>
-                    </SectionItem>
-                </Section>
+                {products.length > 0 ? (
+                    <>
+                        <Section>
+                            <SectionItem
+                                className="cursor-pointer"
+                                onClick={() => handleCheckAll(!allChecked)}
+                            >
+                                <Checkbox
+                                    className="size-6"
+                                    checked={allChecked}
+                                    onCheckedChange={handleCheckAll}
+                                />
+                                <div>Select All</div>
+                            </SectionItem>
+                        </Section>
 
-                <div className="flex flex-col gap-4">
-                    <Label titles={['Products', `${products.length} ITEMS`]} />
-                    <CardLayout variant="linear">
-                        {products.map((product) => (
-                            <CartProductCard
-                                key={product._id}
-                                product={product}
-                                isChecked={
-                                    checkedProducts[product._id] || false
-                                }
-                                onCheckChange={handleProductCheck}
+                        <div className="flex flex-col gap-4">
+                            <Label
+                                titles={[
+                                    'Products',
+                                    `${products.length} ITEMS`,
+                                ]}
                             />
-                        ))}
-                    </CardLayout>
-                </div>
+                            <CardLayout variant="linear">
+                                {products.map((product) => (
+                                    <CartProductCard
+                                        key={product._id}
+                                        product={product}
+                                        isChecked={
+                                            checkedProducts[product._id] ||
+                                            false
+                                        }
+                                        onCheckChange={handleProductCheck}
+                                    />
+                                ))}
+                            </CardLayout>
+                        </div>
+                    </>
+                ) : (
+                    <div className="text-center py-8">Your cart is empty</div>
+                )}
             </Body>
 
-            <CartTotal />
+            {products.length > 0 && <CartTotal />}
         </>
     );
 };

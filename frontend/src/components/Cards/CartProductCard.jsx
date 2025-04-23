@@ -15,6 +15,7 @@ const CartProductCard = ({
         image = '',
         quantity = 1,
         stock = 0,
+        color = '',
     } = product;
 
     const isOutOfStock = stock <= 0;
@@ -39,6 +40,7 @@ const CartProductCard = ({
                     price={price}
                     quantity={quantity}
                     stock={stock}
+                    color={color}
                     isChecked={isChecked}
                     isOutOfStock={isOutOfStock}
                     onCheckChange={onCheckChange}
@@ -62,6 +64,7 @@ const CardContent = ({
     isOutOfStock,
     onCheckChange,
     onQuantityChange,
+    color,
 }) => {
     const updateQuantity = (delta) => {
         const newQuantity = quantity + delta;
@@ -93,6 +96,7 @@ const CardContent = ({
                 name={name}
                 price={price}
                 quantity={quantity}
+                color={color}
                 stock={stock}
                 dimmed={isOutOfStock}
                 updateQuantity={updateQuantity}
@@ -120,6 +124,7 @@ const ProductInfo = ({
     stock,
     dimmed,
     updateQuantity,
+    color,
 }) => {
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -147,6 +152,14 @@ const ProductInfo = ({
                 <span className="text-2xl font-medium hover:underline">
                     {name}
                 </span>
+                <div className="flex gap-2 items-center">
+                    <div>
+                        <span className="tracking-wider">Color</span>
+                    </div>
+                    <div className="border border-gray-300 px-2 py-1 rounded-md bg-gray-950/2.5 text-sm text-gray-500">
+                        {color}
+                    </div>
+                </div>
                 <div className="flex gap-2 items-center">
                     <span className="tracking-wider">Quantity</span>
                     <QuantityControls

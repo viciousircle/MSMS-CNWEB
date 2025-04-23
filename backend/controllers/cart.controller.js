@@ -17,23 +17,38 @@ const getCartItems = asyncHandler(async (req, res) => {
             $or: [{ user: userId }, { uuid: uuid }],
         }).populate({
             path: 'cartItems.product',
-            select: 'name price image colors', // Ensure we get the colors field
+            select: 'name price image colors rate',
         });
 
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        // Ensure each cart item has proper product data
-        const sanitizedCart = {
-            ...cart.toObject(),
-            cartItems: cart.cartItems.map((item) => ({
-                ...item,
-                product: item.product || { _id: null, colors: [] },
-            })),
-        };
+        // Transform the cart items to match the expected format
+        const transformedCartItems = cart.cartItems.map((item) => {
+            const product = item.product || {};
+            const selectedColor =
+                product.colors?.find((c) => c.color === item.color) || {};
 
-        res.status(200).json(sanitizedCart);
+            return {
+                _id: product._id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                color: item.color,
+                stock: selectedColor.stock || 0,
+                quantity: item.quantity,
+            };
+        });
+
+        res.status(200).json({
+            _id: cart._id,
+            user: cart.user,
+            uuid: cart.uuid,
+            items: transformedCartItems,
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt,
+        });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ message: 'Internal server error' });
