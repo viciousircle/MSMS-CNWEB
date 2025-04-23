@@ -1,10 +1,8 @@
 import './styles/App.css';
-
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import Store from './pages/Customer/Store';
 import NotFound from './pages/NotFound';
-import NavigationBar from './components/Structure/NavigationBar';
 import Cart from './pages/Customer/Cart';
 import Order from './pages/Customer/Order';
 import Payment from './pages/Payment';
@@ -16,12 +14,15 @@ import { useAuth } from './contexts/AuthContext';
 import SellerNavigationBar from './components/Structure/NavigationBar/SellerNavigationBar';
 import CustomerNavigationBar from './components/Structure/NavigationBar/CustomerNavigationBar';
 import AdminNavigationBar from './components/Structure/NavigationBar/AdminNavigationBar';
+import Dashboard from './pages/Seller/Dashboard';
+import ManageAccount from './pages/Admin/ManageAccount';
+import GuestNavigationBar from './components/Structure/NavigationBar/GuestNavigationBar';
 
 function App() {
     const { user, isAuthenticated } = useAuth();
 
     const getNavigationBar = () => {
-        if (!isAuthenticated()) return <div>Hi</div>;
+        if (!isAuthenticated()) return <GuestNavigationBar />;
         switch (user?.role) {
             case 'seller':
                 return <SellerNavigationBar />;
@@ -31,13 +32,25 @@ function App() {
                 return <CustomerNavigationBar />;
         }
     };
+
+    const getHomeRoute = () => {
+        if (!isAuthenticated()) return <Store />;
+        switch (user?.role) {
+            case 'seller':
+                return <Navigate to="/orders" replace />;
+            case 'admin':
+                return <Navigate to="/account" replace />;
+            default:
+                return <Store />;
+        }
+    };
+
     return (
         <>
             {getNavigationBar()}
 
-            <NavigationBar />
             <Routes>
-                <Route path="/" element={<Store />} />
+                <Route path="/" element={getHomeRoute()} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/order" element={<Order />} />
                 <Route path="/payment" element={<Payment />} />
@@ -45,9 +58,10 @@ function App() {
                 <Route path="/login" element={<LogIn />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/account" element={<ManageAccount />} />
             </Routes>
             <Toaster />
-            {/* <Footer /> */}
         </>
     );
 }
