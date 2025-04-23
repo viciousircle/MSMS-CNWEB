@@ -24,6 +24,8 @@ const Cart = () => {
         deleteCartItem,
     } = useCart();
 
+    console.log('Products:', products);
+
     if (loading) {
         return <div>Loading cart...</div>;
     }
@@ -32,6 +34,14 @@ const Cart = () => {
         return <div>Error loading cart: {error.message}</div>;
     }
 
+    const handleDeleteItem = async (deletedId) => {
+        try {
+            await deleteCartItem(deletedId); // This will handle both API call and state update
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+            // You might want to show an error message to the user here
+        }
+    };
     return (
         <>
             <Body>
@@ -70,7 +80,7 @@ const Cart = () => {
                                             false
                                         }
                                         onCheckChange={handleProductCheck}
-                                        onDelete={deleteCartItem} // Pass the delete function
+                                        onDelete={handleDeleteItem}
                                     />
                                 ))}
                             </CardLayout>
