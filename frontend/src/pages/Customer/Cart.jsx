@@ -21,6 +21,7 @@ const Cart = () => {
         handleCheckAll,
         loading,
         error,
+        deleteCartItem,
     } = useCart();
 
     if (loading) {
@@ -28,7 +29,7 @@ const Cart = () => {
     }
 
     if (error) {
-        return <div>Error loading cart: {error}</div>;
+        return <div>Error loading cart: {error.message}</div>;
     }
 
     return (
@@ -69,6 +70,7 @@ const Cart = () => {
                                             false
                                         }
                                         onCheckChange={handleProductCheck}
+                                        onDelete={deleteCartItem} // Pass the delete function
                                     />
                                 ))}
                             </CardLayout>
@@ -79,7 +81,7 @@ const Cart = () => {
                 )}
             </Body>
 
-            {products.length > 0 && <CartTotal />}
+            {products.length > 0 && <CartTotal products={products} />}
         </>
     );
 };
@@ -93,8 +95,12 @@ const formatCurrency = (amount) => {
         .replace('₫', 'VND');
 };
 
-const CartTotal = () => {
-    const total = 2.5 + 15.0 + 3.2 * 2; // Temporary static total
+const CartTotal = ({ products }) => {
+    // Calculate the actual total from the products
+    const total = products.reduce((sum, product) => {
+        return sum + product.price * product.quantity;
+    }, 0);
+
     const formattedTotal = formatCurrency(total);
 
     return (

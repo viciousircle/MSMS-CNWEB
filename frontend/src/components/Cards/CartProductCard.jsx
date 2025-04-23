@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 
@@ -7,6 +7,7 @@ const CartProductCard = ({
     isChecked = false,
     onCheckChange = () => {},
     onQuantityChange = () => {},
+    onDelete = () => {},
 }) => {
     const {
         _id = '',
@@ -45,6 +46,7 @@ const CartProductCard = ({
                     isOutOfStock={isOutOfStock}
                     onCheckChange={onCheckChange}
                     onQuantityChange={handleQuantityChange}
+                    onDelete={onDelete}
                 />
                 <Divider vertical />
             </div>
@@ -65,10 +67,24 @@ const CardContent = ({
     onCheckChange,
     onQuantityChange,
     color,
+    onDelete,
 }) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const updateQuantity = (delta) => {
         const newQuantity = quantity + delta;
         onQuantityChange(id, newQuantity); // Pass `id` here
+    };
+    const handleDelete = async () => {
+        try {
+            setIsDeleting(true);
+            await onDelete(id); // Call the delete function with the ID
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            // Error is already handled in the hook, but you could show a toast here
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -100,6 +116,8 @@ const CardContent = ({
                 stock={stock}
                 dimmed={isOutOfStock}
                 updateQuantity={updateQuantity}
+                onDelete={handleDelete}
+                isDeleting={isDeleting}
             />
         </div>
     );
@@ -125,6 +143,8 @@ const ProductInfo = ({
     dimmed,
     updateQuantity,
     color,
+    onDelete,
+    isDeleting = false,
 }) => {
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -176,12 +196,18 @@ const ProductInfo = ({
                 <span className="text-gray-500">
                     {stock > 0 ? `Available: ${stock}` : 'Out of stock'}
                 </span>
-                <span
-                    className="text-red-500 hover:underline cursor-pointer opacity-100"
-                    onClick={(e) => e.stopPropagation()}
+                <button
+                    className={`text-red-500 hover:underline cursor-pointer ${
+                        isDeleting ? 'opacity-50' : 'opacity-100'
+                    }`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                    disabled={isDeleting}
                 >
-                    Delete
-                </span>
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                </button>
             </div>
         </div>
     );
