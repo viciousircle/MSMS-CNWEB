@@ -1,60 +1,11 @@
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
+import ProductCard from './ProductCards/ProductCard';
+import ProductImage from './ProductCards/ProductImage';
+import ProductInfo from './ProductCards/ProductInfo';
+import { DEFAULT_PRODUCT } from '@/constants/cartProductConfig';
+import QuantityControls from '../Controls/QuantityControls';
 import DeleteCartItemButton from '../Buttons/DeleteCartItemButton';
-
-const CartProductCard = ({
-    product = {},
-    isChecked = false,
-    onCheckChange = () => {},
-    onQuantityChange = () => {},
-    onDelete = () => {},
-}) => {
-    const {
-        _id = '',
-        name = '',
-        price = 0,
-        image = '',
-        quantity = 1,
-        stock = 0,
-        color = '',
-    } = product;
-
-    const isOutOfStock = stock <= 0;
-
-    const handleQuantityChange = (newQty) => {
-        if (!isOutOfStock) {
-            const clampedQty = Math.max(1, Math.min(stock, newQty));
-            console.log(`Changing quantity of ${_id} to`, clampedQty);
-            onQuantityChange(_id, clampedQty);
-        }
-    };
-
-    return (
-        <div className="flex flex-col w-full">
-            <Divider horizontal />
-            <div className="flex w-full">
-                <Divider vertical />
-                <CardContent
-                    id={_id}
-                    name={name}
-                    image={image}
-                    price={price}
-                    quantity={quantity}
-                    stock={stock}
-                    color={color}
-                    isChecked={isChecked}
-                    isOutOfStock={isOutOfStock}
-                    onCheckChange={onCheckChange}
-                    onQuantityChange={handleQuantityChange}
-                    onDelete={onDelete}
-                />
-                <Divider vertical />
-            </div>
-            <Divider horizontal />
-        </div>
-    );
-};
 
 const CardContent = ({
     id,
@@ -63,192 +14,97 @@ const CardContent = ({
     price,
     quantity,
     stock,
+    color,
     isChecked,
     isOutOfStock,
     onCheckChange,
     onQuantityChange,
-    color,
     onDelete,
 }) => {
-    const updateQuantity = (delta) => {
-        const newQuantity = quantity + delta;
-        onQuantityChange(id, newQuantity);
-    };
+    const handleCheckboxChange = (checked) =>
+        !isOutOfStock && onCheckChange(id, checked);
+    const updateQuantity = (delta) => onQuantityChange(id, quantity + delta);
 
     return (
         <div
-            className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-4 ${
-                isChecked
-                    ? 'bg-gray-950/2.5'
-                    : isOutOfStock
-                    ? 'bg-gray-950/5 cursor-not-allowed'
-                    : ''
-            }`}
+            className={`flex w-full gap-4 min-w-max border border-gray-950/5 p-4 
+      ${isChecked ? 'bg-gray-950/2.5' : ''} 
+      ${isOutOfStock ? 'bg-gray-950/5 cursor-not-allowed' : ''}`}
         >
             <div className="flex items-center">
                 <Checkbox
                     className="size-5"
                     checked={isChecked}
                     onClick={(e) => e.stopPropagation()}
-                    onCheckedChange={(checked) =>
-                        !isOutOfStock && onCheckChange(id, checked)
-                    }
+                    onCheckedChange={handleCheckboxChange}
                 />
             </div>
-            <ProductImage src={image} dimmed={isOutOfStock} />
-            <ProductInfo
-                name={name}
-                price={price}
-                quantity={quantity}
-                color={color}
-                stock={stock}
-                dimmed={isOutOfStock}
-                updateQuantity={updateQuantity}
-                id={id}
-                onDelete={onDelete}
-            />
+
+            <ProductImage src={image} dimmed={isOutOfStock} className="w-1/5" />
+
+            <div className="flex flex-col w-full gap-2 px-4 justify-center">
+                <div className="flex justify-between items-center">
+                    <ProductInfo
+                        name={name}
+                        price={price}
+                        color={color}
+                        stock={stock}
+                        dimmed={isOutOfStock}
+                        className="flex-1"
+                        nameClassName="text-2xl hover:underline"
+                    />
+                    <div className="flex gap-2 items-center">
+                        <span className="tracking-wider">Quantity</span>
+                        <QuantityControls
+                            quantity={quantity}
+                            stock={stock}
+                            isDisabled={isOutOfStock}
+                            onChange={updateQuantity}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex justify-end border-t border-gray-300 pt-2">
+                    <DeleteCartItemButton id={id} onDelete={onDelete} />
+                </div>
+            </div>
         </div>
     );
 };
 
-const ProductImage = React.memo(({ src, dimmed }) => (
-    <div className="flex w-1/5 h-64 items-center justify-center bg-white rounded-lg outline outline-gray-950/5">
-        <img
-            src={src}
-            alt="Product"
-            className={`w-64 object-contain ${
-                dimmed ? 'opacity-70' : 'opacity-100'
-            }`}
-        />
-    </div>
-));
-
-const ProductInfo = ({
-    name,
-    price,
-    quantity,
-    stock,
-    dimmed,
-    updateQuantity,
-    color,
-    onDelete,
-    id,
+const CartProductCard = ({
+    product = DEFAULT_PRODUCT,
+    isChecked = false,
+    onCheckChange = () => {},
+    onQuantityChange = () => {},
+    onDelete = () => {},
 }) => {
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        if (value === '') {
-            updateQuantity(0 - quantity);
-            return;
-        }
+    const { _id, name, price, image, quantity, stock, color } = product;
+    const isOutOfStock = stock <= 0;
 
-        const newQty = parseInt(value, 10);
-        if (!isNaN(newQty)) {
-            const diff = newQty - quantity;
-            updateQuantity(diff);
-        }
+    const handleQuantityChange = (newQty) => {
+        if (isOutOfStock) return;
+        onQuantityChange(_id, Math.max(1, Math.min(stock, newQty)));
     };
 
     return (
-        <div className="flex flex-col w-full gap-2 px-4 justify-center">
-            <div
-                className={`flex justify-between items-center ${
-                    dimmed ? 'opacity-70' : 'opacity-100'
-                }`}
-            >
-                <span className="text-2xl font-medium hover:underline">
-                    {name}
-                </span>
-                <div className="flex gap-2 items-center">
-                    <div>
-                        <span className="tracking-wider">Color</span>
-                    </div>
-                    <div className="border border-gray-300 px-2 py-1 rounded-md bg-gray-950/2.5 text-sm text-gray-500">
-                        {color}
-                    </div>
-                </div>
-                <div className="flex gap-2 items-center">
-                    <span className="tracking-wider">Quantity</span>
-                    <QuantityControls
-                        quantity={quantity}
-                        stock={stock}
-                        dimmed={dimmed}
-                        onChange={updateQuantity}
-                        onInputChange={handleInputChange}
-                    />
-                </div>
-                <span className="font-mono">{price}</span>
-            </div>
-            <div className="flex justify-between border-t border-gray-300 pt-2">
-                <span className="text-gray-500">
-                    {stock > 0 ? `Available: ${stock}` : 'Out of stock'}
-                </span>
-
-                <DeleteCartItemButton id={id} onDelete={onDelete} />
-            </div>
-        </div>
+        <ProductCard>
+            <CardContent
+                id={_id}
+                name={name}
+                image={image}
+                price={price}
+                quantity={quantity}
+                stock={stock}
+                color={color}
+                isChecked={isChecked}
+                isOutOfStock={isOutOfStock}
+                onCheckChange={onCheckChange}
+                onQuantityChange={handleQuantityChange}
+                onDelete={onDelete}
+            />
+        </ProductCard>
     );
 };
-
-const QuantityControls = ({
-    quantity,
-    stock,
-    dimmed,
-    onChange,
-    onInputChange,
-}) => (
-    <div className="flex items-center">
-        <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-                e.stopPropagation();
-                onChange(-1);
-            }}
-            disabled={dimmed || quantity <= 1}
-            className="h-10 px-3 rounded-r-none border-r-0"
-        >
-            -
-        </Button>
-        <input
-            type="number"
-            min={1}
-            max={stock}
-            value={quantity}
-            disabled={dimmed}
-            onClick={(e) => e.stopPropagation()}
-            onChange={onInputChange}
-            onBlur={(e) => {
-                if (e.target.value === '' || parseInt(e.target.value) < 1) {
-                    onInputChange({ target: { value: quantity.toString() } });
-                }
-            }}
-            className="w-16 h-10 text-center border-t border-b border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
-        />
-        <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-                e.stopPropagation();
-                onChange(1);
-            }}
-            disabled={dimmed || quantity >= stock}
-            className="h-10 px-3 rounded-l-none border-l-0"
-        >
-            +
-        </Button>
-    </div>
-);
-
-const Divider = React.memo(({ horizontal }) =>
-    horizontal ? (
-        <div className="flex w-full">
-            <div className="p-2" />
-            <div className="border-gray-950/5 border-x p-2 w-full" />
-            <div className="p-2" />
-        </div>
-    ) : (
-        <div className="border-gray-950/5 border-y p-2" />
-    )
-);
 
 export default CartProductCard;
