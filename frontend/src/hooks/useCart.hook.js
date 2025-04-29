@@ -35,9 +35,7 @@ const useCart = () => {
             await api(`/cart/${id}`, {
                 method: 'DELETE',
             });
-            // Remove the deleted item from local state
             setProducts((prev) => prev.filter((item) => item._id !== id));
-            // Remove from checked products
             setCheckedProducts((prev) => {
                 const newChecked = { ...prev };
                 delete newChecked[id];
@@ -45,7 +43,7 @@ const useCart = () => {
             });
         } catch (error) {
             console.error('Failed to delete item:', error);
-            throw error; // Re-throw to handle in component
+            throw error;
         }
     };
 
