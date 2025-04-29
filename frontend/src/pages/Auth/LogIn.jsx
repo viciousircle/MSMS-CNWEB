@@ -33,14 +33,6 @@ const LoginForm = ({ formData, handleChange, loading, error, onSubmit }) => (
                 value={formData.password}
                 onChange={handleChange}
                 required
-                extraLabel={
-                    <a
-                        href="#"
-                        className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
-                    >
-                        Forgot your password?
-                    </a>
-                }
             />
 
             {error && <ErrorMessage message={error} />}
