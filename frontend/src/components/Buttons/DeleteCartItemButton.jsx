@@ -1,13 +1,9 @@
 import React from 'react';
-import { deleteCartItem } from '/utils/api';
 
 const DeleteCartItemButton = ({ id, onDelete }) => {
     const handleDelete = async () => {
         try {
-            await deleteCartItem(id);
-            if (onDelete) {
-                onDelete(id);
-            }
+            await onDelete(id);
         } catch (error) {
             console.error('Failed to delete item:', error);
         }
