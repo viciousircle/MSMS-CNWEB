@@ -13,9 +13,7 @@ const ProductInfo = React.memo(
         colorClassName = '',
         stockClassName = '',
     }) => (
-        <div
-            className={`flex flex-col gap-2 items-start w-full max-w-[150px] ${className}`}
-        >
+        <div className={`flex flex-col gap-2 items-start w-full ${className}`}>
             <span
                 className={`font-medium truncate w-full whitespace-nowrap overflow-hidden block text-left ${nameClassName}`}
                 title={name}

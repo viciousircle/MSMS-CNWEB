@@ -12,6 +12,9 @@ import useCart from '@/hooks/useCart.hook';
 import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
 
+// TODO: 1. Change loading, error to beautiful
+// TODO: 2. Fix the price (it seem wrong)
+
 const Cart = () => {
     const {
         products,
@@ -95,7 +98,12 @@ const Cart = () => {
                 {renderCartContent()}
             </Body>
 
-            {products.length > 0 && <CartTotal products={products} />}
+            {products.length > 0 && (
+                <CartTotal
+                    products={products}
+                    checkedProducts={checkedProducts}
+                />
+            )}
         </>
     );
 };

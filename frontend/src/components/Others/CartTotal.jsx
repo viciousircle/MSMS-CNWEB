@@ -2,9 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '/utils/currency';
 
-const CartTotal = ({ products }) => {
+const CartTotal = ({ products, checkedProducts }) => {
     const total = products.reduce((sum, product) => {
-        return sum + product.price * product.quantity;
+        // Only add to total if product is checked
+        if (checkedProducts[product._id]) {
+            return sum + product.price * product.quantity;
+        }
+        return sum;
     }, 0);
 
     const formattedTotal = formatCurrency(total);
@@ -22,5 +26,4 @@ const CartTotal = ({ products }) => {
         </div>
     );
 };
-
 export default CartTotal;

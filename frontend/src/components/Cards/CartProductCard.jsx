@@ -24,7 +24,6 @@ const CardContent = ({
     const handleCheckboxChange = (checked) =>
         !isOutOfStock && onCheckChange(id, checked);
 
-    // Remove the delta function and just pass the new quantity directly
     const handleQuantityChange = (newQuantity) => {
         if (!isOutOfStock) {
             onQuantityChange(id, newQuantity);
@@ -46,19 +45,28 @@ const CardContent = ({
                 />
             </div>
 
-            <ProductImage src={image} dimmed={isOutOfStock} className="w-1/5" />
+            <div>
+                <ProductImage
+                    src={image}
+                    dimmed={isOutOfStock}
+                    className="w-1/2"
+                />
+            </div>
 
             <div className="flex flex-col w-full gap-2 px-4 justify-center">
                 <div className="flex justify-between items-center">
-                    <ProductInfo
-                        name={name}
-                        price={price}
-                        color={color}
-                        stock={stock}
-                        dimmed={isOutOfStock}
-                        className="flex-1"
-                        nameClassName="text-2xl hover:underline"
-                    />
+                    <div className="w-full">
+                        <ProductInfo
+                            name={name}
+                            price={price}
+                            color={color}
+                            stock={stock}
+                            dimmed={isOutOfStock}
+                            className="w-full"
+                            nameClassName="text-xl break-words"
+                        />
+                    </div>
+
                     <div className="flex gap-2 items-center">
                         <span className="tracking-wider">Quantity</span>
                         <QuantityControls
