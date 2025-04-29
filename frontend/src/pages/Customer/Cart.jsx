@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Section, SectionItem } from '@/components/Layouts/SectionLayout';
 import useCart from '@/hooks/useCart.hook';
 import CartTotal from '@/components/Others/CartTotal';
+import CartNotFound from '@/components/NotFounds/CartNotFound';
 
 const Cart = () => {
     const {
@@ -42,7 +43,11 @@ const Cart = () => {
 
     const renderCartContent = () => {
         if (products.length === 0) {
-            return <div className="text-center py-8">Your cart is empty</div>;
+            return (
+                <>
+                    <CartNotFound />
+                </>
+            );
         }
 
         return (

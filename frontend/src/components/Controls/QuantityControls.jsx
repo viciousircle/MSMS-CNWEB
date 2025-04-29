@@ -4,33 +4,25 @@ import { Button } from '@/components/ui/button';
 const QuantityControls = ({ quantity, stock, isDisabled, onChange }) => {
     const handleDecrement = (e) => {
         e.stopPropagation();
-        onChange(-1);
+        onChange(quantity - 1);
     };
 
     const handleIncrement = (e) => {
         e.stopPropagation();
-        onChange(1);
+        onChange(quantity + 1);
     };
 
     const handleInputChange = (e) => {
         const value = e.target.value;
-        if (value === '') {
-            onChange(0 - quantity);
-            return;
-        }
-
         const newQty = parseInt(value, 10);
         if (!isNaN(newQty)) {
-            const diff = newQty - quantity;
-            onChange(diff);
+            onChange(newQty);
         }
     };
 
     const handleBlur = (e) => {
         if (e.target.value === '' || parseInt(e.target.value) < 1) {
-            handleInputChange({
-                target: { value: quantity.toString() },
-            });
+            onChange(quantity);
         }
     };
 
