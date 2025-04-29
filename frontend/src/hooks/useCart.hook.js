@@ -7,7 +7,6 @@ const initializeCheckedProducts = (products) =>
         return acc;
     }, {});
 
-// In useCart.js
 const useCart = () => {
     const [products, setProducts] = useState([]);
     const [checkedProducts, setCheckedProducts] = useState({});
