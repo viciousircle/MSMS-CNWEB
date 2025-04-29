@@ -22,6 +22,7 @@ const Cart = () => {
         handleProductCheck,
         handleCheckAll,
         deleteCartItem,
+        updateCartItemQuantity,
     } = useCart();
 
     const handleDeleteItem = async (deletedId) => {
@@ -78,6 +79,7 @@ const Cart = () => {
                                 }
                                 onCheckChange={handleProductCheck}
                                 onDelete={handleDeleteItem}
+                                onQuantityChange={updateCartItemQuantity}
                             />
                         ))}
                     </CardLayout>

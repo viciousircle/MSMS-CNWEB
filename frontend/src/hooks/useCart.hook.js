@@ -30,6 +30,31 @@ const useCart = () => {
         }
     };
 
+    const updateCartItemQuantity = async (id, newQuantity) => {
+        try {
+            // Ensure newQuantity is a valid number between 1 and stock
+            const parsedQuantity = Math.max(1, Number(newQuantity));
+
+            const response = await api(`/cart/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ quantity: parsedQuantity }), // Remove .toString()
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            setProducts((prev) =>
+                prev.map((item) =>
+                    item._id === id
+                        ? { ...item, quantity: parsedQuantity }
+                        : item
+                )
+            );
+            return response;
+        } catch (error) {
+            console.error('Failed to update quantity:', error);
+            throw error;
+        }
+    };
+
     const deleteCartItem = async (id) => {
         try {
             await api(`/cart/${id}`, {
@@ -85,6 +110,7 @@ const useCart = () => {
         error,
         refetchCart: fetchCart,
         deleteCartItem,
+        updateCartItemQuantity,
     };
 };
 

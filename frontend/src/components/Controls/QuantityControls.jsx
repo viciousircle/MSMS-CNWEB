@@ -4,25 +4,34 @@ import { Button } from '@/components/ui/button';
 const QuantityControls = ({ quantity, stock, isDisabled, onChange }) => {
     const handleDecrement = (e) => {
         e.stopPropagation();
-        onChange(quantity - 1);
+        const newQty = Math.max(1, quantity - 1);
+        onChange(newQty);
     };
 
     const handleIncrement = (e) => {
         e.stopPropagation();
-        onChange(quantity + 1);
+        console.log('Incrementing quantity');
+        const newQty = Math.min(stock, Number(quantity) + 1);
+        console.log('New quantity:', newQty);
+        onChange(newQty);
     };
 
     const handleInputChange = (e) => {
         const value = e.target.value;
+        if (value === '') {
+            onChange(1); // Default to 1 if empty
+            return;
+        }
+
         const newQty = parseInt(value, 10);
         if (!isNaN(newQty)) {
-            onChange(newQty);
+            onChange(Math.max(1, Math.min(stock, newQty)));
         }
     };
 
     const handleBlur = (e) => {
         if (e.target.value === '' || parseInt(e.target.value) < 1) {
-            onChange(quantity);
+            onChange(1); // Reset to 1 if invalid
         }
     };
 
