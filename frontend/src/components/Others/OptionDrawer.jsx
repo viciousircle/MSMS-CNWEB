@@ -15,7 +15,7 @@ import QuantitySelector from '../Selectors/QuantitySelector';
 import ColorSelector from '../Selectors/ColorSelector';
 import useProductOptions from '@/hooks/useProductOption.hook';
 const OptionDrawer = ({ product }) => {
-    const { name, colors } = product;
+    const { name, colors, image, price, _id } = product;
 
     const {
         selectedColor,
@@ -27,6 +27,15 @@ const OptionDrawer = ({ product }) => {
         handleInputChange,
         currentColorStock,
     } = useProductOptions(colors);
+
+    const productData = {
+        id: _id,
+        name,
+        img: image,
+        color: selectedColor,
+        quantity,
+        price,
+    };
 
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -59,9 +68,8 @@ const OptionDrawer = ({ product }) => {
                                 quantity={quantity}
                             />
                             <BuyButton
-                                product={product}
-                                selectedColor={selectedColor}
-                                quantity={quantity}
+                                products={[productData]}
+                                className="flex-1 bg-black text-white hover:bg-gray-800 rounded-md text-sm flex justify-center items-center"
                             />
                         </div>
                         <CancelButton onClose={() => setIsOpen(false)} />
