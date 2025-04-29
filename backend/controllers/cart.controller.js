@@ -147,25 +147,37 @@ const addItemToCart = asyncHandler(async (req, res) => {
  * @access: Private (only for customers)
  */
 const updateCartItem = asyncHandler(async (req, res) => {
-    const { quantity: quantityString } = req.body;
-    const quantity = Number(quantityString);
+    const { quantity } = req.body;
     const itemId = req.params.id;
     const userId = req.user?._id;
 
+    // Validate item ID
     if (!mongoose.Types.ObjectId.isValid(itemId)) {
         return res.status(400).json({ message: 'Invalid cart item ID' });
     }
 
-    if (isNaN(quantity) || quantity < 1) {
-        return res.status(400).json({ message: 'Invalid quantity' });
+    let quantityNumber;
+    try {
+        quantityNumber = parseInt(quantity, 10);
+        if (isNaN(quantityNumber) || quantityNumber < 1) {
+            throw new Error('Invalid quantity');
+        }
+    } catch (err) {
+        return res.status(400).json({
+            message: 'Quantity must be a positive integer',
+            received: quantity,
+            type: typeof quantity,
+        });
     }
 
     try {
+        // Find user's cart
         const cart = await Cart.findOne({ user: userId });
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
+        // Find the specific cart item
         const cartItem = cart.cartItems.find(
             (item) => item._id.toString() === itemId
         );
@@ -173,52 +185,58 @@ const updateCartItem = asyncHandler(async (req, res) => {
             return res.status(404).json({ message: 'Cart item not found' });
         }
 
-        const oldQuantity = cartItem.quantity;
+        // Get product info
         const product = await Product.findById(cartItem.product);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
+        // Check color availability
         const selectedColor = product.colors.find(
             (c) => c.color === cartItem.color
         );
         if (!selectedColor) {
-            return res
-                .status(400)
-                .json({ message: 'Selected color not available' });
-        }
-
-        if (quantity > selectedColor.stock) {
             return res.status(400).json({
-                message: `Only ${selectedColor.stock} items available in stock for this color`,
-                maxQuantity: selectedColor.stock,
+                message: 'Selected color not available',
+                availableColors: product.colors.map((c) => c.color),
             });
         }
 
-        cartItem.quantity = quantity;
+        // Check stock availability
+        if (quantityNumber > selectedColor.stock) {
+            return res.status(400).json({
+                message: `Only ${selectedColor.stock} items available in stock for this color`,
+                maxQuantity: selectedColor.stock,
+                currentQuantity: cartItem.quantity,
+            });
+        }
+
+        // Update quantity
+        const oldQuantity = cartItem.quantity;
+        cartItem.quantity = quantityNumber;
         await cart.save();
 
         res.status(200).json({
             success: true,
             message: 'Cart item quantity updated',
-            items: [
-                {
-                    _id: cartItem._id,
-                    oldQuantity,
-                    newQuantity: quantity,
-                },
-            ],
+            item: {
+                _id: cartItem._id,
+                product: cartItem.product,
+                oldQuantity,
+                newQuantity: quantityNumber,
+                maxQuantity: selectedColor.stock,
+            },
         });
     } catch (error) {
         console.error('Error updating cart item:', error);
-        const errorResponse = {
+        res.status(500).json({
             success: false,
             message: 'Internal server error',
-        };
-        if (process.env.NODE_ENV === 'development') {
-            errorResponse.error = error.message;
-        }
-        res.status(500).json(errorResponse);
+            ...(process.env.NODE_ENV === 'development' && {
+                error: error.message,
+                stack: error.stack,
+            }),
+        });
     }
 });
 

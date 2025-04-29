@@ -1,4 +1,6 @@
 export const api = async (endpoint, options = {}) => {
+    console.log('API call:', endpoint, options); // Add this for debugging
+
     const token = localStorage.getItem('token');
 
     const headers = {

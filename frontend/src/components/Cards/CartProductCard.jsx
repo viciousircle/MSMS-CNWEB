@@ -23,7 +23,13 @@ const CardContent = ({
 }) => {
     const handleCheckboxChange = (checked) =>
         !isOutOfStock && onCheckChange(id, checked);
-    const updateQuantity = (delta) => onQuantityChange(id, quantity + delta);
+
+    // Remove the delta function and just pass the new quantity directly
+    const handleQuantityChange = (newQuantity) => {
+        if (!isOutOfStock) {
+            onQuantityChange(id, newQuantity);
+        }
+    };
 
     return (
         <div
@@ -59,7 +65,7 @@ const CardContent = ({
                             quantity={quantity}
                             stock={stock}
                             isDisabled={isOutOfStock}
-                            onChange={updateQuantity}
+                            onChange={handleQuantityChange}
                         />
                     </div>
                 </div>
@@ -82,9 +88,10 @@ const CartProductCard = ({
     const { _id, name, price, image, quantity, stock, color } = product;
     const isOutOfStock = stock <= 0;
 
-    const handleQuantityChange = (newQty) => {
+    const handleQuantityChange = (id, newQty) => {
         if (isOutOfStock) return;
-        onQuantityChange(_id, Math.max(1, Math.min(stock, newQty)));
+        const validatedQty = Math.max(1, Math.min(stock, Number(newQty)));
+        onQuantityChange(id, validatedQty);
     };
 
     return (
