@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
 import { PencilIcon } from '@heroicons/react/24/outline';
 import {
     Dialog,
@@ -16,14 +17,14 @@ import { EditForm } from '../Others/EditForm';
 import { InformationReceiver } from '../Others/InformationReceiver';
 
 const INITIAL_RECEIVER_INFO = {
-    name: 'Vu Minh Quy',
-    phone: '0327589638',
+    name: '',
+    phone: '',
     address: {
-        number: '903',
-        street: 'Minh Khai',
-        district: 'Hai Ba Trung',
+        number: '',
+        street: '',
+        district: '',
         districtCode: '',
-        province: 'Hanoi',
+        province: '',
         provinceCode: '',
         ward: '',
         wardCode: '',
@@ -31,8 +32,18 @@ const INITIAL_RECEIVER_INFO = {
 };
 
 const PaymentReceiverCard = () => {
-    const [receiverInfo, setReceiverInfo] = useState(INITIAL_RECEIVER_INFO);
-    const [editInfo, setEditInfo] = useState({ ...INITIAL_RECEIVER_INFO });
+    const loadReceiverInfo = () => {
+        const savedInfo = localStorage.getItem('receiverInfo');
+        return savedInfo ? JSON.parse(savedInfo) : INITIAL_RECEIVER_INFO;
+    };
+
+    const [receiverInfo, setReceiverInfo] = useState(loadReceiverInfo());
+    const [editInfo, setEditInfo] = useState({ ...loadReceiverInfo() });
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    useEffect(() => {
+        localStorage.setItem('receiverInfo', JSON.stringify(receiverInfo));
+    }, [receiverInfo]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -54,7 +65,7 @@ const PaymentReceiverCard = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setReceiverInfo({ ...editInfo });
-        // You might want to add API call here to save the data
+        setIsDialogOpen(false);
     };
 
     return (
@@ -68,13 +79,13 @@ const PaymentReceiverCard = () => {
                     </div>
 
                     {/* Edit Dialog */}
-                    <Dialog>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger className="focus:outline-none">
                             <div className="flex border-gray-950/5 border-x gap-2 hover:bg-gray-950/2.5 items-center px-4 py-2 focus:outline-none cursor-pointer">
                                 <PencilIcon className="size-6" />
                             </div>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[1200px] px-8">
+                        <DialogContent className="sm:max-w-[700px] px-8">
                             <EditForm
                                 editInfo={editInfo}
                                 onInputChange={handleInputChange}
@@ -87,7 +98,10 @@ const PaymentReceiverCard = () => {
                 </div>
             </div>
 
-            <InformationReceiver info={receiverInfo} />
+            <InformationReceiver
+                info={receiverInfo}
+                onEditClick={() => setIsDialogOpen(true)}
+            />
         </div>
     );
 };

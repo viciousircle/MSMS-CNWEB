@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,6 +21,53 @@ export const EditForm = ({
     const [provinces] = useProvinces();
     const [districts] = useDistricts(editInfo.address.provinceCode);
     const [wards] = useWards(editInfo.address.districtCode);
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({
+        name: false,
+        phone: false,
+        address: {
+            province: false,
+            district: false,
+            ward: false,
+            number: false,
+            street: false,
+        },
+    });
+
+    // Validate form whenever editInfo changes
+    useEffect(() => {
+        const isValidName = editInfo.name.trim() !== '';
+        const isValidPhone = editInfo.phone.trim() !== '';
+        const isValidAddress =
+            editInfo.address.provinceCode &&
+            editInfo.address.districtCode &&
+            editInfo.address.wardCode &&
+            editInfo.address.number.trim() &&
+            editInfo.address.street.trim();
+
+        setIsFormValid(isValidName && isValidPhone && isValidAddress);
+
+        setValidationErrors({
+            name: !isValidName,
+            phone: !isValidPhone,
+            address: {
+                province: !editInfo.address.provinceCode,
+                district: !editInfo.address.districtCode,
+                ward: !editInfo.address.wardCode,
+                number: !editInfo.address.number.trim(),
+                street: !editInfo.address.street.trim(),
+            },
+        });
+    }, [editInfo.name, editInfo.phone, editInfo.address]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!isFormValid) {
+            // Optionally show more prominent validation messages here
+            return;
+        }
+        onSubmit(e);
+    };
 
     const handleProvinceChange = (provinceCode) => {
         const selectedProvince = provinces.find(
@@ -67,18 +114,42 @@ export const EditForm = ({
             label: 'Receiver',
             name: 'name',
             component: (
-                <Input
-                    className="flex-1"
-                    name="name"
-                    value={editInfo.name}
-                    onChange={onInputChange}
-                />
+                <div className="flex-1">
+                    <Input
+                        className={`flex-1 ${
+                            validationErrors.name ? 'border-red-500' : ''
+                        }`}
+                        name="name"
+                        value={editInfo.name}
+                        onChange={onInputChange}
+                        required
+                    />
+                    {validationErrors.name && (
+                        <p className="text-red-500 text-xs mt-1">
+                            Receiver name is required
+                        </p>
+                    )}
+                </div>
             ),
         },
         {
             label: 'Phone',
             component: (
-                <PhoneInput value={editInfo.phone} onChange={onPhoneChange} />
+                <div className="flex-1">
+                    <PhoneInput
+                        value={editInfo.phone}
+                        onChange={onPhoneChange}
+                        className={
+                            validationErrors.phone ? 'border-red-500' : ''
+                        }
+                        required
+                    />
+                    {validationErrors.phone && (
+                        <p className="text-red-500 text-xs mt-1">
+                            Phone number is required
+                        </p>
+                    )}
+                </div>
             ),
         },
         {
@@ -93,13 +164,21 @@ export const EditForm = ({
                     onDistrictChange={handleDistrictChange}
                     onWardChange={handleWardChange}
                     onAddressChange={onAddressChange}
+                    requiredFields={{
+                        province: true,
+                        district: true,
+                        ward: true,
+                        number: true,
+                        street: true,
+                    }}
+                    validationErrors={validationErrors.address}
                 />
             ),
         },
     ];
 
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit}>
             <DialogHeader>
                 <DialogTitle>Edit information</DialogTitle>
                 <div className="flex flex-col gap-4 mt-4">
@@ -111,9 +190,7 @@ export const EditForm = ({
                             <div className="min-w-[120px] text-left pr-4">
                                 {field.label}
                             </div>
-                            <div className={field.name ? 'flex-1' : 'flex-1'}>
-                                {field.component}
-                            </div>
+                            {field.component}
                         </div>
                     ))}
                 </div>
@@ -123,7 +200,7 @@ export const EditForm = ({
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-                <Button type="submit" className="w-fit">
+                <Button type="submit" className="w-fit" disabled={!isFormValid}>
                     Save changes
                 </Button>
             </DialogFooter>

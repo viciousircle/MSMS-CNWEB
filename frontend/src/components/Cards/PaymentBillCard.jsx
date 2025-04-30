@@ -13,7 +13,7 @@ const PaymentBillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
     const totalPayment = merchandiseSubtotal + shippingSubtotal;
     const paymentMethods = [
         { value: 'cod', label: 'Cash on Delivery' },
-        { value: 'momo', label: 'Momo' },
+        { value: 'qr', label: 'QR' },
     ];
 
     const formattedMerchandiseSubtotal = formatPrice(merchandiseSubtotal);
