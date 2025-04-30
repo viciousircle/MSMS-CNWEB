@@ -7,7 +7,7 @@ import PaymentCard from '@/components/Cards/PaymentProductCard';
 import CardLayout from '@/components/Layouts/CardLayout';
 import Label from '@/components/Others/Label';
 import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
-import PaymentBillCard from '@/components/Cards/PaymentBillCard';
+import BillCard from '@/components/Cards/BillCard/BillCard';
 
 const Payment = () => {
     const location = useLocation();
@@ -28,7 +28,8 @@ const Payment = () => {
             <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
             <PaymentReceiverCard />
             <PaymentDetails products={products} />
-            <PaymentBillCard
+
+            <BillCard
                 merchandiseSubtotal={merchandiseSubtotal}
                 shippingSubtotal={shippingSubtotal}
             />

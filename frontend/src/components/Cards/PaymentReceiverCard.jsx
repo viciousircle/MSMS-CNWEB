@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
 import { PencilIcon } from '@heroicons/react/24/outline';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-} from '@/components/ui/dialog';
-
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { EditForm } from '../Others/EditForm';
 import { InformationReceiver } from '../Others/InformationReceiver';
 
@@ -32,45 +20,42 @@ const INITIAL_RECEIVER_INFO = {
 };
 
 const PaymentReceiverCard = () => {
-    const loadReceiverInfo = () => {
-        const savedInfo = localStorage.getItem('receiverInfo');
-        return savedInfo ? JSON.parse(savedInfo) : INITIAL_RECEIVER_INFO;
+    const getStoredReceiverInfo = () => {
+        try {
+            const stored = localStorage.getItem('receiverInfo');
+            return stored ? JSON.parse(stored) : INITIAL_RECEIVER_INFO;
+        } catch {
+            return INITIAL_RECEIVER_INFO;
+        }
     };
 
-    const [receiverInfo, setReceiverInfo] = useState(loadReceiverInfo());
-    const [editInfo, setEditInfo] = useState({ ...loadReceiverInfo() });
+    const [receiverInfo, setReceiverInfo] = useState(getStoredReceiverInfo);
+    const [editInfo, setEditInfo] = useState({ ...receiverInfo });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('receiverInfo', JSON.stringify(receiverInfo));
     }, [receiverInfo]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditInfo((prev) => ({ ...prev, [name]: value }));
+    const updateEditInfo = (field, value) => {
+        setEditInfo((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleAddressChange = (e) => {
-        const { name, value } = e.target;
+    const updateEditAddress = (field, value) => {
         setEditInfo((prev) => ({
             ...prev,
-            address: { ...prev.address, [name]: value },
+            address: { ...prev.address, [field]: value },
         }));
-    };
-
-    const handlePhoneChange = (value) => {
-        setEditInfo((prev) => ({ ...prev, phone: value }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setReceiverInfo({ ...editInfo });
+        setReceiverInfo(editInfo);
         setIsDialogOpen(false);
     };
 
     return (
         <div className="flex flex-col gap-0">
-            {/* Header Section */}
             <div className="relative">
                 <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
                 <div className="text-gray-700 text-pretty font-medium font-mono px-4 tracking-widest uppercase flex gap-4">
@@ -78,7 +63,6 @@ const PaymentReceiverCard = () => {
                         <div>Information</div>
                     </div>
 
-                    {/* Edit Dialog */}
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger className="focus:outline-none">
                             <div className="flex border-gray-950/5 border-x gap-2 hover:bg-gray-950/2.5 items-center px-4 py-2 focus:outline-none cursor-pointer">
@@ -88,9 +72,21 @@ const PaymentReceiverCard = () => {
                         <DialogContent className="sm:max-w-[700px] px-8">
                             <EditForm
                                 editInfo={editInfo}
-                                onInputChange={handleInputChange}
-                                onAddressChange={handleAddressChange}
-                                onPhoneChange={handlePhoneChange}
+                                onInputChange={(e) =>
+                                    updateEditInfo(
+                                        e.target.name,
+                                        e.target.value
+                                    )
+                                }
+                                onAddressChange={(e) =>
+                                    updateEditAddress(
+                                        e.target.name,
+                                        e.target.value
+                                    )
+                                }
+                                onPhoneChange={(value) =>
+                                    updateEditInfo('phone', value)
+                                }
                                 onSubmit={handleSubmit}
                             />
                         </DialogContent>
