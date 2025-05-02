@@ -229,8 +229,298 @@ const updateOrderStage = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @desc: Get all orders for customer
+ * @route: GET /api/orders/
+ * @access: Private (customer only)
+ */
+const getOrdersForCustomer = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'customer') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only customers can view their orders',
+            });
+        }
+
+        const orders = await Order.find({ user: req.user._id })
+            .populate({
+                path: 'orderItems.product',
+                select: 'name price images',
+            })
+            .sort({ createdAt: -1 });
+
+        const formattedOrders = orders.map((order) => {
+            const totalPayment = order.orderItems.reduce((total, item) => {
+                const itemPrice = item.product?.price || 0;
+                return total + item.quantity * itemPrice;
+            }, 0);
+
+            return {
+                _id: order._id,
+                orderItems: order.orderItems.map((item) => ({
+                    productId: item.product?._id,
+                    name: item.product?.name,
+                    price: item.product?.price,
+                    image: item.product?.images?.[0] || null, // Safe access to images array
+                    color: item.color,
+                    quantity: item.quantity,
+                })),
+                totalPayment: totalPayment.toFixed(2),
+                createdAt: order.createdAt,
+                currentStage: order.orderStage.slice(-1)[0]?.stage || 'New',
+                isPaid: order.isPaid,
+            };
+        });
+
+        res.status(200).json({ orders: formattedOrders });
+    } catch (error) {
+        console.error('Error fetching customer orders:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
+/**
+ * @desc: Create a new order
+ * @route: POST /api/orders/
+ * @access: Private (customer only)
+ */
+const createOrder = asyncHandler(async (req, res) => {
+    try {
+        console.log('DEBUG req.body:', req.body);
+        if (!req.user || req.user.role !== 'customer') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only customers can create orders',
+            });
+        }
+
+        const { orderItems, receiverInformation, paymentMethod } = req.body;
+
+        console.log('Received order creation request:', {
+            user: req.user._id,
+            body: req.body,
+        });
+
+        const missingFields = [];
+        if (!orderItems) missingFields.push('orderItems');
+        if (!receiverInformation) missingFields.push('receiverInformation');
+        if (!paymentMethod) missingFields.push('paymentMethod');
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: `Missing required fields: ${missingFields.join(', ')}`,
+                receivedFields: Object.keys(req.body),
+                requiredFields: [
+                    'orderItems',
+                    'receiverInformation',
+                    'paymentMethod',
+                ],
+            });
+        }
+
+        const missingReceiverFields = [];
+        if (!receiverInformation.receiverName)
+            missingReceiverFields.push('receiverName');
+        if (!receiverInformation.receiverPhone)
+            missingReceiverFields.push('receiverPhone');
+        if (!receiverInformation.receiverAddress)
+            missingReceiverFields.push('receiverAddress');
+
+        if (missingReceiverFields.length > 0) {
+            return res.status(400).json({
+                message: `Missing receiver information: ${missingReceiverFields.join(
+                    ', '
+                )}`,
+                receivedReceiverFields: Object.keys(receiverInformation),
+            });
+        }
+
+        if (!Array.isArray(orderItems)) {
+            return res.status(400).json({
+                message: 'orderItems must be an array',
+                receivedType: typeof orderItems,
+            });
+        }
+
+        if (orderItems.length === 0) {
+            return res.status(400).json({
+                message: 'Order must contain at least one item',
+            });
+        }
+
+        const invalidItems = [];
+        orderItems.forEach((item, index) => {
+            const itemErrors = [];
+            if (!item.product) itemErrors.push('missing product ID');
+            if (!item.quantity) itemErrors.push('missing quantity');
+            if (item.quantity && item.quantity <= 0)
+                itemErrors.push('quantity must be greater than 0');
+            if (itemErrors.length > 0) {
+                invalidItems.push({
+                    index,
+                    errors: itemErrors,
+                });
+            }
+        });
+
+        if (invalidItems.length > 0) {
+            return res.status(400).json({
+                message: 'Invalid order items',
+                invalidItems,
+            });
+        }
+
+        const validPaymentMethods = [
+            'COD',
+            'CreditCard',
+            'PayPal',
+            'BankTransfer',
+        ];
+        if (!validPaymentMethods.includes(paymentMethod)) {
+            return res.status(400).json({
+                message: 'Invalid payment method',
+                receivedMethod: paymentMethod,
+                validMethods: validPaymentMethods,
+            });
+        }
+
+        // 8. Create Order Document
+        const order = new Order({
+            user: req.user._id,
+            orderItems,
+            receiverInformation, // Fixed spelling to match validation
+            paymentMethod,
+            orderStage: [{ stage: 'New', date: new Date() }],
+            isPaid: paymentMethod !== 'COD', // Set to true for non-COD payments
+        });
+
+        // 9. Save and Populate Order
+        const createdOrder = await order.save();
+        const populatedOrder = await Order.populate(createdOrder, {
+            path: 'orderItems.product',
+            select: 'name price images stockCount',
+            model: 'Product', // Explicitly specify the model
+        });
+
+        // 10. Calculate Total Payment
+        const totalPayment = orderItems.reduce((total, item) => {
+            const product = populatedOrder.orderItems.find(
+                (i) => i._id.toString() === item._id?.toString()
+            )?.product;
+            return total + (product?.price || 0) * item.quantity;
+        }, 0);
+
+        // 11. Send Response
+        res.status(201).json({
+            message: 'Order created successfully',
+            order: {
+                ...populatedOrder.toObject(),
+                totalPayment: totalPayment.toFixed(2),
+            },
+        });
+    } catch (error) {
+        console.error('Error creating order:', error);
+        res.status(500).json({
+            message: 'Failed to create order',
+            error:
+                process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : undefined,
+            stack:
+                process.env.NODE_ENV === 'development'
+                    ? error.stack
+                    : undefined,
+        });
+    }
+});
+
+/**
+ * @desc: Cancel order
+ * @route: PUT /api/orders/:id/cancel
+ * @access: Private (customer only)
+ */
+const cancelOrder = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'customer') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only customers can cancel orders',
+            });
+        }
+
+        const orderId = req.params.id;
+
+        // Validate order ID format
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                message: 'Invalid order ID format',
+            });
+        }
+
+        // Find the order and ensure it belongs to the user
+        const order = await Order.findOne({
+            _id: orderId,
+            user: req.user._id,
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found or not owned by user',
+            });
+        }
+
+        // Check if order is already cancelled
+        const currentStage = order.orderStage.slice(-1)[0]?.stage;
+        if (currentStage === 'Cancelled') {
+            return res.status(400).json({
+                message: 'Order is already cancelled',
+            });
+        }
+
+        // Check if order can be cancelled (only in New or Prepare stages)
+        const cancellableStages = ['New', 'Prepare'];
+        if (!cancellableStages.includes(currentStage)) {
+            return res.status(400).json({
+                message: `Order cannot be cancelled in ${currentStage} stage`,
+                cancellableStages,
+            });
+        }
+
+        // Update order stage to Cancelled
+        order.orderStage.push({
+            stage: 'Cancelled',
+            date: new Date(),
+        });
+
+        // If payment was made, should initiate refund process here
+        order.isPaid = false;
+
+        const updatedOrder = await order.save();
+
+        res.status(200).json({
+            message: 'Order cancelled successfully',
+            order: {
+                _id: updatedOrder._id,
+                currentStage: 'Cancelled',
+                cancelledAt: updatedOrder.orderStage.slice(-1)[0].date,
+            },
+        });
+    } catch (error) {
+        console.error('Error cancelling order:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
+// Update module.exports at the bottom to include the new functions
 module.exports = {
     getOrdersForSeller,
     getOrderDetailsForSeller,
     updateOrderStage,
+    getOrdersForCustomer,
+    createOrder,
+    cancelOrder,
 };
