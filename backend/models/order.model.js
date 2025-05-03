@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema(
                 },
             },
         ],
-        receiverInfomation: {
+        receiverInformation: {
             receiverName: { type: String, required: true },
             receiverPhone: { type: String, required: true },
             receiverAddress: { type: String, required: true },

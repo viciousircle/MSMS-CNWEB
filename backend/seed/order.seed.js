@@ -138,7 +138,7 @@ const seedOrders = async () => {
             orders.push({
                 user: customer._id,
                 orderItems: orderItems,
-                receiverInfomation: {
+                receiverInformation: {
                     receiverName: receiverName,
                     receiverPhone: receiverPhone,
                     receiverAddress: receiverAddress,

@@ -124,9 +124,9 @@ const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
 
         // Format the response
         const response = {
-            receiverName: order.receiverInfomation.receiverName,
-            receiverPhone: order.receiverInfomation.receiverPhone,
-            receiverAddress: order.receiverInfomation.receiverAddress,
+            receiverName: order.receiverInformation.receiverName,
+            receiverPhone: order.receiverInformation.receiverPhone,
+            receiverAddress: order.receiverInformation.receiverAddress,
             orderItems: formattedOrderItems,
             shippingSubtotal: shippingSubtotal.toFixed(2),
         };
@@ -372,12 +372,7 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
-        const validPaymentMethods = [
-            'COD',
-            'CreditCard',
-            'PayPal',
-            'BankTransfer',
-        ];
+        const validPaymentMethods = ['COD', 'QR'];
         if (!validPaymentMethods.includes(paymentMethod)) {
             return res.status(400).json({
                 message: 'Invalid payment method',
