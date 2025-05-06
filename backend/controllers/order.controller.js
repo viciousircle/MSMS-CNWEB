@@ -229,6 +229,13 @@ const updateOrderStage = asyncHandler(async (req, res) => {
     }
 });
 
+// TODO: Lam not cai nay
+/**
+ * @desc: Update payment status for order
+ * @route: PUT /api/seller/orders/payment/:id
+ * @access: Private (seller only)
+ */
+
 /**
  * @desc: Get all orders for customer
  * @route: GET /api/orders/
