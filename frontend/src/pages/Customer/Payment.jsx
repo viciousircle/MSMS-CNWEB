@@ -13,6 +13,8 @@ const Payment = () => {
     const location = useLocation();
     const products = location.state?.products || [];
 
+    console.log('Products:', products);
+
     const parsePrice = (price) =>
         typeof price === 'string' ? Number(price.replace(/\./g, '')) : price;
 

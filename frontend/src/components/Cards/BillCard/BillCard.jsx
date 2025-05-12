@@ -60,7 +60,6 @@ const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
             <div className="text-center relative">
                 <SectionDivider position="top" />
                 <div className="text-lg font-medium flex justify-center w-full">
-                    {/* <OrderButton /> */}
                     <OrderDialog />
                 </div>
                 <SectionDivider position="bottom" />

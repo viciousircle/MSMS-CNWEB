@@ -80,9 +80,10 @@ This project is licensed under the MIT License.
 
 1. Chua right update when click button in seller order
 2. Cancelled badge wrong color
-3. Cart controller have many problems
-4. Want to have sign up & log in with google
-5. API tinh thanh pho VN
-6. API thanh toan QR
+3. Want to have sign up & log in with google
+4. API thanh toan QR
 
 https://provinces.open-api.vn/
+
+5. Viet QR
+6. In hoa don

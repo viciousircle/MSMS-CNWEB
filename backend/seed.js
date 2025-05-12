@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const { connectDB } = require('./config/db');
-const seedProducts = require('./seed/product.seed'); // Add this line
+const seedProducts = require('./seed/product.seed');
 const seedOrders = require('./seed/order.seed');
 const colors = require('colors');
 
