@@ -4,8 +4,20 @@ import BillHeader from './BillHeader';
 import BillRow from './BillRow';
 import { PaymentMethodSelector } from '@/components/Selectors/PaymentMethodSelector';
 import OrderDialog from '@/components/Others/OrderDialog';
+import { useLocation } from 'react-router-dom';
 
 const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
+    const location = useLocation();
+    const products = location.state?.products || [];
+    const [receiverInfo, setReceiverInfo] = React.useState(null);
+
+    React.useEffect(() => {
+        const storedInfo = localStorage.getItem('receiverInfo');
+        if (storedInfo) {
+            setReceiverInfo(JSON.parse(storedInfo));
+        }
+    }, []);
+
     const paymentMethods = [
         { value: 'cod', label: 'Cash on Delivery' },
         { value: 'qr', label: 'QR' },
@@ -60,7 +72,11 @@ const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
             <div className="text-center relative">
                 <SectionDivider position="top" />
                 <div className="text-lg font-medium flex justify-center w-full">
-                    <OrderDialog />
+                    <OrderDialog
+                        products={products}
+                        receiverInfo={receiverInfo}
+                        total={total}
+                    />
                 </div>
                 <SectionDivider position="bottom" />
             </div>
