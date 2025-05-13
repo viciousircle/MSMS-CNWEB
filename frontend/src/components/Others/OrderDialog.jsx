@@ -11,6 +11,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { api } from '/utils/api';
 
 const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
     const [orderData, setOrderData] = useState(null);
@@ -35,6 +36,9 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
         return true;
     };
 
+    const formatAddress = (address) =>
+        `${address.number}, ${address.street}, ${address.ward}, ${address.district}, ${address.province}`;
+
     const buildOrderData = () => ({
         orderItems: products.map((product) => ({
             product: product.id,
@@ -46,7 +50,7 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
         receiverInformation: {
             receiverName: receiverInfo.name,
             receiverPhone: receiverInfo.phone,
-            receiverAddress: receiverInfo.address,
+            receiverAddress: formatAddress(receiverInfo.address),
         },
         paymentMethod: 'COD',
         orderDate: new Date().toISOString(),
@@ -64,9 +68,16 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
 
         try {
             const data = buildOrderData();
-            console.log('Order data:', data);
+            console.log('Sending order data:', data);
+
+            const result = await api('/orders/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+
+            console.log('Order response:', result);
             setOrderData(data);
-            onOrderSuccess?.(data);
+            onOrderSuccess?.(result);
         } catch (err) {
             console.error('Order failed:', err);
             setError('Failed to place order. Please try again.');
@@ -75,13 +86,8 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
         }
     };
 
-    const formatAddress = (address) => {
-        return `${address.number}, ${address.street}, ${address.ward}, ${address.district}, ${address.province}`;
-    };
-
-    const generateOrderId = () => {
-        return Math.random().toString(36).substring(2, 10).toUpperCase();
-    };
+    const generateOrderId = () =>
+        Math.random().toString(36).substring(2, 10).toUpperCase();
 
     const OrderSummary = ({ order }) => (
         <div className="space-y-3">
@@ -99,7 +105,7 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
                 </p>
                 <p>
                     <strong>Address:</strong>{' '}
-                    {formatAddress(order.receiverInformation.receiverAddress)}
+                    {order.receiverInformation.receiverAddress}
                 </p>
             </div>
 
@@ -114,8 +120,8 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
                     {order.orderItems.map((item, index) => (
                         <li key={index} className="flex justify-between">
                             <span>
-                                {item.productName || `Product ${item.product}`}(
-                                {item.color}) × {item.quantity}
+                                {item.productName || `Product ${item.product}`}{' '}
+                                ({item.color}) × {item.quantity}
                             </span>
                             {item.price && (
                                 <span>
@@ -161,10 +167,11 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <button
-                    className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif "
+                    className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif"
                     onClick={handleOrder}
+                    disabled={isLoading}
                 >
-                    Order Now
+                    {isLoading ? 'Placing Order...' : 'Order Now'}
                 </button>
             </AlertDialogTrigger>
 
@@ -184,7 +191,6 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
                                 {error}
                             </div>
                         )}
-
                         {orderData && <OrderSummary order={orderData} />}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
