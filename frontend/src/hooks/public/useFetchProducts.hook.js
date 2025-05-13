@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { api } from '/utils/api';
-export const useProducts = () => {
+import { productApi } from '/utils/api/product.api';
+
+export const useFetchProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -8,14 +9,12 @@ export const useProducts = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await api('/products');
-
-                const formattedData = data.map((product) => ({
+                const response = await productApi.getAllProducts();
+                const formattedData = response.map((product) => ({
                     ...product,
                     img: product.image.replace(/^"+|"+$/g, ''),
                     colors: product.colors,
                 }));
-
                 setProducts(formattedData);
                 setLoading(false);
             } catch (err) {

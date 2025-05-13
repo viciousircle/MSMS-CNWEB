@@ -3,11 +3,11 @@ import Body from '@/components/Structure/Body';
 import CardLayout from '@/components/Layouts/CardLayout';
 import { formatPrice } from '/utils/formatPrice';
 import SkeletonProductCard from '@/components/Cards/SkeletonProductCard';
-import { useProducts } from '@/hooks/useProducts.hook';
+import { useFetchProducts } from '@/hooks/public/useFetchProducts.hook';
 import StandardProductCard from '@/components/Cards/StandardProductCard';
 
 const Store = () => {
-    const { products, loading, error } = useProducts();
+    const { products, loading, error } = useFetchProducts();
 
     if (error) {
         return (
