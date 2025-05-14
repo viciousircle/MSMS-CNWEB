@@ -11,13 +11,40 @@ import { Section, SectionItem } from '@/components/Layouts/SectionLayout';
 import useCart from '@/hooks/useCart.hook';
 import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
+import { useFetchCart } from '@/hooks/cart/useFetchCart.hook';
 
-// TODO: 1. Change loading, error to beautiful
-// TODO: 2. Fix the price (it seem wrong)
+const LoadingCart = () => (
+    <Body>
+        <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
+        <CardLayout variant="linear">
+            <div className="flex justify-center items-center p-8">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </CardLayout>
+    </Body>
+);
+
+const ErrorCart = ({ error }) => (
+    <Body>
+        <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
+        <CardLayout variant="linear">
+            <div className="p-4 text-center">
+                <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
+                    <div>Error loading cart: {error.message}</div>
+                </p>
+                <button
+                    className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
+                    onClick={() => window.location.reload()}
+                >
+                    Try Again
+                </button>
+            </div>
+        </CardLayout>
+    </Body>
+);
 
 const Cart = () => {
     const {
-        products,
         checkedProducts,
         allChecked,
         error,
@@ -27,6 +54,8 @@ const Cart = () => {
         deleteCartItem,
         updateCartItemQuantity,
     } = useCart();
+
+    const { cart, loading: cartLoading, error: cartError } = useFetchCart();
 
     const handleDeleteItem = async (deletedId) => {
         try {
@@ -38,55 +67,56 @@ const Cart = () => {
     };
 
     if (loading) {
-        return <div>Loading cart...</div>;
+        return <LoadingCart />;
     }
 
     if (error) {
-        return <div>Error loading cart: {error.message}</div>;
+        return <ErrorCart error={error} />;
     }
 
+    const renderSelectAll = () => (
+        <Section>
+            <SectionItem
+                className="cursor-pointer"
+                onClick={() => handleCheckAll(!allChecked)}
+            >
+                <Checkbox
+                    className="size-6"
+                    checked={allChecked}
+                    onCheckedChange={handleCheckAll}
+                />
+                <div>Select All</div>
+            </SectionItem>
+        </Section>
+    );
+
+    const renderProducts = () => (
+        <div className="flex flex-col gap-4">
+            <Label titles={['Products', `${cart.length} ITEMS`]} />
+            <CardLayout variant="linear">
+                {cart.map((item) => (
+                    <CartProductCard
+                        key={item._id}
+                        product={item}
+                        isChecked={checkedProducts[item._id] || false}
+                        onCheckChange={handleProductCheck}
+                        onDelete={handleDeleteItem}
+                        onQuantityChange={updateCartItemQuantity}
+                    />
+                ))}
+            </CardLayout>
+        </div>
+    );
+
     const renderCartContent = () => {
-        if (products.length === 0) {
-            return (
-                <>
-                    <CartNotFound />
-                </>
-            );
+        if (cart.length === 0) {
+            return <CartNotFound />;
         }
 
         return (
             <>
-                <Section>
-                    <SectionItem
-                        className="cursor-pointer"
-                        onClick={() => handleCheckAll(!allChecked)}
-                    >
-                        <Checkbox
-                            className="size-6"
-                            checked={allChecked}
-                            onCheckedChange={handleCheckAll}
-                        />
-                        <div>Select All</div>
-                    </SectionItem>
-                </Section>
-
-                <div className="flex flex-col gap-4">
-                    <Label titles={['Products', `${products.length} ITEMS`]} />
-                    <CardLayout variant="linear">
-                        {products.map((product) => (
-                            <CartProductCard
-                                key={product._id}
-                                product={product}
-                                isChecked={
-                                    checkedProducts[product._id] || false
-                                }
-                                onCheckChange={handleProductCheck}
-                                onDelete={handleDeleteItem}
-                                onQuantityChange={updateCartItemQuantity}
-                            />
-                        ))}
-                    </CardLayout>
-                </div>
+                {renderSelectAll()}
+                {renderProducts()}
             </>
         );
     };
@@ -98,9 +128,9 @@ const Cart = () => {
                 {renderCartContent()}
             </Body>
 
-            {products.length > 0 && (
+            {cart.length > 0 && (
                 <CartTotal
-                    products={products}
+                    products={cart.filter((p) => checkedProducts[p._id])}
                     checkedProducts={checkedProducts}
                 />
             )}
