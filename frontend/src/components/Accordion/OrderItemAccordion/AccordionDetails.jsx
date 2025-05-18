@@ -3,9 +3,9 @@ import OrderItemsSection from './OrderItemsSection';
 import CancelOrderSection from './CancelOrderSection';
 import OrderInfoSection from './OrderInfoSection';
 
-const AccordionDetails = ({ order }) => {
+const AccordionDetails = ({ order, refetchOrders }) => {
     const handleCancelOrder = () => {
-        console.log(`Canceling order #${order._id}`);
+        refetchOrders(); // Trigger refresh after cancellation
     };
 
     return (
@@ -14,7 +14,7 @@ const AccordionDetails = ({ order }) => {
                 <OrderItemsSection items={order.orderItems} />
                 <OrderInfoSection order={order} />
             </div>
-            {order.currentStage.toLowerCase() === 'new' && (
+            {['New', 'Prepare'].includes(order.currentStage) && (
                 <div className="flex justify-end">
                     <CancelOrderSection
                         orderId={order._id}

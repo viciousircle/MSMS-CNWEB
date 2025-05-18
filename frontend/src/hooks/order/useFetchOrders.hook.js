@@ -6,39 +6,39 @@ export const useFetchOrders = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await orderApi.getOrders();
-                const ordersData = Array.isArray(response.orders)
-                    ? response.orders.map((order) => ({
-                          ...order,
-                          createdAt: new Date(order.createdAt).toLocaleString(
-                              'en-US',
-                              {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                  hour: 'numeric',
-                                  minute: 'numeric',
-                                  hour12: true,
-                              }
-                          ),
-                      }))
-                    : [];
-                setOrders(ordersData);
-            } catch (err) {
-                console.error('Error fetching orders:', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchOrders = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await orderApi.getOrders();
+            const ordersData = Array.isArray(response.orders)
+                ? response.orders.map((order) => ({
+                      ...order,
+                      createdAt: new Date(order.createdAt).toLocaleString(
+                          'en-US',
+                          {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: 'numeric',
+                              hour12: true,
+                          }
+                      ),
+                  }))
+                : [];
+            setOrders(ordersData);
+        } catch (err) {
+            console.error('Error fetching orders:', err);
+            setError(err.message || 'Failed to fetch orders');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchOrders();
     }, []);
 
-    return { orders, loading, error };
+    return { orders, loading, error, refetch: fetchOrders };
 };

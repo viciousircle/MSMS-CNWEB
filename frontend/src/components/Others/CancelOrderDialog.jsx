@@ -20,9 +20,8 @@ const CancelOrderDialog = ({ orderId, onCancel }) => {
     const handleCancel = async () => {
         try {
             await cancelOrder(orderId);
-
             if (onCancel) {
-                onCancel(cancelledOrder);
+                onCancel(cancelledOrder); // Trigger refetch via parent
             }
         } catch (err) {
             console.error('Error cancelling order:', err);
@@ -31,9 +30,9 @@ const CancelOrderDialog = ({ orderId, onCancel }) => {
 
     useEffect(() => {
         if (isSuccess) {
-            console.log('Order cancelled successfully:', cancelledOrder);
-
-            setOpen(false);
+            // toast.success(`Order #${orderId} cancelled successfully`);
+            console.log(`Order #${orderId} cancelled successfully`);
+            setOpen(false); // Close dialog
         }
         if (error) {
             console.error('Error cancelling order:', error);

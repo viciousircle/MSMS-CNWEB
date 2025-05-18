@@ -7,7 +7,7 @@ import OrderItemAccordion from '@/components/Accordion/OrderItemAccordion/OrderI
 import { useFetchOrders } from '@/hooks/order/useFetchOrders.hook';
 
 const Order = () => {
-    const { orders, loading, error } = useFetchOrders();
+    const { orders, loading, error, refetch } = useFetchOrders();
 
     console.log('Orders:', orders);
 
@@ -31,7 +31,11 @@ const Order = () => {
                 <div className="space-y-4">
                     {filteredOrders.length > 0 ? (
                         filteredOrders.map((order) => (
-                            <OrderItemAccordion key={order._id} order={order} />
+                            <OrderItemAccordion
+                                key={order._id}
+                                order={order}
+                                refetchOrders={refetch}
+                            />
                         ))
                     ) : (
                         <EmptyState />

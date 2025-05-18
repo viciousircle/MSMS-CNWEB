@@ -8,7 +8,7 @@ import {
 import { StageBadge } from '@/components/Others/StatusBadge';
 import AccordionDetails from './AccordionDetails';
 
-const OrderItemAccordion = ({ order }) => {
+const OrderItemAccordion = ({ order, refetchOrders }) => {
     return (
         <Accordion
             type="single"
@@ -19,7 +19,7 @@ const OrderItemAccordion = ({ order }) => {
                 <AccordionTrigger className="hover:no-underline px-4 py-3">
                     <div className="flex w-full justify-between items-center">
                         <div className="flex items-center gap-4">
-                            <div className="w-[100px] flex ">
+                            <div className="w-[100px] flex">
                                 <StageBadge status={order.currentStage} />
                             </div>
                             <div className="flex gap-4">
@@ -28,7 +28,6 @@ const OrderItemAccordion = ({ order }) => {
                                 </span>
                             </div>
                         </div>
-
                         <div className="flex items-center space-x-4">
                             <span className="text-sm text-gray-500">
                                 {order.createdAt}
@@ -37,7 +36,10 @@ const OrderItemAccordion = ({ order }) => {
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <AccordionDetails order={order} />
+                    <AccordionDetails
+                        order={order}
+                        refetchOrders={refetchOrders}
+                    />
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
