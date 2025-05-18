@@ -48,6 +48,9 @@ const OrderStatusGroup = () => {
                     <div className=" hover:bg-gray-950/2.5">
                         <ShieldCheckIcon className="size-20 py-1 px-2" />
                     </div>
+                    <div className="text-lg font-mono bg-gray-950/2.5 border-t w-full text-center border-gray-950/5 uppercase">
+                        <div>All</div>
+                    </div>
                 </div>
                 <div className="border-x border-gray-950/5 flex items-center flex-col">
                     <div className="text-lg font-mono bg-gray-950/2.5 border-b w-full text-center border-gray-950/5 ">
