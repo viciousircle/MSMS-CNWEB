@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useSignUp } from '@/hooks/auth/useSignUp.hook';
 import { Link } from 'react-router-dom';
 import { Chrome } from 'lucide-react';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const formFields = [
     {
@@ -44,6 +45,43 @@ const formFields = [
 const SignUp = ({ className, ...props }) => {
     const { formData, error, isSubmitting, handleChange, handleSubmit } =
         useSignUp();
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const response = await fetch(
+                'http://localhost:5678/api/users/google',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        credential: credentialResponse.credential,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Google authentication failed');
+            }
+
+            // Handle successful login (store token, redirect, etc.)
+            console.log('Google login successful', data);
+            // You might want to store the token and redirect user
+            localStorage.setItem('token', data.token);
+            window.location.href = '/'; // Redirect to home page
+        } catch (error) {
+            console.error('Google login error:', error);
+            // Handle error (show error message to user)
+        }
+    };
+
+    const handleGoogleError = () => {
+        console.error('Google login failed');
+        // Handle error (show error message to user)
+    };
 
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -93,9 +131,17 @@ const SignUp = ({ className, ...props }) => {
                                 >
                                     {isSubmitting ? 'Signing Up...' : 'Sign Up'}
                                 </Button>
-                                <Button variant={'destructive'}>
-                                    Sign Up with Google
-                                </Button>
+
+                                <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
+                                    <div className="flex justify-center">
+                                        <GoogleLogin
+                                            onSuccess={handleGoogleSuccess}
+                                            onError={handleGoogleError}
+                                            useOneTap={false}
+                                        />
+                                    </div>
+                                </GoogleOAuthProvider>
+
                                 <p className="text-sm text-center text-gray-400">
                                     Already have an account?{' '}
                                     <Link

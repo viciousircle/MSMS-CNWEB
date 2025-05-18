@@ -3,12 +3,18 @@ const colors = require('colors');
 const dotenv = require('dotenv').config({ path: '../.env' });
 const { errorHandler } = require('./middleware/error.middleware');
 const { connectDB } = require('./config/db');
-const cors = require('cors'); // Add this line
+const cors = require('cors');
 const port = process.env.PORT || 5678;
 
 connectDB();
 const app = express();
-app.use(cors());
+
+app.use(
+    cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+    })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

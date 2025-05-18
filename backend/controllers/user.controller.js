@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/user.model');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * @description Generate JWT token
@@ -14,6 +16,51 @@ const generateToken = (id, role) => {
         expiresIn: '30d',
     });
 };
+
+/**
+ * @desc: Authenticate with Google
+ * @route: POST /api/users/google
+ * @access: Public
+ */
+const googleAuth = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { name, email } = payload;
+
+        // Check if user exists
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create new user if doesn't exist
+            user = await User.create({
+                name,
+                email,
+                password: 'google-auth', // You might want to handle this differently
+                role: 'customer',
+                isGoogleAuth: true,
+            });
+        }
+
+        res.status(200).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id, user.role),
+        });
+    } catch (error) {
+        console.error('Google auth error:', error);
+        res.status(401);
+        throw new Error('Invalid Google token');
+    }
+});
 
 /**
  * @desc: Register new user
@@ -103,4 +150,4 @@ const getMe = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { registerUser, loginUser, getMe };
+module.exports = { registerUser, loginUser, getMe, googleAuth };
