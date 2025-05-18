@@ -12,4 +12,15 @@ export const orderApi = {
             throw error;
         }
     },
+    cancelOrder: async (orderId) => {
+        try {
+            const response = await api(`/orders/${orderId}/cancel`, {
+                method: 'PUT',
+            });
+            return response;
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            throw error;
+        }
+    },
 };

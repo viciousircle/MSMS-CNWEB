@@ -14,10 +14,14 @@ const AccordionDetails = ({ order }) => {
                 <OrderItemsSection items={order.orderItems} />
                 <OrderInfoSection order={order} />
             </div>
-            <CancelOrderSection
-                orderId={order.id}
-                onCancel={handleCancelOrder}
-            />
+            {order.currentStage.toLowerCase() === 'new' && (
+                <div className="flex justify-end">
+                    <CancelOrderSection
+                        orderId={order._id}
+                        onCancel={handleCancelOrder}
+                    />
+                </div>
+            )}
         </div>
     );
 };
