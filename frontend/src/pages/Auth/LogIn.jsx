@@ -11,8 +11,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/useLogin.hook';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-const LoginForm = ({ formData, handleChange, loading, error, onSubmit }) => (
+const LoginForm = ({
+    formData,
+    handleChange,
+    loading,
+    error,
+    onSubmit,
+    handleGoogleSuccess,
+    handleGoogleError,
+}) => (
     <form onSubmit={onSubmit}>
         <div className="flex flex-col gap-6">
             <FormField
@@ -41,9 +50,19 @@ const LoginForm = ({ formData, handleChange, loading, error, onSubmit }) => (
                 {loading ? 'Logging in...' : 'Login'}
             </Button>
 
-            <Button variant="outline" className="w-full" type="button">
-                Login with Google
-            </Button>
+            <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
+                <div className="flex justify-center">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                        useOneTap={false}
+                        width={330}
+                        theme="neutral"
+                        shape="square"
+                        text="continue_with"
+                    />
+                </div>
+            </GoogleOAuthProvider>
 
             <SignupLink />
         </div>
@@ -82,7 +101,7 @@ const ErrorMessage = ({ message }) => (
 
 const SignupLink = () => (
     <div className="mt-4 text-center text-sm">
-        Don&apos;t have an account?{' '}
+        Don't have an account?{' '}
         <a href="/signup" className="underline underline-offset-4">
             Sign up
         </a>
@@ -100,6 +119,41 @@ const LogIn = ({ className, ...props }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         await login(formData);
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const response = await fetch(
+                'http://localhost:5678/api/users/google',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        credential: credentialResponse.credential,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Google authentication failed');
+            }
+
+            console.log('Google login successful', data);
+            localStorage.setItem('token', data.token);
+            window.location.href = '/';
+        } catch (error) {
+            console.error('Google login error:', error);
+            // You might want to set an error state here to display to the user
+        }
+    };
+
+    const handleGoogleError = () => {
+        console.error('Google login failed');
+        // You might want to set an error state here to display to the user
     };
 
     return (
@@ -123,6 +177,8 @@ const LogIn = ({ className, ...props }) => {
                                 loading={loading}
                                 error={error}
                                 onSubmit={handleSubmit}
+                                handleGoogleSuccess={handleGoogleSuccess}
+                                handleGoogleError={handleGoogleError}
                             />
                         </CardContent>
                     </Card>
