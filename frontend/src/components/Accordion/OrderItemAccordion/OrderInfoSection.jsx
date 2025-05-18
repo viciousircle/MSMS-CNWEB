@@ -18,12 +18,6 @@ const InfoRow = ({ icon: Icon, text, children }) => (
 );
 
 const OrderInfoSection = ({ order }) => {
-    const shippingAddress = {
-        name: 'Alex Smith',
-        address: '789 Pine Rd, Springfield, IL 62703',
-        phone: '+1 (555) 123-4567',
-    };
-
     return (
         <div className="flex-1 flex flex-col gap-4">
             <div className="border border-gray-200 p-4 rounded-lg h-fit">
@@ -31,12 +25,12 @@ const OrderInfoSection = ({ order }) => {
                     Shipping address
                 </h3>
                 <div className="flex flex-col gap-4">
-                    <InfoRow icon={UserIcon} text={shippingAddress.name} />
+                    <InfoRow icon={UserIcon} text={order.receiverName} />
                     <InfoRow
                         icon={HomeModernIcon}
-                        text={shippingAddress.address}
+                        text={order.receiverAddress}
                     />
-                    <InfoRow icon={PhoneIcon} text={shippingAddress.phone} />
+                    <InfoRow icon={PhoneIcon} text={order.receiverPhone} />
                 </div>
             </div>
 
@@ -47,15 +41,19 @@ const OrderInfoSection = ({ order }) => {
                 <div className="flex flex-col gap-4">
                     <InfoRow
                         icon={ArrowPathRoundedSquareIcon}
-                        children={<StageBadge status={order.stage} />}
+                        children={<StageBadge status={order.currentStage} />}
                     />
                     <InfoRow
                         icon={TruckIcon}
-                        children={<PaidStatusBadge status={order.paidStatus} />}
+                        children={
+                            <PaidStatusBadge
+                                status={order.isPaid ? 'Paid' : 'Unpaid'}
+                            />
+                        }
                     />
                     <InfoRow
                         icon={ClockIcon}
-                        text={`Order date: ${order.date}`}
+                        text={`Order date: ${order.createdAt}`}
                     />
                     <InfoRow
                         icon={CheckIcon}

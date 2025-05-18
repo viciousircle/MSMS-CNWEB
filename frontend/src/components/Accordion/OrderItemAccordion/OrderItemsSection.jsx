@@ -1,11 +1,10 @@
-import React from 'react';
-
 const OrderItemsSection = ({ items }) => {
     const subtotal = items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
     );
-    const shippingCost = 0.03;
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0); // Calculate total quantity
+    const shippingCost = 30.0; // Example shipping cost
     const total = subtotal + shippingCost;
 
     return (
@@ -16,7 +15,7 @@ const OrderItemsSection = ({ items }) => {
                 </h3>
                 <div className="flex flex-col gap-4">
                     {items.map((item) => (
-                        <OrderItem key={item.id} {...item} />
+                        <OrderItem key={item._id} {...item} />
                     ))}
                 </div>
             </div>
@@ -25,11 +24,11 @@ const OrderItemsSection = ({ items }) => {
                 <h3 className="text-base font-medium text-black mb-2">
                     Order Summary
                 </h3>
-                <div className="flex flex-col gap-2 px-2">
+                <div className="flex flex-col px-2">
                     <OrderSummaryItem
                         label="Subtotal"
                         value={`$${subtotal.toFixed(2)}`}
-                        additionalInfo={`${items.length} items`}
+                        additionalInfo={`${totalQuantity} items`} // Use totalQuantity instead of items.length
                     />
                     <OrderSummaryItem
                         label="Shipping"
@@ -39,6 +38,7 @@ const OrderItemsSection = ({ items }) => {
                     <OrderSummaryItem
                         label="Total"
                         value={`$${total.toFixed(2)}`}
+                        additionalInfo=" "
                         isBold
                     />
                 </div>
@@ -46,7 +46,6 @@ const OrderItemsSection = ({ items }) => {
         </div>
     );
 };
-
 const OrderSummaryItem = ({
     label,
     value,
@@ -57,11 +56,11 @@ const OrderSummaryItem = ({
         <div
             className={`text-base ${
                 isBold ? 'font-medium' : 'font-thin'
-            } tracking-wider`}
+            } tracking-wider flex-1`}
         >
             {label}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-4 flex-1">
             {additionalInfo && (
                 <div
                     className={`text-base ${
@@ -82,12 +81,12 @@ const OrderSummaryItem = ({
     </div>
 );
 
-const OrderItem = ({ name, color, price, quantity, imageUrl }) => (
+const OrderItem = ({ name, color, price, quantity, image }) => (
     <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
             <div className="rounded-md border">
                 <img
-                    src={imageUrl}
+                    src={image}
                     alt={name}
                     className="w-24 h-24 p-2 object-contain"
                 />
@@ -106,7 +105,9 @@ const OrderItem = ({ name, color, price, quantity, imageUrl }) => (
             <div className="border rounded-sm p-2 text-gray-500">
                 {quantity} × ${price.toFixed(2)}
             </div>
-            <div className="font-medium">${(quantity * price).toFixed(2)}</div>
+            <div className="font-medium">
+                {(quantity * price).toFixed(2)} VND
+            </div>
         </div>
     </div>
 );

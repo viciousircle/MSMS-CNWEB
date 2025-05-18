@@ -252,7 +252,7 @@ const getOrdersForCustomer = asyncHandler(async (req, res) => {
         const orders = await Order.find({ user: req.user._id })
             .populate({
                 path: 'orderItems.product',
-                select: 'name price images',
+                select: 'name price image',
             })
             .sort({ createdAt: -1 });
 
@@ -268,11 +268,13 @@ const getOrdersForCustomer = asyncHandler(async (req, res) => {
                     productId: item.product?._id,
                     name: item.product?.name,
                     price: item.product?.price,
-                    image: item.product?.images?.[0] || null, // Safe access to images array
+                    image: item.product?.image || null,
                     color: item.color,
                     quantity: item.quantity,
                 })),
-                totalPayment: totalPayment.toFixed(2),
+                receiverName: order.receiverInformation.receiverName,
+                receiverPhone: order.receiverInformation.receiverPhone,
+                receiverAddress: order.receiverInformation.receiverAddress,
                 createdAt: order.createdAt,
                 currentStage: order.orderStage.slice(-1)[0]?.stage || 'New',
                 isPaid: order.isPaid,

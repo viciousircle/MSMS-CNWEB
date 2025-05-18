@@ -6,7 +6,7 @@ const ORDER_STATUSES = [
     'Prepare',
     'Shipping',
     'Shipped',
-    'Canceled',
+    'Cancelled',
     'Rejected',
 ];
 
