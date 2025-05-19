@@ -140,6 +140,8 @@ export const ViewDetailsSheet = ({
     if (error) return <div>Error: {error}</div>;
     if (!orderDetails) return <div>Order not found</div>;
 
+    console.log('Order Details:', orderDetails);
+
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -160,15 +162,15 @@ export const ViewDetailsSheet = ({
                             <InfoSection title="Receiver Information">
                                 <InfoRow
                                     label="Full Name"
-                                    value={orderDetails.receiverName}
+                                    value={orderDetails.receiverInfo.name}
                                 />
                                 <InfoRow
                                     label="Phone"
-                                    value={orderDetails.receiverPhone}
+                                    value={orderDetails.receiverInfo.phone}
                                 />
                                 <InfoRow
                                     label="Address"
-                                    value={orderDetails.receiverAddress}
+                                    value={orderDetails.receiverInfo.address}
                                 />
                             </InfoSection>
 

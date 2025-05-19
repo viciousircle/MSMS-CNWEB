@@ -18,7 +18,9 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
         (sum, item) => sum + parseFloat(item.itemAmount.replace('$', '')),
         0
     );
-    const shipping = parseFloat(shippingSubtotal.replace('$', ''));
+    const shipping = shippingSubtotal
+        ? parseFloat(shippingSubtotal.replace('$', ''))
+        : 0;
     const total = subtotal + shipping;
 
     return (
