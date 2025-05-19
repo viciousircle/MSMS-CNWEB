@@ -9,7 +9,7 @@ export const OrderTableRow = ({
     order,
     isSelected,
     onToggleSelection,
-    onStageUpdated, // Add this prop
+    onUpdate,
 }) => {
     // Extract the current stage (assuming orderStage is an array)
     const currentStage = Array.isArray(order.orderStage)
@@ -19,7 +19,7 @@ export const OrderTableRow = ({
     const displayId = formatDisplayId(order._id, 'ORD-');
 
     const cells = [
-        <StageBadge status={currentStage} />, // Use currentStage here
+        <StageBadge status={currentStage} />,
         displayId,
         order.customerName,
         order.customerEmail,
@@ -30,7 +30,7 @@ export const OrderTableRow = ({
     ];
 
     const handleStageUpdate = (newStage) => {
-        onStageUpdated?.(order._id, newStage);
+        onUpdate?.(order._id, { orderStage: newStage });
     };
 
     return (
@@ -59,7 +59,7 @@ export const OrderTableRow = ({
                 <ViewDetailsSheet
                     orderId={order._id}
                     dateOrder={order.dateOrder}
-                    orderStage={currentStage} // Pass currentStage here
+                    orderStage={currentStage}
                     paymentMethod={order.paymentMethod}
                     paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
                     onStageUpdated={handleStageUpdate}

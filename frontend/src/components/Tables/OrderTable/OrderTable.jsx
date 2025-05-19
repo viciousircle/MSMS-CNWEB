@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React } from 'react';
 import {
     Table,
     TableBody,
@@ -11,90 +11,57 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ORDER_TABLE_COLUMNS } from '@/constants/orderTableConfig';
 import { OrderTableRow } from './OrderTableRow';
 import { OrderTableHeaderCell } from './OrderTableHeaderCell';
-import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 
-export const OrderTable = ({ orders, onUpdate }) => {
-    const {
-        selectedRows,
-        totalPayment,
-        allSelected,
-        toggleRowSelection,
-        toggleAllRows,
-    } = useOrderTable(orders);
-
-    const [orderList, setOrderList] = useState(orders);
-
-    const handleStageUpdate = (orderId, newStage) => {
-        setOrderList((prevOrders) =>
-            prevOrders.map((order) =>
-                order._id === orderId
-                    ? {
-                          ...order,
-                          orderStage: [
-                              ...(Array.isArray(order.orderStage)
-                                  ? order.orderStage
-                                  : []),
-                              { stage: newStage, date: new Date() },
-                          ],
-                      }
-                    : order
-            )
-        );
-    };
-
+export const OrderTable = ({
+    orders,
+    onUpdate,
+    selectedRows,
+    onToggleSelection,
+    onToggleAll,
+    allSelected,
+}) => {
     return (
         <Table>
-            <TableHeader className="bg-gray-100">
+            <TableHeader>
                 <TableRow>
-                    {ORDER_TABLE_COLUMNS.map(
-                        ({ key, width, align, header, isCheckbox }) => (
-                            <OrderTableHeaderCell
-                                key={key}
-                                className={`${width} ${
-                                    key === 'details' ? 'pr-4' : ''
-                                }`}
-                                align={align}
-                            >
-                                {isCheckbox ? (
-                                    <Checkbox
-                                        className="size-4 bg-white"
-                                        checked={allSelected}
-                                        onCheckedChange={toggleAllRows}
-                                    />
-                                ) : (
-                                    header
-                                )}
-                            </OrderTableHeaderCell>
-                        )
-                    )}
+                    <TableCell className="w-[50px]">
+                        <div className="flex items-center justify-center">
+                            <Checkbox
+                                className="size-4 bg-white"
+                                checked={allSelected}
+                                onCheckedChange={onToggleAll}
+                            />
+                        </div>
+                    </TableCell>
+                    {ORDER_TABLE_COLUMNS.map((column) => (
+                        <OrderTableHeaderCell
+                            key={column.key}
+                            label={column.label}
+                        />
+                    ))}
                 </TableRow>
             </TableHeader>
-
             <TableBody>
                 {orders.map((order, index) => (
                     <OrderTableRow
                         key={order._id}
                         order={order}
+                        index={index}
+                        onUpdate={onUpdate}
                         isSelected={selectedRows.has(order._id)}
-                        onToggleSelection={() => toggleRowSelection(order._id)}
-                        onUpdate={(updatedFields) =>
-                            onUpdate(index, updatedFields)
-                        }
+                        onToggleSelection={() => onToggleSelection(order._id)}
                     />
                 ))}
             </TableBody>
-
             <TableFooter>
                 <TableRow>
-                    <TableCell />
-                    <TableCell className="text-center font-medium">
-                        Total
+                    <TableCell colSpan={ORDER_TABLE_COLUMNS.length + 1}>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-500">
+                                Total Orders: {orders.length}
+                            </span>
+                        </div>
                     </TableCell>
-                    <TableCell colSpan={3} />
-                    <TableCell className="text-center font-medium">
-                        ${totalPayment}
-                    </TableCell>
-                    <TableCell colSpan={4} />
                 </TableRow>
             </TableFooter>
         </Table>

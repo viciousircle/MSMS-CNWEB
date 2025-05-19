@@ -10,6 +10,7 @@ import ChangeStageMenu from '@/components/Others/ChangeStageMenu';
 import StageFlow from '@/components/Others/StageFlow';
 import { FilterControls } from '@/components/Others/FilterControls';
 import { useOrdersLogic } from '@/hooks/seller/useOrdersLogic.hook';
+import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 
 const Orders = () => {
     const {
@@ -27,6 +28,9 @@ const Orders = () => {
         updateOrder,
         handleItemsPerPageChange,
     } = useOrdersLogic();
+
+    const { selectedRows, toggleRowSelection, toggleAllRows, allSelected } =
+        useOrderTable(paginatedOrders);
 
     const tabValues = [
         'all',
@@ -59,7 +63,14 @@ const Orders = () => {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                             <PrintButton />
-                            <ChangeStageMenu />
+                            <ChangeStageMenu
+                                selectedOrders={selectedRows}
+                                orders={paginatedOrders}
+                                onStageUpdated={() => {
+                                    // Refresh the orders list
+                                    window.location.reload();
+                                }}
+                            />
                             <StageFlow />
                         </div>
                         <FilterControls
@@ -79,6 +90,10 @@ const Orders = () => {
                             <OrderTable
                                 orders={paginatedOrders}
                                 onUpdate={updateOrder}
+                                selectedRows={selectedRows}
+                                onToggleSelection={toggleRowSelection}
+                                onToggleAll={toggleAllRows}
+                                allSelected={allSelected}
                             />
                         </TabsContent>
                     ))}
