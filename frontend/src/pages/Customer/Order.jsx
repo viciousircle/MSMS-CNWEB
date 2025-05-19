@@ -8,15 +8,34 @@ import { useFetchOrders } from '@/hooks/order/useFetchOrders.hook';
 
 const Order = () => {
     const { orders, loading, error, refetch } = useFetchOrders();
-
-    console.log('Orders:', orders);
-
     const [activeTab, setActiveTab] = useState('All Orders');
 
     const filteredOrders =
         activeTab === 'All Orders'
             ? orders
             : orders.filter((order) => order.currentStage === activeTab);
+
+    if (loading) {
+        return (
+            <Body>
+                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
+                <div className="px-4">
+                    <LoadingState />
+                </div>
+            </Body>
+        );
+    }
+
+    if (error) {
+        return (
+            <Body>
+                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
+                <div className="px-4">
+                    <ErrorState error={error} onRetry={refetch} />
+                </div>
+            </Body>
+        );
+    }
 
     return (
         <Body>
@@ -45,6 +64,30 @@ const Order = () => {
         </Body>
     );
 };
+
+const LoadingState = () => (
+    <div className="border border-gray-200 rounded-lg bg-white p-8">
+        <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+        </div>
+    </div>
+);
+
+const ErrorState = ({ error, onRetry }) => (
+    <div className="border border-red-200 rounded-lg bg-red-50 p-4">
+        <p className="text-sm text-red-600 mb-2">
+            {error?.message || 'An error occurred while fetching orders.'}
+        </p>
+        <button
+            onClick={onRetry}
+            className="text-sm text-red-600 hover:text-red-700 font-medium"
+        >
+            Try again
+        </button>
+    </div>
+);
 
 const EmptyState = () => (
     <div className="border border-gray-200 rounded-lg bg-white p-4">

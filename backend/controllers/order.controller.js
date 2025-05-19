@@ -95,7 +95,7 @@ const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
             })
             .populate({
                 path: 'orderItems.product',
-                select: 'name price',
+                select: 'name price image',
             });
 
         if (!order) {
@@ -110,8 +110,10 @@ const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
             return {
                 itemId: item.product?._id,
                 itemName: item.product?.name,
+                itemImage: item.product?.image,
                 itemColor: item.color,
                 itemQuantity: item.quantity,
+                itemPrice: itemPrice.toFixed(2),
                 itemAmount: (item.quantity * itemPrice).toFixed(2),
             };
         });
@@ -124,11 +126,29 @@ const getOrderDetailsForSeller = asyncHandler(async (req, res) => {
 
         // Format the response
         const response = {
-            receiverName: order.receiverInformation.receiverName,
-            receiverPhone: order.receiverInformation.receiverPhone,
-            receiverAddress: order.receiverInformation.receiverAddress,
+            orderId: order._id,
+            customerInfo: {
+                name: order.user.name,
+                email: order.user.email,
+            },
+            receiverInfo: {
+                name: order.receiverInformation.receiverName,
+                phone: order.receiverInformation.receiverPhone,
+                address: order.receiverInformation.receiverAddress,
+            },
             orderItems: formattedOrderItems,
-            shippingSubtotal: shippingSubtotal.toFixed(2),
+            orderSummary: {
+                shippingSubtotal: shippingSubtotal.toFixed(2),
+                paymentMethod: order.paymentMethod,
+                isPaid: order.isPaid,
+                currentStage: order.orderStage.slice(-1)[0]?.stage || 'New',
+                orderDate: order.createdAt,
+                lastUpdated: order.updatedAt,
+            },
+            orderHistory: order.orderStage.map((stage) => ({
+                stage: stage.stage,
+                date: stage.date,
+            })),
         };
 
         res.status(200).json(response);
@@ -266,7 +286,7 @@ const getOrdersForCustomer = asyncHandler(async (req, res) => {
                 _id: order._id,
                 orderItems: order.orderItems.map((item) => ({
                     productId: item.product?._id,
-                    name: item.product?.name,
+                    name: item.product?.name || null,
                     price: item.product?.price,
                     image: item.product?.image || null,
                     color: item.color,
