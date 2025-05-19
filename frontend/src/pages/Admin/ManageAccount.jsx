@@ -86,17 +86,45 @@ const ManageAccount = () => {
             setFormErrors(errors);
             return;
         }
-        // TODO: Implement API call to add account
-        console.log('Adding account:', newAccount);
-        setIsAddDialogOpen(false);
-        setNewAccount({
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            role: 'seller',
-        });
-        setFormErrors({});
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: newAccount.name,
+                    email: newAccount.email,
+                    password: newAccount.password,
+                    role: newAccount.role,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add account');
+            }
+
+            // Close dialog and reset form
+            setIsAddDialogOpen(false);
+            setNewAccount({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                role: 'seller',
+            });
+            setFormErrors({});
+
+            // Refresh the accounts list
+            // You might want to add a refresh function to your useAccountsLogic hook
+            window.location.reload(); // Temporary solution - replace with proper refresh logic
+        } catch (error) {
+            setFormErrors({
+                submit: error.message || 'Failed to add account',
+            });
+        }
     };
 
     const handleCloseDialog = () => {
