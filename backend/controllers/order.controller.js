@@ -404,7 +404,7 @@ const createOrder = asyncHandler(async (req, res) => {
         const createdOrder = await order.save();
         const populatedOrder = await Order.populate(createdOrder, {
             path: 'orderItems.product',
-            select: 'name price images stockCount',
+            select: 'name price image',
             model: 'Product', // Explicitly specify the model
         });
 
