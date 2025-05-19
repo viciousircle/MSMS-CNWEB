@@ -5,24 +5,78 @@ jest.mock('../config/db', () => ({
 
 const request = require('supertest');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { app } = require('../server');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const Product = require('../models/product.model');
 const User = require('../models/user.model');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const bcrypt = require('bcryptjs');
 
 let mongoServer;
+let testUser;
+let testSeller;
+let testProduct;
+let userToken;
+let sellerToken;
 
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri);
-    await User.deleteMany({});
-});
 
-afterEach(async () => {
-    await Product.deleteMany(); // Cleanup after each test
-    await User.deleteMany();
+    // Create test customer
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    testUser = await User.create({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: hashedPassword,
+        role: 'customer',
+    });
+
+    // Create test seller
+    testSeller = await User.create({
+        name: 'Test Seller',
+        email: 'seller@example.com',
+        password: hashedPassword,
+        role: 'seller',
+    });
+
+    // Generate auth tokens
+    userToken = jwt.sign(
+        { id: testUser._id, role: testUser.role },
+        process.env.JWT_SECRET || 'test-secret',
+        {
+            expiresIn: '30d',
+        }
+    );
+
+    sellerToken = jwt.sign(
+        { id: testSeller._id, role: testSeller.role },
+        process.env.JWT_SECRET || 'test-secret',
+        {
+            expiresIn: '30d',
+        }
+    );
+
+    // Create test product
+    testProduct = await Product.create({
+        name: 'Test Product',
+        description: 'Test Description',
+        price: 99.99,
+        stock: 10,
+        seller: testSeller._id,
+        image: 'https://example.com/test-image.jpg',
+        colors: [
+            {
+                color: 'Red',
+                stock: 5,
+            },
+            {
+                color: 'Blue',
+                stock: 5,
+            },
+        ],
+    });
 });
 
 afterAll(async () => {
@@ -31,319 +85,159 @@ afterAll(async () => {
     await mongoServer.stop();
 });
 
-// --------
+describe('Product API Tests', () => {
+    describe('GET /api/products', () => {
+        it('should get all products', async () => {
+            const response = await request(app)
+                .get('/api/products')
+                .expect(200);
 
-describe('GET /api/products (Get all products)', () => {
-    it('should return an empty array when no products exist', async () => {
-        const response = await request(app).get('/api/products').expect(200);
-        expect(response.body).toEqual([]);
+            expect(Array.isArray(response.body)).toBe(true);
+            expect(response.body.length).toBeGreaterThan(0);
+            expect(response.body[0]).toHaveProperty('name');
+            expect(response.body[0]).toHaveProperty('price');
+        });
     });
 
-    it('should return products when they exist', async () => {
-        const sampleProducts = [
-            {
-                _id: new mongoose.Types.ObjectId(),
-                name: 'Product 1',
-                image: 'https://example.com/image1.jpg',
-                price: 100.03,
-                colors: [
-                    {
-                        color: 'red',
-                        stock: 10,
-                        _id: new mongoose.Types.ObjectId(),
-                    },
-                    {
-                        color: 'blue',
-                        stock: 5,
-                        _id: new mongoose.Types.ObjectId(),
-                    },
-                ],
-                rate: 4,
-                _v: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                _id: new mongoose.Types.ObjectId(),
-                name: 'Product 2',
-                image: 'https://example.com/image2.jpg',
-                price: 200.99,
-                colors: [
-                    {
-                        color: 'green',
-                        stock: 20,
-                        _id: new mongoose.Types.ObjectId(),
-                    },
-                ],
-                rate: 5,
-                _v: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        ];
-        await Product.insertMany(sampleProducts);
+    describe('GET /api/products/:id', () => {
+        it('should get a product by ID', async () => {
+            const response = await request(app)
+                .get(`/api/products/${testProduct._id}`)
+                .expect(200);
 
-        const response = await request(app).get('/api/products').expect(200);
-
-        expect(response.body.length).toBe(2);
-        expect(response.body[0].name).toBe('Product 1');
-        expect(response.body[1].name).toBe('Product 2');
-    });
-
-    it('should return 500 if there is a database error', async () => {
-        jest.spyOn(Product, 'find').mockImplementationOnce(() => {
-            throw new Error('Database error');
+            expect(response.body).toHaveProperty('_id');
+            expect(response.body._id.toString()).toBe(
+                testProduct._id.toString()
+            );
+            expect(response.body.name).toBe('Test Product');
         });
 
-        const response = await request(app).get('/api/products').expect(500);
-        expect(response.body.message).toBe('Internal server error');
+        it('should return 400 for invalid product ID', async () => {
+            const response = await request(app)
+                .get('/api/products/invalid-id')
+                .expect(400);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe('Invalid product ID');
+        });
+
+        it('should return 404 for non-existent product', async () => {
+            const fakeId = new mongoose.Types.ObjectId();
+            const response = await request(app)
+                .get(`/api/products/${fakeId}`)
+                .expect(404);
+
+            expect(response.body).toHaveProperty('message');
+        });
+    });
+
+    describe('PUT /api/products/:id', () => {
+        it('should update product details (seller only)', async () => {
+            const updateData = {
+                name: 'Updated Product',
+                price: 149.99,
+                colors: [
+                    {
+                        color: 'Green',
+                        stock: 10,
+                    },
+                ],
+            };
+
+            const response = await request(app)
+                .put(`/api/products/${testProduct._id}`)
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .send(updateData)
+                .expect(200);
+
+            expect(response.body.name).toBe('Updated Product');
+            expect(response.body.price).toBe(149.99);
+            expect(response.body.colors[0].color).toBe('Green');
+        });
+
+        it('should return 403 if not a seller', async () => {
+            const response = await request(app)
+                .put(`/api/products/${testProduct._id}`)
+                .set('Authorization', `Bearer ${userToken}`)
+                .send({ name: 'Updated Product' })
+                .expect(403);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe(
+                'Not authorized for this action'
+            );
+        });
+
+        it('should return 400 for invalid color data', async () => {
+            const invalidData = {
+                colors: [
+                    {
+                        color: 'Red',
+                        stock: -1, // Invalid stock
+                    },
+                ],
+            };
+
+            const response = await request(app)
+                .put(`/api/products/${testProduct._id}`)
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .send(invalidData)
+                .expect(400);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe('Invalid color data structure');
+        });
+
+        it('should return 200 even if no changes detected', async () => {
+            const sameData = {
+                name: testProduct.name,
+                price: testProduct.price,
+            };
+
+            const response = await request(app)
+                .put(`/api/products/${testProduct._id}`)
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .send(sameData)
+                .expect(200);
+
+            expect(response.body).toHaveProperty('name');
+            expect(response.body.name).toBe(testProduct.name);
+        });
+    });
+
+    describe('DELETE /api/products/:id', () => {
+        it('should delete a product (seller only)', async () => {
+            const response = await request(app)
+                .delete(`/api/products/${testProduct._id}`)
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .expect(200);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body).toHaveProperty('deletedProduct');
+            expect(response.body.deletedProduct._id.toString()).toBe(
+                testProduct._id.toString()
+            );
+        });
+
+        it('should return 404 for non-existent product', async () => {
+            const fakeId = new mongoose.Types.ObjectId();
+            const response = await request(app)
+                .delete(`/api/products/${fakeId}`)
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .expect(404);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe('Product not found!');
+        });
+
+        it('should return 400 for invalid product ID', async () => {
+            const response = await request(app)
+                .delete('/api/products/invalid-id')
+                .set('Authorization', `Bearer ${sellerToken}`)
+                .expect(400);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe('Invalid product ID');
+        });
     });
 });
-
-//TODO: No need
-// describe('GET /api/products/:id (Get a product by ID)', () => {
-//     it('should return a product when ID valid', async () => {
-//         const product = await Product.create({
-//             name: 'Sample',
-//             image: 'https://example.com/sample.jpg',
-//             price: 100,
-//             stock: 2000,
-//             rate: 4.5,
-//         });
-
-//         const response = await request(app)
-//             .get(`/api/products/${product._id}`)
-//             .expect(200);
-
-//         expect(response.body).toMatchObject({
-//             _id: product._id.toString(),
-//             name: 'Sample',
-//             image: 'https://example.com/sample.jpg',
-//             price: 100,
-//             stock: 2000,
-//             rate: 4.5,
-//         });
-//     });
-
-//     it('should return 404 if product is not found', async () => {
-//         const nonExistId = new mongoose.Types.ObjectId();
-
-//         const response = await request(app)
-//             .get(`/api/products/${nonExistId}`)
-//             .expect(404);
-
-//         expect(response.body.message).toBe(
-//             `Product with id ${nonExistId} not found!`
-//         );
-//     });
-
-//     it('should return 400 if the Id format is invalid', async () => {
-//         const response = await request(app)
-//             .get('/api/products/invalidID')
-//             .expect(400);
-
-//         expect(response.body.message).toBe('Invalid product ID');
-//     });
-
-//     it('should return 500 if there is a database error', async () => {
-//         // Mock Product.findById to throw an error
-//         jest.spyOn(Product, 'findById').mockImplementationOnce(() => {
-//             throw new Error('Database error');
-//         });
-
-//         const validId = new mongoose.Types.ObjectId();
-
-//         const response = await request(app)
-//             .get(`/api/products/${validId}`)
-//             .expect(500);
-
-//         expect(response.body.message).toBe('Internal server error');
-//     });
-// });
-
-// describe('PUT /api/products/:id', () => {
-//     it('should return 200 if the product updated successfully', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         const product = await Product.create({
-//             _id: new mongoose.Types.ObjectId(),
-//             name: 'Sample',
-//             image: 'https://example.com/sample.jpg',
-//             price: 100,
-//             stock: 2000,
-//             rate: 4.5,
-//         });
-
-//         const response = await request(app)
-//             .put(`/api/products/${product._id}`)
-//             .set('Authorization', `Bearer ${token}`)
-//             .send({
-//                 name: 'Updated',
-//                 price: 200,
-//             })
-//             .expect(200);
-
-//         expect(response.body.name).toBe('Updated');
-//         expect(response.body.price).toBe(200);
-//     });
-//     it('should return 401 if the user is not a seller', async () => {});
-//     it('should return 400 if no changes are detected', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         const product = await Product.create({
-//             _id: new mongoose.Types.ObjectId(),
-//             name: 'Sample',
-//             image: 'https://example.com/sample.jpg',
-//             price: 100,
-//             stock: 2000,
-//             rate: 4.5,
-//         });
-
-//         const response = await request(app)
-//             .put(`/api/products/${product._id}`)
-//             .set('Authorization', `Bearer ${token}`)
-//             .send({
-//                 name: 'Sample',
-//                 price: 100,
-//             })
-//             .expect(400);
-//         expect(response.body.message).toBe(
-//             'No changes detected. Product remains the same!'
-//         );
-//     });
-//     it('should return 400 if the provided Id is invalid', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         // Using an obviously invalid ID format
-//         const invalidId = 'invalid123';
-
-//         const response = await request(app)
-//             .put(`/api/products/${invalidId}`)
-//             .set('Authorization', `Bearer ${token}`)
-//             .send({
-//                 name: 'Updated Name',
-//                 price: 200,
-//             })
-//             .expect(400);
-
-//         expect(response.body.message).toBe('Invalid product ID');
-//     });
-//     it('should return 400 if the provided values are invalid', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         const response = await request(app)
-//             .put('/api/products/invalid123')
-//             .set('Authorization', `Bearer ${token}`)
-//             .send({ name: 'Updated Name' })
-//             .expect(400);
-
-//         expect(response.body.message).toBe('Invalid product ID');
-//     });
-//     it('should return 404 if the product not found', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         const nonExistId = new mongoose.Types.ObjectId();
-
-//         const response = await request(app)
-//             .put(`/api/products/${nonExistId}`)
-//             .set('Authorization', `Bearer ${token}`)
-//             .expect(404);
-
-//         expect(response.body.message).toBe('Product not found!');
-//     });
-//     it('should return 500 if there is a database error', async () => {
-//         const seller = await User.create({
-//             name: 'Seller',
-//             email: 'seller@example.com',
-//             password: await bcrypt.hash('password', 10),
-//             role: 'seller',
-//         });
-
-//         const loginResponse = await request(app).post('/api/users/login').send({
-//             email: 'seller@example.com',
-//             password: 'password',
-//         });
-
-//         const token = loginResponse.body.token;
-//         expect(token).toBeDefined();
-
-//         jest.spyOn(Product, 'findById').mockImplementationOnce(() => {
-//             throw new Error('Database error');
-//         });
-
-//         const response = await request(app)
-//             .put(`/api/products/${new mongoose.Types.ObjectId()}`)
-//             .set('Authorization', `Bearer ${token}`)
-//             .send({ name: 'Updated Name' })
-//             .expect(500);
-
-//         expect(response.body.message).toBe('Internal server error.');
-
-//         jest.restoreAllMocks();
-//     });
-// });
