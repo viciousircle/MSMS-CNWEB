@@ -249,13 +249,6 @@ const updateOrderStage = asyncHandler(async (req, res) => {
     }
 });
 
-// TODO: Lam not cai nay
-/**
- * @desc: Update payment status for order
- * @route: PUT /api/seller/orders/payment/:id
- * @access: Private (seller only)
- */
-
 /**
  * @desc: Get all orders for customer
  * @route: GET /api/orders/
@@ -284,14 +277,18 @@ const getOrdersForCustomer = asyncHandler(async (req, res) => {
 
             return {
                 _id: order._id,
-                orderItems: order.orderItems.map((item) => ({
-                    productId: item.product?._id,
-                    name: item.product?.name || null,
-                    price: item.product?.price,
-                    image: item.product?.image || null,
-                    color: item.color,
-                    quantity: item.quantity,
-                })),
+                orderItems: order.orderItems.map((item) => {
+                    const product = item.product || {};
+                    return {
+                        _id: item._id,
+                        productId: product._id,
+                        name: product.name || null,
+                        price: product.price || 0,
+                        image: product.image || null,
+                        color: item.color,
+                        quantity: item.quantity,
+                    };
+                }),
                 receiverName: order.receiverInformation.receiverName,
                 receiverPhone: order.receiverInformation.receiverPhone,
                 receiverAddress: order.receiverInformation.receiverAddress,
@@ -332,6 +329,7 @@ const createOrder = asyncHandler(async (req, res) => {
             body: req.body,
         });
 
+        // Validate required fields
         const missingFields = [];
         if (!orderItems) missingFields.push('orderItems');
         if (!receiverInformation) missingFields.push('receiverInformation');
@@ -349,6 +347,7 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
+        // Validate receiver information
         const missingReceiverFields = [];
         if (!receiverInformation.receiverName)
             missingReceiverFields.push('receiverName');
@@ -366,6 +365,7 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
+        // Validate orderItems
         if (!Array.isArray(orderItems)) {
             return res.status(400).json({
                 message: 'orderItems must be an array',
@@ -379,10 +379,19 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
+        // Transform orderItems to match schema
+        const transformedOrderItems = orderItems.map((item) => ({
+            product: item.product,
+            color: item.color,
+            quantity: item.quantity,
+        }));
+
+        // Validate transformed items
         const invalidItems = [];
-        orderItems.forEach((item, index) => {
+        transformedOrderItems.forEach((item, index) => {
             const itemErrors = [];
             if (!item.product) itemErrors.push('missing product ID');
+            if (!item.color) itemErrors.push('missing color');
             if (!item.quantity) itemErrors.push('missing quantity');
             if (item.quantity && item.quantity <= 0)
                 itemErrors.push('quantity must be greater than 0');
@@ -410,33 +419,31 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
-        // 8. Create Order Document
+        // Create Order Document with transformed orderItems
         const order = new Order({
             user: req.user._id,
-            orderItems,
-            receiverInformation, // Fixed spelling to match validation
+            orderItems: transformedOrderItems,
+            receiverInformation,
             paymentMethod,
             orderStage: [{ stage: 'New', date: new Date() }],
-            isPaid: paymentMethod !== 'COD', // Set to true for non-COD payments
+            isPaid: paymentMethod !== 'COD',
         });
 
-        // 9. Save and Populate Order
+        // Save and Populate Order
         const createdOrder = await order.save();
         const populatedOrder = await Order.populate(createdOrder, {
             path: 'orderItems.product',
             select: 'name price image',
-            model: 'Product', // Explicitly specify the model
+            model: 'Product',
         });
 
-        // 10. Calculate Total Payment
-        const totalPayment = orderItems.reduce((total, item) => {
-            const product = populatedOrder.orderItems.find(
-                (i) => i._id.toString() === item._id?.toString()
-            )?.product;
-            return total + (product?.price || 0) * item.quantity;
+        // Calculate Total Payment
+        const totalPayment = populatedOrder.orderItems.reduce((total, item) => {
+            const itemPrice = item.product?.price || 0;
+            return total + item.quantity * itemPrice;
         }, 0);
 
-        // 11. Send Response
+        // Send Response
         res.status(201).json({
             message: 'Order created successfully',
             order: {
