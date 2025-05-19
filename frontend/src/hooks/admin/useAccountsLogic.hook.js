@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import { api } from '/utils/api';
 
 const DEFAULT_ACCOUNTS_PER_PAGE = 10;
@@ -11,7 +10,7 @@ export const useAccountsLogic = () => {
         accountsPerPage: DEFAULT_ACCOUNTS_PER_PAGE,
     });
     const [filters, setFilters] = useState({
-        activeTab: 'all',
+        activeTab: 'customer',
         selectedDate: null,
     });
     const [status, setStatus] = useState({
