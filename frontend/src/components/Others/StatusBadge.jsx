@@ -1,11 +1,15 @@
 const StatusBadge = ({ status, colorMap }) => {
     const defaultClasses = 'bg-gray-100 text-gray-600';
+    const defaultColorMap = {
+        active: 'bg-green-100 text-green-600',
+        inactive: 'bg-red-100 text-red-600',
+    };
 
     return (
         <div className="flex items-center justify-center">
             <div
                 className={`rounded-sm px-4 py-1 text-sm font-medium w-fit ${
-                    colorMap[status] || defaultClasses
+                    (colorMap || defaultColorMap)[status] || defaultClasses
                 }`}
             >
                 {status}
@@ -37,4 +41,15 @@ const StageBadge = ({ status }) => (
     />
 );
 
-export { StatusBadge, PaidStatusBadge, StageBadge };
+const RoleBadge = ({ role }) => (
+    <StatusBadge
+        status={role}
+        colorMap={{
+            customer: 'bg-blue-100 text-blue-600',
+            seller: 'bg-green-100 text-green-600',
+            admin: 'bg-red-100 text-red-600',
+        }}
+    />
+);
+
+export { StatusBadge, PaidStatusBadge, StageBadge, RoleBadge };

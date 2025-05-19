@@ -24,6 +24,7 @@ app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/cart', require('./routes/cart.routes'));
 app.use('/api/seller/orders', require('./routes/orderSeller.routes'));
 app.use('/api/orders', require('./routes/order.routes'));
+app.use('/api/admin', require('./routes/admin.routes'));
 
 app.use(errorHandler);
 
