@@ -6,7 +6,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { AccountTableRow } from './AccountTableRow';
 import { AccountTableHeaderCell } from './AccountTableHeaderCell';
 import { useAccountTable } from '@/hooks/admin/useAccountTable.hook';
@@ -16,7 +15,6 @@ const ACCOUNT_TABLE_COLUMNS = [
     { id: 'username', label: 'Username', width: '200px' },
     { id: 'email', label: 'Email', width: '250px' },
     { id: 'role', label: 'Role', width: '120px' },
-    { id: 'status', label: 'Status', width: '120px' },
     { id: 'createdAt', label: 'Created At', width: '150px' },
     { id: 'actions', label: 'Actions', width: '120px' },
 ];

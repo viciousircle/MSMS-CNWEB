@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UsersIcon } from '@heroicons/react/24/outline';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { HeaderWithIcon } from '@/components/Structure/Header';
@@ -7,6 +7,24 @@ import { AccountTable } from '@/components/Tables/AccountTable/AccountTable';
 import { PaginationControls } from '@/components/Others/PaginationControls';
 import { AccountFilterControls } from '@/components/Others/AccountFilterControls';
 import { useAccountsLogic } from '@/hooks/admin/useAccountsLogic.hook';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ManageAccount = () => {
     const {
@@ -25,6 +43,75 @@ const ManageAccount = () => {
         deleteAccount,
         handleItemsPerPageChange,
     } = useAccountsLogic();
+
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [newAccount, setNewAccount] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'seller',
+    });
+
+    const [formErrors, setFormErrors] = useState({});
+
+    const validateForm = () => {
+        const errors = {};
+        if (!newAccount.name.trim()) {
+            errors.name = 'Name is required';
+        }
+        if (!newAccount.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(newAccount.email)) {
+            errors.email = 'Invalid email format';
+        }
+        if (!newAccount.password) {
+            errors.password = 'Password is required';
+        } else if (newAccount.password.length < 6) {
+            errors.password = 'Password must be at least 6 characters';
+        }
+        if (newAccount.password !== newAccount.confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
+        }
+        return errors;
+    };
+
+    const handleAddClick = () => {
+        setIsAddDialogOpen(true);
+    };
+
+    const handleAddAccount = async () => {
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
+        // TODO: Implement API call to add account
+        console.log('Adding account:', newAccount);
+        setIsAddDialogOpen(false);
+        setNewAccount({
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            role: 'seller',
+        });
+        setFormErrors({});
+    };
+
+    const handleCloseDialog = () => {
+        setIsAddDialogOpen(false);
+        setNewAccount({
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            role: 'seller',
+        });
+        setFormErrors({});
+    };
+
+    console.log('paginatedAccounts', paginatedAccounts);
 
     if (loading) {
         return <div>Loading accounts...</div>;
@@ -47,6 +134,7 @@ const ManageAccount = () => {
                         onDateChange={setSelectedDate}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
+                        onAddClick={handleAddClick}
                     />
                 </div>
 
@@ -61,6 +149,201 @@ const ManageAccount = () => {
                     currentPage={currentPage}
                     onPageChange={setCurrentPage}
                 />
+
+                <Dialog
+                    open={isAddDialogOpen}
+                    onOpenChange={setIsAddDialogOpen}
+                >
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl font-semibold">
+                                Add New Account
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="name"
+                                    className="text-sm font-medium"
+                                >
+                                    Full Name
+                                </Label>
+                                <Input
+                                    id="name"
+                                    value={newAccount.name}
+                                    onChange={(e) => {
+                                        setNewAccount({
+                                            ...newAccount,
+                                            name: e.target.value,
+                                        });
+                                        if (formErrors.name) {
+                                            setFormErrors({
+                                                ...formErrors,
+                                                name: '',
+                                            });
+                                        }
+                                    }}
+                                    className={
+                                        formErrors.name ? 'border-red-500' : ''
+                                    }
+                                    placeholder="Enter full name"
+                                />
+                                {formErrors.name && (
+                                    <p className="text-sm text-red-500">
+                                        {formErrors.name}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="email"
+                                    className="text-sm font-medium"
+                                >
+                                    Email
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={newAccount.email}
+                                    onChange={(e) => {
+                                        setNewAccount({
+                                            ...newAccount,
+                                            email: e.target.value,
+                                        });
+                                        if (formErrors.email) {
+                                            setFormErrors({
+                                                ...formErrors,
+                                                email: '',
+                                            });
+                                        }
+                                    }}
+                                    className={
+                                        formErrors.email ? 'border-red-500' : ''
+                                    }
+                                    placeholder="Enter email address"
+                                />
+                                {formErrors.email && (
+                                    <p className="text-sm text-red-500">
+                                        {formErrors.email}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="password"
+                                    className="text-sm font-medium"
+                                >
+                                    Password
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={newAccount.password}
+                                    onChange={(e) => {
+                                        setNewAccount({
+                                            ...newAccount,
+                                            password: e.target.value,
+                                        });
+                                        if (formErrors.password) {
+                                            setFormErrors({
+                                                ...formErrors,
+                                                password: '',
+                                            });
+                                        }
+                                    }}
+                                    className={
+                                        formErrors.password
+                                            ? 'border-red-500'
+                                            : ''
+                                    }
+                                    placeholder="Enter password"
+                                />
+                                {formErrors.password && (
+                                    <p className="text-sm text-red-500">
+                                        {formErrors.password}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="confirmPassword"
+                                    className="text-sm font-medium"
+                                >
+                                    Confirm Password
+                                </Label>
+                                <Input
+                                    id="confirmPassword"
+                                    type="password"
+                                    value={newAccount.confirmPassword}
+                                    onChange={(e) => {
+                                        setNewAccount({
+                                            ...newAccount,
+                                            confirmPassword: e.target.value,
+                                        });
+                                        if (formErrors.confirmPassword) {
+                                            setFormErrors({
+                                                ...formErrors,
+                                                confirmPassword: '',
+                                            });
+                                        }
+                                    }}
+                                    className={
+                                        formErrors.confirmPassword
+                                            ? 'border-red-500'
+                                            : ''
+                                    }
+                                    placeholder="Confirm password"
+                                />
+                                {formErrors.confirmPassword && (
+                                    <p className="text-sm text-red-500">
+                                        {formErrors.confirmPassword}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="role"
+                                    className="text-sm font-medium"
+                                >
+                                    Role
+                                </Label>
+                                <Tabs
+                                    value={newAccount.role}
+                                    onValueChange={(value) =>
+                                        setNewAccount({
+                                            ...newAccount,
+                                            role: value,
+                                        })
+                                    }
+                                    className="w-full"
+                                >
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="seller">
+                                            Seller
+                                        </TabsTrigger>
+                                        <TabsTrigger value="admin">
+                                            Admin
+                                        </TabsTrigger>
+                                    </TabsList>
+                                </Tabs>
+                            </div>
+                        </div>
+                        <DialogFooter className="gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={handleCloseDialog}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleAddAccount}
+                                className="bg-primary hover:bg-primary/90"
+                            >
+                                Add Account
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </Body>
     );

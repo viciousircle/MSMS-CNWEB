@@ -2,6 +2,7 @@ import React from 'react';
 import DatePicker from '@/components/Others/DatePicker';
 import { ItemsPerPageSelector } from '@/components/Selectors/ItemsPerPageSelector';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 
 export const AccountFilterControls = React.memo(
     ({
@@ -11,8 +12,19 @@ export const AccountFilterControls = React.memo(
         onDateChange,
         activeTab,
         onTabChange,
+        onAddClick,
     }) => (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4 w-full">
+            <div className="flex-1">
+                <Button
+                    onClick={onAddClick}
+                    variant="default"
+                    className={'text-sm'}
+                >
+                    Add Account
+                </Button>
+            </div>
+
             <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Show</span>
                 <ItemsPerPageSelector
@@ -20,10 +32,7 @@ export const AccountFilterControls = React.memo(
                     onChange={onItemsPerPageChange}
                 />
             </div>
-            <DatePicker
-                selectedDate={selectedDate}
-                onDateChange={onDateChange}
-            />
+
             <Tabs
                 value={activeTab}
                 onValueChange={onTabChange}
