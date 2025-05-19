@@ -7,8 +7,13 @@ import {
 } from '@/components/ui/accordion';
 import { StageBadge } from '@/components/Others/StatusBadge';
 import AccordionDetails from './AccordionDetails';
+import { formatDisplayId } from '/utils/idConverter';
 
 const OrderItemAccordion = ({ order, refetchOrders }) => {
+    const displayId = formatDisplayId(order._id, 'ORD-');
+
+    console.log(displayId);
+
     return (
         <Accordion
             type="single"
@@ -24,7 +29,7 @@ const OrderItemAccordion = ({ order, refetchOrders }) => {
                             </div>
                             <div className="flex gap-4">
                                 <span className="font-bold text-gray-900">
-                                    #{order._id}
+                                    {displayId}
                                 </span>
                             </div>
                         </div>

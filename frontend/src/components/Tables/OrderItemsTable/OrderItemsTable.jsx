@@ -9,6 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { formatDisplayId } from '/utils/idConverter';
 
 const formatPrice = (price) => `$${price.toFixed(2)}`;
 
@@ -28,7 +29,7 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                     <TableHead className="text-center w-[100px]">
                         Item
                     </TableHead>
-                    <TableHead className="text-center">Name</TableHead>
+                    <TableHead className="text-left">Name</TableHead>
                     <TableHead className="text-center">Color</TableHead>
                     <TableHead className="text-center">Quantity</TableHead>
                     <TableHead className="text-center">Amount</TableHead>
@@ -38,9 +39,9 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                 {items.map((item, index) => (
                     <TableRow key={index}>
                         <TableCell className="text-center font-medium">
-                            {item.itemId}
+                            {formatDisplayId(item.itemId, 'ITEM-')}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-left">
                             {item.itemName}
                         </TableCell>
                         <TableCell className="text-center">

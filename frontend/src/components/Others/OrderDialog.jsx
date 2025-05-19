@@ -167,11 +167,11 @@ const OrderDialog = ({ products, receiverInfo, onOrderSuccess }) => {
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <button
-                    className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif"
+                    className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase"
                     onClick={handleOrder}
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Placing Order...' : 'Order Now'}
+                    {isLoading ? 'Placing Order...' : 'Check out'}
                 </button>
             </AlertDialogTrigger>
 

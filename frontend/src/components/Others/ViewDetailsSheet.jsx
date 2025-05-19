@@ -14,6 +14,7 @@ import { OrderItemsTable } from '../Tables/OrderItemsTable/OrderItemsTable';
 import { useOrderDetails } from '@/hooks/seller/useOrderDetails.hook';
 import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
 import { toast } from 'sonner';
+import { formatDisplayId } from '/utils/idConverter';
 
 const InfoRow = ({ label, value }) => (
     <div className="flex justify-between">
@@ -152,7 +153,7 @@ export const ViewDetailsSheet = ({
             <SheetContent className="sm:max-w-lg overflow-y-auto">
                 <SheetHeader>
                     <SheetTitle className="text-center">
-                        Order {orderId} Details
+                        Order {formatDisplayId(orderId, 'ORD-')} Details
                     </SheetTitle>
                     <SheetDescription>
                         <div className="flex flex-col gap-6 mt-6">
@@ -172,7 +173,10 @@ export const ViewDetailsSheet = ({
                             </InfoSection>
 
                             <InfoSection title="Order Summary">
-                                <InfoRow label="Order ID" value={orderId} />
+                                <InfoRow
+                                    label="Order ID"
+                                    value={formatDisplayId(orderId, 'ORD-')}
+                                />
                                 <InfoRow label="Date" value={dateOrder} />
                                 <InfoRow
                                     label="Payment Method"

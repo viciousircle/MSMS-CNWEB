@@ -3,6 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ViewDetailsSheet } from '../../Others/ViewDetailsSheet';
 import { PaidStatusBadge, StageBadge } from '../../Others/StatusBadge';
+import { formatDisplayId } from '/utils/idConverter';
 
 export const OrderTableRow = ({
     order,
@@ -15,9 +16,11 @@ export const OrderTableRow = ({
         ? order.orderStage.slice(-1)[0]?.stage
         : order.orderStage;
 
+    const displayId = formatDisplayId(order._id, 'ORD-');
+
     const cells = [
         <StageBadge status={currentStage} />, // Use currentStage here
-        order._id,
+        displayId,
         order.customerName,
         order.customerEmail,
         `$${order.totalPayment}`,
