@@ -6,7 +6,11 @@ import { PaymentMethodSelector } from '@/components/Selectors/PaymentMethodSelec
 import OrderDialog from '@/components/Others/OrderDialog';
 import { useLocation } from 'react-router-dom';
 
-const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
+const BillCard = ({
+    merchandiseSubtotal,
+    shippingSubtotal,
+    onPaymentMethodChange,
+}) => {
     const location = useLocation();
     const products = location.state?.products || [];
     const [receiverInfo, setReceiverInfo] = React.useState(null);
@@ -20,11 +24,15 @@ const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
 
     const paymentMethods = [
         { value: 'cod', label: 'Cash on Delivery' },
-        { value: 'qr', label: 'QR' },
+        { value: 'qr', label: 'VietQR Payment' },
     ];
 
     const format = (value) => `${formatPrice(value)} VND`;
     const total = merchandiseSubtotal + shippingSubtotal;
+
+    const handlePaymentMethodChange = (value) => {
+        onPaymentMethodChange?.(value);
+    };
 
     return (
         <div className="space-y-6">
@@ -51,6 +59,9 @@ const BillCard = ({ merchandiseSubtotal, shippingSubtotal }) => {
                                 value={
                                     <PaymentMethodSelector
                                         paymentMethods={paymentMethods}
+                                        onValueChange={
+                                            handlePaymentMethodChange
+                                        }
                                     />
                                 }
                                 customValueClass="bg-gray-950/2.5 "

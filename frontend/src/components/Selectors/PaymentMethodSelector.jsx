@@ -7,8 +7,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-export const PaymentMethodSelector = ({ paymentMethods }) => (
-    <Select>
+export const PaymentMethodSelector = ({ paymentMethods, onValueChange }) => (
+    <Select onValueChange={onValueChange}>
         <SelectTrigger className="w-full text-left">
             <SelectValue placeholder="Cash on Delivery" />
         </SelectTrigger>
