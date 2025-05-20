@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BanknotesIcon } from '@heroicons/react/24/outline';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
@@ -16,14 +16,36 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { api } from '/utils/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Payment = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
     const products = location.state?.products || [];
     const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [orderData, setOrderData] = useState(null);
+    const [isOrderSuccessDialogOpen, setIsOrderSuccessDialogOpen] =
+        useState(false);
+
+    useEffect(() => {
+        if (!isAuthenticated()) {
+            navigate('/login', { state: { from: '/payment', products } });
+        }
+    }, [isAuthenticated, navigate, products]);
 
     const parsePrice = (price) =>
         typeof price === 'string' ? Number(price.replace(/\./g, '')) : price;
@@ -118,8 +140,9 @@ const Payment = () => {
             });
 
             console.log('Order response:', result);
+            setOrderData(data);
             setIsQRDialogOpen(false);
-            // TODO: Handle successful order (e.g., redirect to order confirmation page)
+            setIsOrderSuccessDialogOpen(true);
         } catch (err) {
             console.error('Order failed:', err);
             setError('Failed to place order. Please try again.');
@@ -127,6 +150,69 @@ const Payment = () => {
             setIsLoading(false);
         }
     };
+
+    const OrderSummary = ({ order }) => (
+        <div className="space-y-3">
+            <div className="border-b pb-3">
+                <h3 className="font-semibold text-gray-900">
+                    Delivery Information
+                </h3>
+                <p>
+                    <strong>Receiver:</strong>{' '}
+                    {order.receiverInformation.receiverName}
+                </p>
+                <p>
+                    <strong>Phone:</strong>{' '}
+                    {order.receiverInformation.receiverPhone}
+                </p>
+                <p>
+                    <strong>Address:</strong>{' '}
+                    {order.receiverInformation.receiverAddress}
+                </p>
+            </div>
+
+            <div className="border-b pb-3">
+                <h3 className="font-semibold text-gray-900">Payment Method</h3>
+                <p>{order.paymentMethod}</p>
+            </div>
+
+            <div>
+                <h3 className="font-semibold text-gray-900">Order Items</h3>
+                <ul className="space-y-2 mt-2">
+                    {order.orderItems.map((item, index) => (
+                        <li key={index} className="flex justify-between">
+                            <span>
+                                {item.productName || `Product ${item.product}`}{' '}
+                                ({item.color}) × {item.quantity}
+                            </span>
+                            {item.price && (
+                                <span>
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                </span>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {order.totalAmount && (
+                <div className="border-t pt-3 text-right font-semibold">
+                    Total: ${order.totalAmount.toFixed(2)}
+                </div>
+            )}
+
+            <div className="text-sm text-gray-500 mt-4">
+                Order ID: #
+                {Math.random().toString(36).substring(2, 10).toUpperCase()}
+                <br />
+                Date: {new Date(order.orderDate).toLocaleString()}
+            </div>
+        </div>
+    );
+
+    if (!isAuthenticated()) {
+        return null; // Will redirect in useEffect
+    }
 
     return (
         <Body>
@@ -168,6 +254,38 @@ const Payment = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog
+                open={isOrderSuccessDialogOpen}
+                onOpenChange={setIsOrderSuccessDialogOpen}
+            >
+                <AlertDialogContent id="print-area">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-center text-lg font-medium text-green-600">
+                            Order Placed Successfully!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4">
+                            {orderData && <OrderSummary order={orderData} />}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Back to Store</AlertDialogCancel>
+                        <button
+                            className="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md"
+                            onClick={() => window.print()}
+                        >
+                            Print Invoice
+                        </button>
+                        <AlertDialogAction
+                            onClick={() =>
+                                console.log('View order status:', orderData)
+                            }
+                        >
+                            Track Order
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Body>
     );
 };
