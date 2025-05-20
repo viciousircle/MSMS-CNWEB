@@ -27,6 +27,7 @@ const Orders = () => {
         setSelectedDate,
         updateOrder,
         handleItemsPerPageChange,
+        fetchOrders,
     } = useOrdersLogic();
 
     const { selectedRows, toggleRowSelection, toggleAllRows, allSelected } =
@@ -41,6 +42,16 @@ const Orders = () => {
         'cancelled',
         'reject',
     ];
+
+    const handleStageUpdate = async (orderId, newStage) => {
+        try {
+            await updateOrder(orderId, { stage: newStage });
+            // After successful update, refresh the orders list
+            await fetchOrders();
+        } catch (error) {
+            console.error('Error updating order stage:', error);
+        }
+    };
 
     if (loading) {
         return <div>Loading orders...</div>;
@@ -66,10 +77,7 @@ const Orders = () => {
                             <ChangeStageMenu
                                 selectedOrders={selectedRows}
                                 orders={paginatedOrders}
-                                onStageUpdated={() => {
-                                    // Refresh the orders list
-                                    window.location.reload();
-                                }}
+                                onStageUpdated={handleStageUpdate}
                             />
                             <StageFlow />
                         </div>
@@ -89,7 +97,7 @@ const Orders = () => {
                         >
                             <OrderTable
                                 orders={paginatedOrders}
-                                onUpdate={updateOrder}
+                                onUpdate={handleStageUpdate}
                                 selectedRows={selectedRows}
                                 onToggleSelection={toggleRowSelection}
                                 onToggleAll={toggleAllRows}

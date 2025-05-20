@@ -13,6 +13,7 @@ import { PaidStatusBadge, StageBadge } from './StatusBadge';
 import { OrderItemsTable } from '../Tables/OrderItemsTable/OrderItemsTable';
 import { useOrderDetails } from '@/hooks/seller/useOrderDetails.hook';
 import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
+import { useUpdatePaymentStatus } from '@/hooks/seller/useUpdatePaymentStatus';
 import { toast } from 'sonner';
 import { formatDisplayId } from '/utils/idConverter';
 
@@ -32,68 +33,91 @@ const InfoSection = ({ title, children }) => (
     </div>
 );
 
-const ActionButtons = ({ orderStage, isUpdating, handleStageUpdate }) => {
-    switch (orderStage) {
-        case 'New':
-            return (
-                <div className="flex gap-3">
-                    <Button
-                        className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                        onClick={() => handleStageUpdate('Prepare')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Prepare'}
-                    </Button>
-                    <Button
-                        className="flex-1 bg-red-100 text-red-700 hover:bg-red-200"
-                        onClick={() => handleStageUpdate('Reject')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Reject'}
-                    </Button>
-                </div>
-            );
-        case 'Prepare':
-            return (
-                <div className="flex gap-3">
-                    <Button
-                        className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
-                        onClick={() => handleStageUpdate('New')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Revert to New'}
-                    </Button>
-                    <Button
-                        className="flex-1 bg-green-100 text-green-800 hover:bg-green-200"
-                        onClick={() => handleStageUpdate('Shipping')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Mark as Shipping'}
-                    </Button>
-                </div>
-            );
-        case 'Shipping':
-            return (
-                <div className="flex gap-3">
-                    <Button
-                        className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                        onClick={() => handleStageUpdate('Prepare')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Revert to Prepare'}
-                    </Button>
-                    <Button
-                        className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200"
-                        onClick={() => handleStageUpdate('Shipped')}
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? 'Processing...' : 'Mark as Shipped'}
-                    </Button>
-                </div>
-            );
-        default:
-            return null;
-    }
+const ActionButtons = ({
+    orderStage,
+    isUpdating,
+    handleStageUpdate,
+    paymentStatus,
+    isPaymentUpdating,
+    handlePaymentUpdate,
+}) => {
+    return (
+        <div className="space-y-3">
+            <div className="flex gap-3">
+                {orderStage === 'New' && (
+                    <>
+                        <Button
+                            className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                            onClick={() => handleStageUpdate('Prepare')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Prepare'}
+                        </Button>
+                        <Button
+                            className="flex-1 bg-red-100 text-red-700 hover:bg-red-200"
+                            onClick={() => handleStageUpdate('Reject')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Reject'}
+                        </Button>
+                    </>
+                )}
+                {orderStage === 'Prepare' && (
+                    <>
+                        <Button
+                            className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                            onClick={() => handleStageUpdate('New')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Revert to New'}
+                        </Button>
+                        <Button
+                            className="flex-1 bg-green-100 text-green-800 hover:bg-green-200"
+                            onClick={() => handleStageUpdate('Shipping')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Mark as Shipping'}
+                        </Button>
+                    </>
+                )}
+                {orderStage === 'Shipping' && (
+                    <>
+                        <Button
+                            className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                            onClick={() => handleStageUpdate('Prepare')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Revert to Prepare'}
+                        </Button>
+                        <Button
+                            className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200"
+                            onClick={() => handleStageUpdate('Shipped')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? 'Processing...' : 'Mark as Shipped'}
+                        </Button>
+                    </>
+                )}
+            </div>
+
+            {/* Payment Status Toggle Button */}
+            <Button
+                className={`w-full ${
+                    paymentStatus === 'Paid'
+                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                        : 'bg-green-100 text-green-800 hover:bg-green-200'
+                }`}
+                onClick={() => handlePaymentUpdate(paymentStatus !== 'Paid')}
+                disabled={isPaymentUpdating}
+            >
+                {isPaymentUpdating
+                    ? 'Processing...'
+                    : paymentStatus === 'Paid'
+                    ? 'Mark as Unpaid'
+                    : 'Mark as Paid'}
+            </Button>
+        </div>
+    );
 };
 
 export const ViewDetailsSheet = ({
@@ -103,9 +127,12 @@ export const ViewDetailsSheet = ({
     paymentMethod,
     paymentStatus,
     onStageUpdated,
+    onPaymentStatusUpdated,
 }) => {
     const { orderDetails, loading, error, refetch } = useOrderDetails(orderId);
     const { updateOrderStage, isUpdating } = useUpdateOrderStage();
+    const { updatePaymentStatus, isUpdating: isPaymentUpdating } =
+        useUpdatePaymentStatus();
 
     const handleStageUpdate = async (newStage) => {
         try {
@@ -121,6 +148,26 @@ export const ViewDetailsSheet = ({
             await refetch();
         } catch (error) {
             toast.error(`Failed to update status: ${error.message}`);
+            // You might want to revert the optimistic update here
+        }
+    };
+
+    const handlePaymentUpdate = async (isPaid) => {
+        try {
+            // Optimistically update parent state first
+            onPaymentStatusUpdated?.(isPaid ? 'Paid' : 'Unpaid');
+
+            // Then make the API call
+            await updatePaymentStatus(orderId, isPaid);
+
+            toast.success(
+                `Payment status updated to ${isPaid ? 'Paid' : 'Unpaid'}`
+            );
+
+            // Optional: Refetch to ensure complete sync with server
+            await refetch();
+        } catch (error) {
+            toast.error(`Failed to update payment status: ${error.message}`);
             // You might want to revert the optimistic update here
         }
     };
@@ -211,6 +258,9 @@ export const ViewDetailsSheet = ({
                                 orderStage={orderStage}
                                 isUpdating={isUpdating}
                                 handleStageUpdate={handleStageUpdate}
+                                paymentStatus={paymentStatus}
+                                isPaymentUpdating={isPaymentUpdating}
+                                handlePaymentUpdate={handlePaymentUpdate}
                             />
                         </div>
                     </SheetDescription>

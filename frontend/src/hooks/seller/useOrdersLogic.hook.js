@@ -39,25 +39,25 @@ export const useOrdersLogic = () => {
         fetchOrders();
     }, []);
 
-    const updateOrder = async (indexOnPage, updatedFields) => {
-        const globalIndex =
-            (pagination.currentPage - 1) * pagination.ordersPerPage +
-            indexOnPage;
-        const orderId = orders[globalIndex]._id;
-
+    const updateOrder = async (orderId, updatedFields) => {
         try {
             const updatedOrder = await api(`/seller/orders/${orderId}`, {
                 method: 'PATCH',
                 body: JSON.stringify(updatedFields),
             });
 
+            // Update the order in the local state
             setOrders((prev) => {
-                const newOrders = [...prev];
-                newOrders[globalIndex] = {
-                    ...newOrders[globalIndex],
-                    ...updatedOrder,
-                };
-                return newOrders;
+                return prev.map((order) => {
+                    if (order._id === orderId) {
+                        return {
+                            ...order,
+                            ...updatedOrder,
+                            orderStage: updatedFields.stage || order.orderStage,
+                        };
+                    }
+                    return order;
+                });
             });
         } catch (err) {
             console.error('Error updating order:', err);
@@ -114,5 +114,6 @@ export const useOrdersLogic = () => {
             setFilters((prev) => ({ ...prev, selectedDate: date })),
         updateOrder,
         handleItemsPerPageChange,
+        fetchOrders,
     };
 };

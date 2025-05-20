@@ -8,15 +8,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
 import { toast } from 'sonner';
 
 const STAGE_FLOW = ['New', 'Prepare', 'Shipping', 'Shipped'];
 const REVERSE_STAGE_FLOW = [...STAGE_FLOW].reverse();
 
 const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
-    const { updateOrderStage, isUpdating } = useUpdateOrderStage();
-
     const getNextStage = (currentStage) => {
         const currentIndex = STAGE_FLOW.indexOf(currentStage);
         return currentIndex < STAGE_FLOW.length - 1
@@ -31,19 +28,41 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             : currentStage;
     };
 
+    const getCurrentStage = (order) => {
+        if (!order) return null;
+        return Array.isArray(order.orderStage)
+            ? order.orderStage.slice(-1)[0]?.stage
+            : order.orderStage;
+    };
+
     const handleStageChange = async (newStage) => {
         if (selectedOrders.size === 0) {
             toast.error('Please select at least one order');
             return;
         }
 
+        // Check if any selected order is cancelled or rejected
+        const hasCancelledOrRejected = Array.from(selectedOrders).some(
+            (orderId) => {
+                const order = orders.find((o) => o._id === orderId);
+                const currentStage = getCurrentStage(order);
+                return (
+                    currentStage === 'Cancelled' || currentStage === 'Reject'
+                );
+            }
+        );
+
+        if (hasCancelledOrRejected) {
+            toast.error('Cannot change stage for cancelled or rejected orders');
+            return;
+        }
+
         try {
             const updatePromises = Array.from(selectedOrders).map((orderId) =>
-                updateOrderStage(orderId, newStage)
+                onStageUpdated(orderId, newStage)
             );
 
             await Promise.all(updatePromises);
-            onStageUpdated?.();
             toast.success(
                 `Updated ${selectedOrders.size} order(s) to ${newStage}`
             );
@@ -59,25 +78,40 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             return;
         }
 
+        // Check if any selected order is cancelled or rejected
+        const hasCancelledOrRejected = Array.from(selectedOrders).some(
+            (orderId) => {
+                const order = orders.find((o) => o._id === orderId);
+                const currentStage = getCurrentStage(order);
+                return (
+                    currentStage === 'Cancelled' || currentStage === 'Reject'
+                );
+            }
+        );
+
+        if (hasCancelledOrRejected) {
+            toast.error('Cannot change stage for cancelled or rejected orders');
+            return;
+        }
+
         try {
             const updatePromises = Array.from(selectedOrders).map(
                 async (orderId) => {
                     const order = orders.find((o) => o._id === orderId);
                     if (!order) return;
 
-                    const currentStage = Array.isArray(order.orderStage)
-                        ? order.orderStage.slice(-1)[0]?.stage
-                        : order.orderStage;
+                    const currentStage = getCurrentStage(order);
+                    if (!currentStage) return;
+
                     const nextStage = getNextStage(currentStage);
 
                     if (nextStage !== currentStage) {
-                        return updateOrderStage(orderId, nextStage);
+                        return onStageUpdated(orderId, nextStage);
                     }
                 }
             );
 
             await Promise.all(updatePromises.filter(Boolean));
-            onStageUpdated?.();
             toast.success(
                 `Moved ${selectedOrders.size} order(s) to next stage`
             );
@@ -93,25 +127,40 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             return;
         }
 
+        // Check if any selected order is cancelled or rejected
+        const hasCancelledOrRejected = Array.from(selectedOrders).some(
+            (orderId) => {
+                const order = orders.find((o) => o._id === orderId);
+                const currentStage = getCurrentStage(order);
+                return (
+                    currentStage === 'Cancelled' || currentStage === 'Reject'
+                );
+            }
+        );
+
+        if (hasCancelledOrRejected) {
+            toast.error('Cannot change stage for cancelled or rejected orders');
+            return;
+        }
+
         try {
             const updatePromises = Array.from(selectedOrders).map(
                 async (orderId) => {
                     const order = orders.find((o) => o._id === orderId);
                     if (!order) return;
 
-                    const currentStage = Array.isArray(order.orderStage)
-                        ? order.orderStage.slice(-1)[0]?.stage
-                        : order.orderStage;
+                    const currentStage = getCurrentStage(order);
+                    if (!currentStage) return;
+
                     const prevStage = getPreviousStage(currentStage);
 
                     if (prevStage !== currentStage) {
-                        return updateOrderStage(orderId, prevStage);
+                        return onStageUpdated(orderId, prevStage);
                     }
                 }
             );
 
             await Promise.all(updatePromises.filter(Boolean));
-            onStageUpdated?.();
             toast.success(
                 `Moved ${selectedOrders.size} order(s) to previous stage`
             );
@@ -121,10 +170,23 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
         }
     };
 
+    // Check if any selected order is cancelled or rejected
+    const hasCancelledOrRejected = Array.from(selectedOrders).some(
+        (orderId) => {
+            const order = orders.find((o) => o._id === orderId);
+            const currentStage = getCurrentStage(order);
+            return currentStage === 'Cancelled' || currentStage === 'Reject';
+        }
+    );
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button disabled={isUpdating || selectedOrders.size === 0}>
+                <Button
+                    disabled={
+                        selectedOrders.size === 0 || hasCancelledOrRejected
+                    }
+                >
                     <ArrowPathRoundedSquareIcon className="w-4 h-4 mr-1" />
                     Change Stage
                 </Button>

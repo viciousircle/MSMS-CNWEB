@@ -219,6 +219,13 @@ const updateOrderStage = asyncHandler(async (req, res) => {
             });
         }
 
+        // Check if order is cancelled or rejected
+        if (currentStage === 'Cancelled' || currentStage === 'Reject') {
+            return res.status(400).json({
+                message: 'Cannot change stage for cancelled or rejected orders',
+            });
+        }
+
         // Add new stage to the orderStage array
         order.orderStage.push({
             stage: stage,
@@ -230,15 +237,15 @@ const updateOrderStage = asyncHandler(async (req, res) => {
             order.isPaid = false;
         }
 
-        // Save the updated order
-        const updatedOrder = await order.save();
+        await order.save();
 
         res.status(200).json({
             message: 'Order stage updated successfully',
-            orderId: updatedOrder._id,
-            previousStage: currentStage,
-            newStage: stage,
-            updatedAt: updatedOrder.updatedAt,
+            order: {
+                _id: order._id,
+                currentStage: stage,
+                updatedAt: order.orderStage.slice(-1)[0].date,
+            },
         });
     } catch (error) {
         console.error('Error updating order stage:', error);
@@ -546,11 +553,81 @@ const cancelOrder = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @desc: Update order payment status for seller
+ * @route: PUT /api/seller/orders/:id/payment
+ * @access: Private (seller only)
+ */
+const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
+    try {
+        // Verify user is seller
+        if (!req.user || req.user.role !== 'seller') {
+            return res.status(401).json({
+                message: 'Unauthorized: Only sellers can update payment status',
+            });
+        }
+
+        const orderId = req.params.id;
+        const { isPaid } = req.body;
+
+        // Validate order ID format
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                message: 'Invalid order ID format',
+            });
+        }
+
+        // Validate isPaid input
+        if (typeof isPaid !== 'boolean') {
+            return res.status(400).json({
+                message: 'Invalid payment status value',
+            });
+        }
+
+        // Find the order
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found',
+            });
+        }
+
+        // Check if order is cancelled or rejected
+        const currentStage = order.orderStage.slice(-1)[0]?.stage;
+        if (currentStage === 'Cancelled' || currentStage === 'Reject') {
+            return res.status(400).json({
+                message:
+                    'Cannot update payment status for cancelled or rejected orders',
+            });
+        }
+
+        // Update payment status
+        order.isPaid = isPaid;
+        await order.save();
+
+        res.status(200).json({
+            message: 'Payment status updated successfully',
+            order: {
+                _id: order._id,
+                isPaid: order.isPaid,
+                updatedAt: order.updatedAt,
+            },
+        });
+    } catch (error) {
+        console.error('Error updating payment status:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
 // Update module.exports at the bottom to include the new functions
 module.exports = {
     getOrdersForSeller,
     getOrderDetailsForSeller,
     updateOrderStage,
+    updateOrderPaymentStatus,
     getOrdersForCustomer,
     createOrder,
     cancelOrder,
