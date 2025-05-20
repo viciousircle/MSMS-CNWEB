@@ -88,3 +88,4 @@ https://provinces.open-api.vn/
 5. Viet QR
 6. In hoa don
 7. Estimated delivery is not done
+8. Fix cai update rightaway owr seller

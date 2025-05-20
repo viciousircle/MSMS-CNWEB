@@ -28,6 +28,7 @@ const Orders = () => {
         updateOrder,
         handleItemsPerPageChange,
         fetchOrders,
+        setPaginatedOrders,
     } = useOrdersLogic();
 
     const { selectedRows, toggleRowSelection, toggleAllRows, allSelected } =
@@ -45,8 +46,16 @@ const Orders = () => {
 
     const handleStageUpdate = async (orderId, newStage) => {
         try {
+            // Update the order in the backend
             await updateOrder(orderId, { stage: newStage });
-            // After successful update, refresh the orders list
+
+            // Immediately update the local state
+            const updatedOrders = paginatedOrders.map((order) =>
+                order.id === orderId ? { ...order, stage: newStage } : order
+            );
+            setPaginatedOrders(updatedOrders);
+
+            // Update the orders in the parent component
             await fetchOrders();
         } catch (error) {
             console.error('Error updating order stage:', error);
