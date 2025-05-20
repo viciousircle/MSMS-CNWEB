@@ -9,11 +9,17 @@ import Label from '@/components/Others/Label';
 import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
 import BillCard from '@/components/Cards/BillCard/BillCard';
 import VietQR from '@/components/Payment/VietQR';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 const Payment = () => {
     const location = useLocation();
     const products = location.state?.products || [];
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
 
     const parsePrice = (price) =>
         typeof price === 'string' ? Number(price.replace(/\./g, '')) : price;
@@ -35,6 +41,13 @@ const Payment = () => {
         accountName: 'MSMS CN WEB',
     };
 
+    // Handle payment method change
+    const handlePaymentMethodChange = (method) => {
+        if (method === 'qr') {
+            setIsQRDialogOpen(true);
+        }
+    };
+
     return (
         <Body>
             <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
@@ -44,18 +57,23 @@ const Payment = () => {
             <BillCard
                 merchandiseSubtotal={merchandiseSubtotal}
                 shippingSubtotal={shippingSubtotal}
-                onPaymentMethodChange={setPaymentMethod}
+                onPaymentMethodChange={handlePaymentMethodChange}
             />
 
-            {paymentMethod === 'qr' && (
-                <div className="mt-6 px-4">
-                    <VietQR
-                        amount={total}
-                        orderId={`ORD-${Date.now()}`}
-                        bankInfo={bankInfo}
-                    />
-                </div>
-            )}
+            <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Scan QR Code to Pay</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4">
+                        <VietQR
+                            amount={total}
+                            orderId={`ORD-${Date.now()}`}
+                            bankInfo={bankInfo}
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
         </Body>
     );
 };
