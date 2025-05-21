@@ -1,94 +1,92 @@
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { CircleCheck, AlertTriangle, XCircle } from 'lucide-react';
-import React, { useState } from 'react';
-import { api } from '/utils/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAddToCart } from '@/hooks/cart/useAddToCart.hook';
+
+const COOLDOWN_DURATION = 1000;
 
 const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
     const [lastClickTime, setLastClickTime] = useState(0);
-    const cooldown = 1000;
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const { addToCart, isLoading } = useAddToCart();
+
+    const showToast = (message, icon, colorClass) => {
+        toast(
+            <div className={`flex items-center gap-2 ${colorClass}`}>
+                {icon}
+                <span>{message}</span>
+            </div>
+        );
+    };
+
+    const validateSelection = () => {
+        const colorVariant = product.colors.find(
+            (c) => c.color === selectedColor
+        );
+
+        if (!colorVariant) {
+            showToast(
+                'Selected color variant not found',
+                <XCircle />,
+                'text-red-600'
+            );
+            return false;
+        }
+
+        if (colorVariant.stock < quantity) {
+            showToast(
+                `Insufficient stock! Only ${colorVariant.stock} items available.`,
+                <XCircle />,
+                'text-red-600'
+            );
+            return false;
+        }
+
+        return true;
+    };
 
     const handleClick = async () => {
         if (!isAuthenticated()) {
-            toast(
-                <div className="flex items-center gap-2 text-yellow-600">
-                    <AlertTriangle />
-                    <span>Please login to add items to cart</span>
-                </div>
+            showToast(
+                'Please login to add items to cart',
+                <AlertTriangle />,
+                'text-yellow-600'
             );
             navigate('/login');
             return;
         }
 
         const now = Date.now();
-        if (now - lastClickTime < cooldown) {
-            toast(
-                <div className="flex items-center gap-2 text-yellow-600">
-                    <AlertTriangle />
-                    <span>You're clicking too fast! Please wait.</span>
-                </div>
+        if (now - lastClickTime < COOLDOWN_DURATION) {
+            showToast(
+                "You're clicking too fast! Please wait.",
+                <AlertTriangle />,
+                'text-yellow-600'
             );
             return;
         }
 
         setLastClickTime(now);
 
+        if (!validateSelection()) return;
+
         try {
-            // Check stock availability first
-            const colorVariant = product.colors.find(
-                (c) => c.color === selectedColor
+            await addToCart(product._id, selectedColor, quantity);
+            showToast(
+                'Item added to cart successfully!',
+                <CircleCheck />,
+                'text-green-600'
             );
-            if (!colorVariant) {
-                toast(
-                    <div className="flex items-center gap-2 text-red-600">
-                        <XCircle />
-                        <span>Selected color variant not found</span>
-                    </div>
-                );
-                return;
-            }
-
-            if (colorVariant.stock < quantity) {
-                toast(
-                    <div className="flex items-center gap-2 text-red-600">
-                        <XCircle />
-                        <span>
-                            Insufficient stock! Only {colorVariant.stock} items
-                            available.
-                        </span>
-                    </div>
-                );
-                return;
-            }
-
-            await api('/cart', {
-                method: 'POST',
-                body: JSON.stringify({
-                    productId: product._id,
-                    color: selectedColor,
-                    quantity,
-                    dateAdded: new Date(),
-                }),
-            });
-
-            toast(
-                <div className="flex items-center gap-2 text-green-600">
-                    <CircleCheck />
-                    <span>Item added to cart successfully!</span>
-                </div>
-            );
-
             onClose();
         } catch (error) {
-            toast(
-                <div className="flex items-center gap-2 text-red-600">
-                    <XCircle />
-                    <span>{error.message || 'Failed to add item.'}</span>
-                </div>
+            showToast(
+                error.message || 'Failed to add item.',
+                <XCircle />,
+                'text-red-600'
             );
         }
     };
@@ -97,8 +95,9 @@ const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
         <Button
             className="flex-1 hover:bg-emerald-600 hover:text-white bg-white border-emerald-600 border text-emerald-600"
             onClick={handleClick}
+            disabled={isLoading}
         >
-            Add to Cart
+            {isLoading ? 'Adding...' : 'Add to Cart'}
         </Button>
     );
 };

@@ -13,11 +13,16 @@ export const cartApi = {
         }
     },
 
-    addToCart: async (productId, quantity) => {
+    addToCart: async (productId, selectedColor, quantity) => {
         try {
-            const response = await api('/cart', {
+            const response = api('/cart', {
                 method: 'POST',
-                body: JSON.stringify({ productId, quantity }),
+                body: JSON.stringify({
+                    productId: productId,
+                    color: selectedColor,
+                    quantity,
+                    dateAdded: new Date(),
+                }),
             });
             return response;
         } catch (error) {
