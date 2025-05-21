@@ -16,11 +16,9 @@ import { useFetchCart } from '@/hooks/cart/useFetchCart.hook';
 const LoadingCart = () => (
     <Body>
         <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
-        <CardLayout variant="linear">
-            <div className="flex justify-center items-center p-8">
-                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        </CardLayout>
+        <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
     </Body>
 );
 

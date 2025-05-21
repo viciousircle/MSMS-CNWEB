@@ -2,7 +2,6 @@ import { HeaderFullText } from '@/components/Structure/Header';
 import Body from '@/components/Structure/Body';
 import CardLayout from '@/components/Layouts/CardLayout';
 import { formatPrice } from '/utils/formatPrice';
-import SkeletonProductCard from '@/components/Cards/SkeletonProductCard';
 import { useFetchProducts } from '@/hooks/public/useFetchProducts.hook';
 import StandardProductCard from '@/components/Cards/StandardProductCard';
 
@@ -17,6 +16,16 @@ const Store = () => {
         );
     }
 
+    if (loading) {
+        return (
+            <Body>
+                <div className="flex justify-center items-center min-h-[50vh]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </Body>
+        );
+    }
+
     return (
         <Body>
             <HeaderFullText>
@@ -26,20 +35,16 @@ const Store = () => {
                 </span>
             </HeaderFullText>
             <CardLayout variant="grid">
-                {loading
-                    ? Array.from({ length: 8 }).map((_, index) => (
-                          <SkeletonProductCard key={index} />
-                      ))
-                    : products.map((product) => (
-                          <div key={product.id}>
-                              <StandardProductCard
-                                  product={{
-                                      ...product,
-                                      price: formatPrice(product.price),
-                                  }}
-                              />
-                          </div>
-                      ))}
+                {products.map((product) => (
+                    <div key={product.id}>
+                        <StandardProductCard
+                            product={{
+                                ...product,
+                                price: formatPrice(product.price),
+                            }}
+                        />
+                    </div>
+                ))}
             </CardLayout>
         </Body>
     );
