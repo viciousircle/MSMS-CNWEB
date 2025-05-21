@@ -74,6 +74,14 @@ const Footer = () => {
                                     Orders
                                 </Link>
                             </li>
+                            <li>
+                                <Link
+                                    to="/about"
+                                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                                >
+                                    About Us
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 

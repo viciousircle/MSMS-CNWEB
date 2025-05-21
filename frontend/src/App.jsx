@@ -22,6 +22,7 @@ import ManageAccount from './pages/Admin/ManageAccount';
 //- Shared components
 import NotFound from './pages/NotFound';
 import Payment from './pages/Customer/Payment';
+import About from './pages/About';
 import ProtectedRoute from './components/Structure/ProtectedRoute';
 import SellerNavigationBar from './components/Structure/NavigationBar/SellerNavigationBar';
 import CustomerNavigationBar from './components/Structure/NavigationBar/CustomerNavigationBar';
@@ -61,6 +62,7 @@ const App = () => {
         <>
             <Route path="/login" element={<LogIn />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
         </>
     );
