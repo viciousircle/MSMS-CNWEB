@@ -11,12 +11,12 @@ import { Section, SectionItem } from '@/components/Layouts/SectionLayout';
 import useCart from '@/hooks/useCart.hook';
 import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
-import { useFetchCart } from '@/hooks/cart/useFetchCart.hook';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
 
 const Cart = () => {
     const {
+        products: cart,
         checkedProducts,
         allChecked,
         error,
@@ -26,8 +26,6 @@ const Cart = () => {
         deleteCartItem,
         updateCartItemQuantity,
     } = useCart();
-
-    const { cart, loading: cartLoading, error: cartError } = useFetchCart();
 
     const handleDeleteItem = async (deletedId) => {
         try {
