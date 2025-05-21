@@ -5,6 +5,8 @@ import { HeaderWithIcon } from '@/components/Structure/Header';
 import StatusSelector from '@/components/Selectors/StatusSelector';
 import OrderItemAccordion from '@/components/Accordion/OrderItemAccordion/OrderItemAccordion';
 import { useFetchOrders } from '@/hooks/order/useFetchOrders.hook';
+import LoadingState from '@/components/States/LoadingState';
+import ErrorState from '@/components/States/ErrorState';
 
 const Order = () => {
     const { orders, loading, error, refetch } = useFetchOrders();
@@ -16,24 +18,17 @@ const Order = () => {
             : orders.filter((order) => order.currentStage === activeTab);
 
     if (loading) {
-        return (
-            <Body>
-                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
-                <div className="px-4">
-                    <LoadingState />
-                </div>
-            </Body>
-        );
+        return <LoadingState icon={InboxArrowDownIcon} title="My Orders" />;
     }
 
     if (error) {
         return (
-            <Body>
-                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
-                <div className="px-4">
-                    <ErrorState error={error} onRetry={refetch} />
-                </div>
-            </Body>
+            <ErrorState
+                icon={InboxArrowDownIcon}
+                title="My Orders"
+                error={error}
+                onRetry={refetch}
+            />
         );
     }
 
@@ -64,26 +59,6 @@ const Order = () => {
         </Body>
     );
 };
-
-const LoadingState = () => (
-    <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-);
-
-const ErrorState = ({ error, onRetry }) => (
-    <div className="border border-red-200 rounded-lg bg-red-50 p-4">
-        <p className="text-sm text-red-600 mb-2">
-            {error?.message || 'An error occurred while fetching orders.'}
-        </p>
-        <button
-            onClick={onRetry}
-            className="text-sm text-red-600 hover:text-red-700 font-medium"
-        >
-            Try again
-        </button>
-    </div>
-);
 
 const EmptyState = () => (
     <div className="border border-gray-200 rounded-lg bg-white p-4">

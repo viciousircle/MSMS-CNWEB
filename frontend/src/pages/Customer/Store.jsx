@@ -4,26 +4,18 @@ import CardLayout from '@/components/Layouts/CardLayout';
 import { formatPrice } from '/utils/formatPrice';
 import { useFetchProducts } from '@/hooks/public/useFetchProducts.hook';
 import StandardProductCard from '@/components/Cards/StandardProductCard';
+import LoadingState from '@/components/States/LoadingState';
+import ErrorState from '@/components/States/ErrorState';
 
 const Store = () => {
     const { products, loading, error } = useFetchProducts();
 
-    if (error) {
-        return (
-            <Body>
-                <div>Error: {error}</div>
-            </Body>
-        );
+    if (loading) {
+        return <LoadingState />;
     }
 
-    if (loading) {
-        return (
-            <Body>
-                <div className="flex justify-center items-center min-h-[50vh]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                </div>
-            </Body>
-        );
+    if (error) {
+        return <ErrorState error={error} />;
     }
 
     return (

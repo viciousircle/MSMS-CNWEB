@@ -12,34 +12,8 @@ import useCart from '@/hooks/useCart.hook';
 import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
 import { useFetchCart } from '@/hooks/cart/useFetchCart.hook';
-
-const LoadingCart = () => (
-    <Body>
-        <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
-        <div className="flex justify-center items-center min-h-[50vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-    </Body>
-);
-
-const ErrorCart = ({ error }) => (
-    <Body>
-        <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
-        <CardLayout variant="linear">
-            <div className="p-4 text-center">
-                <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
-                    <div>Error loading cart: {error.message}</div>
-                </p>
-                <button
-                    className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
-                    onClick={() => window.location.reload()}
-                >
-                    Try Again
-                </button>
-            </div>
-        </CardLayout>
-    </Body>
-);
+import LoadingState from '@/components/States/LoadingState';
+import ErrorState from '@/components/States/ErrorState';
 
 const Cart = () => {
     const {
@@ -65,11 +39,13 @@ const Cart = () => {
     };
 
     if (loading) {
-        return <LoadingCart />;
+        return <LoadingState icon={ShoppingCartIcon} title="Cart" />;
     }
 
     if (error) {
-        return <ErrorCart error={error} />;
+        return (
+            <ErrorState icon={ShoppingCartIcon} title="Cart" error={error} />
+        );
     }
 
     const renderSelectAll = () => (

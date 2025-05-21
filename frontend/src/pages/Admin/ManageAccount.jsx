@@ -25,6 +25,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import LoadingState from '@/components/States/LoadingState';
+import ErrorState from '@/components/States/ErrorState';
 
 const ManageAccount = () => {
     const {
@@ -142,32 +144,16 @@ const ManageAccount = () => {
     console.log('paginatedAccounts', paginatedAccounts);
 
     if (loading) {
-        return (
-            <Body>
-                <HeaderWithIcon icon={UsersIcon} title="Account Management" />
-                <div className="flex justify-center items-center min-h-[50vh]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                </div>
-            </Body>
-        );
+        return <LoadingState icon={UsersIcon} title="Account Management" />;
     }
 
     if (error) {
         return (
-            <Body>
-                <HeaderWithIcon icon={UsersIcon} title="Account Management" />
-                <div className="p-4 text-center">
-                    <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
-                        Error: {error}
-                    </p>
-                    <button
-                        className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
-                        onClick={() => window.location.reload()}
-                    >
-                        Try Again
-                    </button>
-                </div>
-            </Body>
+            <ErrorState
+                icon={UsersIcon}
+                title="Account Management"
+                error={error}
+            />
         );
     }
 
