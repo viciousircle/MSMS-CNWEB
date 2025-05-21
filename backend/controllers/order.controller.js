@@ -417,6 +417,37 @@ const createOrder = asyncHandler(async (req, res) => {
             });
         }
 
+        // Check and update product stock
+        for (const item of transformedOrderItems) {
+            const product = await Product.findById(item.product);
+            if (!product) {
+                return res.status(400).json({
+                    message: `Product not found: ${item.product}`,
+                });
+            }
+
+            // Find the color variant
+            const colorVariant = product.colors.find(
+                (c) => c.color === item.color
+            );
+            if (!colorVariant) {
+                return res.status(400).json({
+                    message: `Color variant not found for product ${product.name}: ${item.color}`,
+                });
+            }
+
+            // Check if enough stock is available
+            if (colorVariant.stock < item.quantity) {
+                return res.status(400).json({
+                    message: `Insufficient stock for product ${product.name} in color ${item.color}. Available: ${colorVariant.stock}, Requested: ${item.quantity}`,
+                });
+            }
+
+            // Update stock
+            colorVariant.stock -= item.quantity;
+            await product.save();
+        }
+
         const validPaymentMethods = ['COD', 'QR'];
         if (!validPaymentMethods.includes(paymentMethod)) {
             return res.status(400).json({

@@ -38,6 +38,33 @@ const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
         setLastClickTime(now);
 
         try {
+            // Check stock availability first
+            const colorVariant = product.colors.find(
+                (c) => c.color === selectedColor
+            );
+            if (!colorVariant) {
+                toast(
+                    <div className="flex items-center gap-2 text-red-600">
+                        <XCircle />
+                        <span>Selected color variant not found</span>
+                    </div>
+                );
+                return;
+            }
+
+            if (colorVariant.stock < quantity) {
+                toast(
+                    <div className="flex items-center gap-2 text-red-600">
+                        <XCircle />
+                        <span>
+                            Insufficient stock! Only {colorVariant.stock} items
+                            available.
+                        </span>
+                    </div>
+                );
+                return;
+            }
+
             await api('/cart', {
                 method: 'POST',
                 body: JSON.stringify({
