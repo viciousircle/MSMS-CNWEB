@@ -12,6 +12,7 @@ import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
+import Footer from '@/components/Structure/Footer';
 
 const Cart = () => {
     const {
@@ -89,7 +90,7 @@ const Cart = () => {
         cart.length > 0 && Object.values(checkedProducts).some(Boolean);
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             <Body>
                 <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
                 <CartContent />
@@ -101,7 +102,8 @@ const Cart = () => {
                     checkedProducts={checkedProducts}
                 />
             )}
-        </>
+            <Footer />
+        </div>
     );
 };
 

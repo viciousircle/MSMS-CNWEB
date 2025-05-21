@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { api } from '/utils/api';
 import { useAuth } from '@/contexts/AuthContext';
+import Footer from '@/components/Structure/Footer';
 
 const Payment = () => {
     const location = useLocation();
@@ -215,78 +216,83 @@ const Payment = () => {
     }
 
     return (
-        <Body>
-            <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
-            <PaymentReceiverCard />
-            <PaymentDetails products={products} />
+        <div className="flex flex-col min-h-screen">
+            <Body>
+                <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
+                <PaymentReceiverCard />
+                <PaymentDetails products={products} />
 
-            <BillCard
-                merchandiseSubtotal={merchandiseSubtotal}
-                shippingSubtotal={shippingSubtotal}
-                onPaymentMethodChange={handlePaymentMethodChange}
-            />
+                <BillCard
+                    merchandiseSubtotal={merchandiseSubtotal}
+                    shippingSubtotal={shippingSubtotal}
+                    onPaymentMethodChange={handlePaymentMethodChange}
+                />
 
-            <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Scan QR Code to Pay</DialogTitle>
-                    </DialogHeader>
-                    <div className="mt-4">
-                        <VietQR
-                            amount={total}
-                            orderId={`ORD-${Date.now()}`}
-                            bankInfo={bankInfo}
-                        />
-                    </div>
-                    {error && (
-                        <div className="text-red-500 p-3 bg-red-50 rounded-md mt-4">
-                            {error}
+                <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Scan QR Code to Pay</DialogTitle>
+                        </DialogHeader>
+                        <div className="mt-4">
+                            <VietQR
+                                amount={total}
+                                orderId={`ORD-${Date.now()}`}
+                                bankInfo={bankInfo}
+                            />
                         </div>
-                    )}
-                    <DialogFooter className="mt-6">
-                        <button
-                            className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={handleCheckout}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? 'Processing...' : 'Check out'}
-                        </button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        {error && (
+                            <div className="text-red-500 p-3 bg-red-50 rounded-md mt-4">
+                                {error}
+                            </div>
+                        )}
+                        <DialogFooter className="mt-6">
+                            <button
+                                className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={handleCheckout}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Processing...' : 'Check out'}
+                            </button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
-            <AlertDialog
-                open={isOrderSuccessDialogOpen}
-                onOpenChange={setIsOrderSuccessDialogOpen}
-            >
-                <AlertDialogContent id="print-area">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="text-center text-lg font-medium text-green-600">
-                            Order Placed Successfully!
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-4">
-                            {orderData && <OrderSummary order={orderData} />}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Back to Store</AlertDialogCancel>
-                        <button
-                            className="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md"
-                            onClick={() => window.print()}
-                        >
-                            Print Invoice
-                        </button>
-                        <AlertDialogAction
-                            onClick={() =>
-                                console.log('View order status:', orderData)
-                            }
-                        >
-                            Track Order
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </Body>
+                <AlertDialog
+                    open={isOrderSuccessDialogOpen}
+                    onOpenChange={setIsOrderSuccessDialogOpen}
+                >
+                    <AlertDialogContent id="print-area">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="text-center text-lg font-medium text-green-600">
+                                Order Placed Successfully!
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="space-y-4">
+                                {orderData && (
+                                    <OrderSummary order={orderData} />
+                                )}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Back to Store</AlertDialogCancel>
+                            <button
+                                className="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md"
+                                onClick={() => window.print()}
+                            >
+                                Print Invoice
+                            </button>
+                            <AlertDialogAction
+                                onClick={() =>
+                                    console.log('View order status:', orderData)
+                                }
+                            >
+                                Track Order
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </Body>
+            <Footer />
+        </div>
     );
 };
 

@@ -11,6 +11,7 @@ import StageFlow from '@/components/Others/StageFlow';
 import { FilterControls } from '@/components/Others/FilterControls';
 import { useOrdersLogic } from '@/hooks/seller/useOrdersLogic.hook';
 import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
+import Footer from '@/components/Structure/Footer';
 
 const Orders = () => {
     const {
@@ -64,87 +65,96 @@ const Orders = () => {
 
     if (loading) {
         return (
-            <Body>
-                <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
-                <div className="flex justify-center items-center min-h-[50vh]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                </div>
-            </Body>
+            <div className="flex flex-col min-h-screen">
+                <Body>
+                    <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
+                    <div className="flex justify-center items-center min-h-[50vh]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                    </div>
+                </Body>
+                <Footer />
+            </div>
         );
     }
 
     if (error) {
         return (
-            <Body>
-                <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
-                <div className="p-4 text-center">
-                    <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
-                        Error: {error}
-                    </p>
-                    <button
-                        className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
-                        onClick={() => window.location.reload()}
-                    >
-                        Try Again
-                    </button>
-                </div>
-            </Body>
+            <div className="flex flex-col min-h-screen">
+                <Body>
+                    <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
+                    <div className="p-4 text-center">
+                        <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
+                            Error: {error}
+                        </p>
+                        <button
+                            className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
+                            onClick={() => window.location.reload()}
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                </Body>
+                <Footer />
+            </div>
         );
     }
 
     return (
-        <Body>
-            <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
-            <div className="flex flex-col gap-4 px-4 w-full">
-                <Tabs
-                    defaultValue="all"
-                    value={activeTab}
-                    onValueChange={setActiveTab}
-                    className="w-full flex flex-col gap-4"
-                >
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <PrintButton />
-                            <ChangeStageMenu
-                                selectedOrders={selectedRows}
-                                orders={paginatedOrders}
-                                onStageUpdated={handleStageUpdate}
+        <div className="flex flex-col min-h-screen">
+            <Body>
+                <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
+                <div className="flex flex-col gap-4 px-4 w-full">
+                    <Tabs
+                        defaultValue="all"
+                        value={activeTab}
+                        onValueChange={setActiveTab}
+                        className="w-full flex flex-col gap-4"
+                    >
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <PrintButton />
+                                <ChangeStageMenu
+                                    selectedOrders={selectedRows}
+                                    orders={paginatedOrders}
+                                    onStageUpdated={handleStageUpdate}
+                                />
+                                <StageFlow />
+                            </div>
+                            <FilterControls
+                                ordersPerPage={ordersPerPage}
+                                onItemsPerPageChange={handleItemsPerPageChange}
+                                selectedDate={selectedDate}
+                                onDateChange={setSelectedDate}
                             />
-                            <StageFlow />
                         </div>
-                        <FilterControls
-                            ordersPerPage={ordersPerPage}
-                            onItemsPerPageChange={handleItemsPerPageChange}
-                            selectedDate={selectedDate}
-                            onDateChange={setSelectedDate}
-                        />
-                    </div>
 
-                    {tabValues.map((tabValue) => (
-                        <TabsContent
-                            key={tabValue}
-                            value={tabValue}
-                            className="w-full"
-                        >
-                            <OrderTable
-                                orders={paginatedOrders}
-                                onUpdate={handleStageUpdate}
-                                selectedRows={selectedRows}
-                                onToggleSelection={toggleRowSelection}
-                                onToggleAll={toggleAllRows}
-                                allSelected={allSelected}
-                            />
-                        </TabsContent>
-                    ))}
-                </Tabs>
+                        {tabValues.map((tabValue) => (
+                            <TabsContent
+                                key={tabValue}
+                                value={tabValue}
+                                className="w-full"
+                            >
+                                <OrderTable
+                                    orders={paginatedOrders}
+                                    onUpdate={handleStageUpdate}
+                                    selectedRows={selectedRows}
+                                    onToggleSelection={toggleRowSelection}
+                                    onToggleAll={toggleAllRows}
+                                    allSelected={allSelected}
+                                />
+                            </TabsContent>
+                        ))}
+                    </Tabs>
 
-                <PaginationControls
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                />
-            </div>
-        </Body>
+                    <PaginationControls
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            </Body>
+            <Footer />
+        </div>
     );
 };
 

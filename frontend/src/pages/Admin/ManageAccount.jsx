@@ -27,6 +27,7 @@ import {
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
+import Footer from '@/components/Structure/Footer';
 
 const ManageAccount = () => {
     const {
@@ -149,239 +150,249 @@ const ManageAccount = () => {
 
     if (error) {
         return (
-            <ErrorState
-                icon={UsersIcon}
-                title="Account Management"
-                error={error}
-            />
+            <div className="flex flex-col min-h-screen">
+                <ErrorState
+                    icon={UsersIcon}
+                    title="Account Management"
+                    error={error}
+                />
+                <Footer />
+            </div>
         );
     }
 
     return (
-        <Body>
-            <HeaderWithIcon icon={UsersIcon} title="Account Management" />
-            <div className="flex flex-col gap-4 px-4 w-full">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2"></div>
-                    <AccountFilterControls
-                        accountsPerPage={accountsPerPage}
-                        onItemsPerPageChange={handleItemsPerPageChange}
-                        selectedDate={selectedDate}
-                        onDateChange={setSelectedDate}
-                        activeTab={activeTab}
-                        onTabChange={setActiveTab}
-                        onAddClick={handleAddClick}
+        <div className="flex flex-col min-h-screen">
+            <Body>
+                <HeaderWithIcon icon={UsersIcon} title="Account Management" />
+                <div className="flex flex-col gap-4 px-4 w-full">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2"></div>
+                        <AccountFilterControls
+                            accountsPerPage={accountsPerPage}
+                            onItemsPerPageChange={handleItemsPerPageChange}
+                            selectedDate={selectedDate}
+                            onDateChange={setSelectedDate}
+                            activeTab={activeTab}
+                            onTabChange={setActiveTab}
+                            onAddClick={handleAddClick}
+                        />
+                    </div>
+
+                    <AccountTable
+                        accounts={paginatedAccounts}
+                        onUpdate={updateAccount}
+                        onDelete={deleteAccount}
                     />
+
+                    <PaginationControls
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                    />
+
+                    <Dialog
+                        open={isAddDialogOpen}
+                        onOpenChange={setIsAddDialogOpen}
+                    >
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-semibold">
+                                    Add New Account
+                                </DialogTitle>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="name"
+                                        className="text-sm font-medium"
+                                    >
+                                        Full Name
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        value={newAccount.name}
+                                        onChange={(e) => {
+                                            setNewAccount({
+                                                ...newAccount,
+                                                name: e.target.value,
+                                            });
+                                            if (formErrors.name) {
+                                                setFormErrors({
+                                                    ...formErrors,
+                                                    name: '',
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            formErrors.name
+                                                ? 'border-red-500'
+                                                : ''
+                                        }
+                                        placeholder="Enter full name"
+                                    />
+                                    {formErrors.name && (
+                                        <p className="text-sm text-red-500">
+                                            {formErrors.name}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="email"
+                                        className="text-sm font-medium"
+                                    >
+                                        Email
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={newAccount.email}
+                                        onChange={(e) => {
+                                            setNewAccount({
+                                                ...newAccount,
+                                                email: e.target.value,
+                                            });
+                                            if (formErrors.email) {
+                                                setFormErrors({
+                                                    ...formErrors,
+                                                    email: '',
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            formErrors.email
+                                                ? 'border-red-500'
+                                                : ''
+                                        }
+                                        placeholder="Enter email address"
+                                    />
+                                    {formErrors.email && (
+                                        <p className="text-sm text-red-500">
+                                            {formErrors.email}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="password"
+                                        className="text-sm font-medium"
+                                    >
+                                        Password
+                                    </Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={newAccount.password}
+                                        onChange={(e) => {
+                                            setNewAccount({
+                                                ...newAccount,
+                                                password: e.target.value,
+                                            });
+                                            if (formErrors.password) {
+                                                setFormErrors({
+                                                    ...formErrors,
+                                                    password: '',
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            formErrors.password
+                                                ? 'border-red-500'
+                                                : ''
+                                        }
+                                        placeholder="Enter password"
+                                    />
+                                    {formErrors.password && (
+                                        <p className="text-sm text-red-500">
+                                            {formErrors.password}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="confirmPassword"
+                                        className="text-sm font-medium"
+                                    >
+                                        Confirm Password
+                                    </Label>
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        value={newAccount.confirmPassword}
+                                        onChange={(e) => {
+                                            setNewAccount({
+                                                ...newAccount,
+                                                confirmPassword: e.target.value,
+                                            });
+                                            if (formErrors.confirmPassword) {
+                                                setFormErrors({
+                                                    ...formErrors,
+                                                    confirmPassword: '',
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            formErrors.confirmPassword
+                                                ? 'border-red-500'
+                                                : ''
+                                        }
+                                        placeholder="Confirm password"
+                                    />
+                                    {formErrors.confirmPassword && (
+                                        <p className="text-sm text-red-500">
+                                            {formErrors.confirmPassword}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="role"
+                                        className="text-sm font-medium"
+                                    >
+                                        Role
+                                    </Label>
+                                    <Tabs
+                                        value={newAccount.role}
+                                        onValueChange={(value) =>
+                                            setNewAccount({
+                                                ...newAccount,
+                                                role: value,
+                                            })
+                                        }
+                                        className="w-full"
+                                    >
+                                        <TabsList className="grid w-full grid-cols-2">
+                                            <TabsTrigger value="seller">
+                                                Seller
+                                            </TabsTrigger>
+                                            <TabsTrigger value="admin">
+                                                Admin
+                                            </TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                </div>
+                            </div>
+                            <DialogFooter className="gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleCloseDialog}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleAddAccount}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
+                                    Add Account
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-
-                <AccountTable
-                    accounts={paginatedAccounts}
-                    onUpdate={updateAccount}
-                    onDelete={deleteAccount}
-                />
-
-                <PaginationControls
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                />
-
-                <Dialog
-                    open={isAddDialogOpen}
-                    onOpenChange={setIsAddDialogOpen}
-                >
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle className="text-xl font-semibold">
-                                Add New Account
-                            </DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="name"
-                                    className="text-sm font-medium"
-                                >
-                                    Full Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    value={newAccount.name}
-                                    onChange={(e) => {
-                                        setNewAccount({
-                                            ...newAccount,
-                                            name: e.target.value,
-                                        });
-                                        if (formErrors.name) {
-                                            setFormErrors({
-                                                ...formErrors,
-                                                name: '',
-                                            });
-                                        }
-                                    }}
-                                    className={
-                                        formErrors.name ? 'border-red-500' : ''
-                                    }
-                                    placeholder="Enter full name"
-                                />
-                                {formErrors.name && (
-                                    <p className="text-sm text-red-500">
-                                        {formErrors.name}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="email"
-                                    className="text-sm font-medium"
-                                >
-                                    Email
-                                </Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={newAccount.email}
-                                    onChange={(e) => {
-                                        setNewAccount({
-                                            ...newAccount,
-                                            email: e.target.value,
-                                        });
-                                        if (formErrors.email) {
-                                            setFormErrors({
-                                                ...formErrors,
-                                                email: '',
-                                            });
-                                        }
-                                    }}
-                                    className={
-                                        formErrors.email ? 'border-red-500' : ''
-                                    }
-                                    placeholder="Enter email address"
-                                />
-                                {formErrors.email && (
-                                    <p className="text-sm text-red-500">
-                                        {formErrors.email}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="password"
-                                    className="text-sm font-medium"
-                                >
-                                    Password
-                                </Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={newAccount.password}
-                                    onChange={(e) => {
-                                        setNewAccount({
-                                            ...newAccount,
-                                            password: e.target.value,
-                                        });
-                                        if (formErrors.password) {
-                                            setFormErrors({
-                                                ...formErrors,
-                                                password: '',
-                                            });
-                                        }
-                                    }}
-                                    className={
-                                        formErrors.password
-                                            ? 'border-red-500'
-                                            : ''
-                                    }
-                                    placeholder="Enter password"
-                                />
-                                {formErrors.password && (
-                                    <p className="text-sm text-red-500">
-                                        {formErrors.password}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="confirmPassword"
-                                    className="text-sm font-medium"
-                                >
-                                    Confirm Password
-                                </Label>
-                                <Input
-                                    id="confirmPassword"
-                                    type="password"
-                                    value={newAccount.confirmPassword}
-                                    onChange={(e) => {
-                                        setNewAccount({
-                                            ...newAccount,
-                                            confirmPassword: e.target.value,
-                                        });
-                                        if (formErrors.confirmPassword) {
-                                            setFormErrors({
-                                                ...formErrors,
-                                                confirmPassword: '',
-                                            });
-                                        }
-                                    }}
-                                    className={
-                                        formErrors.confirmPassword
-                                            ? 'border-red-500'
-                                            : ''
-                                    }
-                                    placeholder="Confirm password"
-                                />
-                                {formErrors.confirmPassword && (
-                                    <p className="text-sm text-red-500">
-                                        {formErrors.confirmPassword}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="role"
-                                    className="text-sm font-medium"
-                                >
-                                    Role
-                                </Label>
-                                <Tabs
-                                    value={newAccount.role}
-                                    onValueChange={(value) =>
-                                        setNewAccount({
-                                            ...newAccount,
-                                            role: value,
-                                        })
-                                    }
-                                    className="w-full"
-                                >
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="seller">
-                                            Seller
-                                        </TabsTrigger>
-                                        <TabsTrigger value="admin">
-                                            Admin
-                                        </TabsTrigger>
-                                    </TabsList>
-                                </Tabs>
-                            </div>
-                        </div>
-                        <DialogFooter className="gap-2">
-                            <Button
-                                variant="outline"
-                                onClick={handleCloseDialog}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                onClick={handleAddAccount}
-                                className="bg-primary hover:bg-primary/90"
-                            >
-                                Add Account
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </Body>
+            </Body>
+            <Footer />
+        </div>
     );
 };
 

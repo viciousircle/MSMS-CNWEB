@@ -19,16 +19,8 @@ const useCart = () => {
         isLoading: isFetching,
         error: fetchError,
     } = useFetchCart();
-    const {
-        updateQuantity,
-        isLoading: isUpdating,
-        error: updateError,
-    } = useUpdateQuantity();
-    const {
-        deleteItem,
-        isLoading: isDeleting,
-        error: deleteError,
-    } = useDeleteItem();
+    const { updateQuantity, error: updateError } = useUpdateQuantity();
+    const { deleteItem, error: deleteError } = useDeleteItem();
 
     const fetchCart = useCallback(async () => {
         try {
@@ -55,20 +47,30 @@ const useCart = () => {
 
     const updateCartItemQuantity = useCallback(
         async (id, newQuantity) => {
+            const parsedQuantity = Math.max(1, Number(newQuantity));
+
+            // Optimistically update the UI
+            setState((prev) => ({
+                ...prev,
+                products: prev.products.map((item) =>
+                    item._id === id
+                        ? { ...item, quantity: parsedQuantity }
+                        : item
+                ),
+            }));
+
             try {
-                await updateQuantity(id, newQuantity);
+                await updateQuantity(id, parsedQuantity);
+            } catch (error) {
+                // Revert the optimistic update on error
                 setState((prev) => ({
                     ...prev,
                     products: prev.products.map((item) =>
                         item._id === id
-                            ? {
-                                  ...item,
-                                  quantity: Math.max(1, Number(newQuantity)),
-                              }
+                            ? { ...item, quantity: item.quantity }
                             : item
                     ),
                 }));
-            } catch (error) {
                 console.error('Failed to update quantity:', error);
                 throw error;
             }
@@ -78,26 +80,40 @@ const useCart = () => {
 
     const deleteCartItem = useCallback(
         async (id) => {
+            // Store the item to be deleted for potential rollback
+            const itemToDelete = state.products.find((item) => item._id === id);
+
+            // Optimistically update the UI
+            setState((prev) => {
+                const newChecked = { ...prev.checkedProducts };
+                delete newChecked[id];
+
+                return {
+                    ...prev,
+                    products: prev.products.filter((item) => item._id !== id),
+                    checkedProducts: newChecked,
+                };
+            });
+
             try {
                 await deleteItem(id);
-                setState((prev) => {
-                    const newChecked = { ...prev.checkedProducts };
-                    delete newChecked[id];
-
-                    return {
-                        ...prev,
-                        products: prev.products.filter(
-                            (item) => item._id !== id
-                        ),
-                        checkedProducts: newChecked,
-                    };
-                });
             } catch (error) {
+                // Revert the optimistic update on error
+                if (itemToDelete) {
+                    setState((prev) => ({
+                        ...prev,
+                        products: [...prev.products, itemToDelete],
+                        checkedProducts: {
+                            ...prev.checkedProducts,
+                            [id]: false,
+                        },
+                    }));
+                }
                 console.error('Failed to delete item:', error);
                 throw error;
             }
         },
-        [deleteItem]
+        [deleteItem, state.products]
     );
 
     const handleProductCheck = useCallback((id, checked) => {
@@ -136,7 +152,7 @@ const useCart = () => {
     return {
         products: state.products,
         checkedProducts: state.checkedProducts,
-        loading: state.loading || isFetching || isUpdating || isDeleting,
+        loading: state.loading || isFetching,
         error: state.error || fetchError || updateError || deleteError,
         allChecked,
         handleProductCheck,

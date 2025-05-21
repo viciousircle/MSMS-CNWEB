@@ -7,6 +7,7 @@ import OrderItemAccordion from '@/components/Accordion/OrderItemAccordion/OrderI
 import { useFetchOrders } from '@/hooks/order/useFetchOrders.hook';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
+import Footer from '@/components/Structure/Footer';
 
 const Order = () => {
     const { orders, loading, error, refetch } = useFetchOrders();
@@ -33,30 +34,33 @@ const Order = () => {
     }
 
     return (
-        <Body>
-            <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
-            <div className="px-4">
-                <div className="mb-6">
-                    <StatusSelector
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                    />
+        <div className="flex flex-col min-h-screen">
+            <Body>
+                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
+                <div className="px-4">
+                    <div className="mb-6">
+                        <StatusSelector
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        {filteredOrders.length > 0 ? (
+                            filteredOrders.map((order) => (
+                                <OrderItemAccordion
+                                    key={order._id}
+                                    order={order}
+                                    refetchOrders={refetch}
+                                />
+                            ))
+                        ) : (
+                            <EmptyState />
+                        )}
+                    </div>
                 </div>
-                <div className="space-y-4">
-                    {filteredOrders.length > 0 ? (
-                        filteredOrders.map((order) => (
-                            <OrderItemAccordion
-                                key={order._id}
-                                order={order}
-                                refetchOrders={refetch}
-                            />
-                        ))
-                    ) : (
-                        <EmptyState />
-                    )}
-                </div>
-            </div>
-        </Body>
+            </Body>
+            <Footer />
+        </div>
     );
 };
 
