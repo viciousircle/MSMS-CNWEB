@@ -3,12 +3,27 @@ import { Button } from '@/components/ui/button';
 import { CircleCheck, AlertTriangle, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { api } from '/utils/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
     const [lastClickTime, setLastClickTime] = useState(0);
     const cooldown = 1000;
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     const handleClick = async () => {
+        if (!isAuthenticated()) {
+            toast(
+                <div className="flex items-center gap-2 text-yellow-600">
+                    <AlertTriangle />
+                    <span>Please login to add items to cart</span>
+                </div>
+            );
+            navigate('/login');
+            return;
+        }
+
         const now = Date.now();
         if (now - lastClickTime < cooldown) {
             toast(
