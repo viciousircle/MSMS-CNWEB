@@ -1,30 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { cartApi } from '/utils/api/cart.api';
 
 export const useFetchCart = () => {
-    const [cart, setCart] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await cartApi.getCart();
-                const cartProducts = Array.isArray(response.items)
-                    ? response.items
-                    : [];
-                setCart(cartProducts);
-            } catch (err) {
-                console.error('Error fetching cart:', err);
-                setError(err.message);
-                setLoading(false);
-            }
-        };
-
-        fetchCart();
+    const fetchCart = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await cartApi.getCart();
+            return response;
+        } catch (err) {
+            setError(err.message || 'Failed to fetch cart');
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
-    return { cart, loading, error };
+    return {
+        fetchCart,
+        isLoading,
+        error,
+    };
 };

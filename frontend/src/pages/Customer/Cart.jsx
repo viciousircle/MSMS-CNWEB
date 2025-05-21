@@ -29,23 +29,18 @@ const Cart = () => {
     const handleDeleteItem = async (deletedId) => {
         try {
             await deleteCartItem(deletedId);
-            console.log('Item deleted successfully');
         } catch (error) {
             console.error('Failed to delete item:', error);
         }
     };
 
-    if (loading) {
-        return <LoadingState icon={ShoppingCartIcon} title="Cart" />;
-    }
-
-    if (error) {
+    if (loading) return <LoadingState icon={ShoppingCartIcon} title="Cart" />;
+    if (error)
         return (
             <ErrorState icon={ShoppingCartIcon} title="Cart" error={error} />
         );
-    }
 
-    const renderSelectAll = () => (
+    const SelectAllSection = () => (
         <Section>
             <SectionItem
                 className="cursor-pointer"
@@ -61,7 +56,7 @@ const Cart = () => {
         </Section>
     );
 
-    const renderProducts = () => (
+    const ProductList = () => (
         <div className="flex flex-col gap-4">
             <Label titles={['Products', `${cart.length} ITEMS`]} />
             <CardLayout variant="linear">
@@ -79,27 +74,28 @@ const Cart = () => {
         </div>
     );
 
-    const renderCartContent = () => {
-        if (cart.length === 0) {
-            return <CartNotFound />;
-        }
+    const CartContent = () => {
+        if (cart.length === 0) return <CartNotFound />;
 
         return (
             <>
-                {renderSelectAll()}
-                {renderProducts()}
+                <SelectAllSection />
+                <ProductList />
             </>
         );
     };
+
+    const shouldShowCartTotal =
+        cart.length > 0 && Object.values(checkedProducts).some(Boolean);
 
     return (
         <>
             <Body>
                 <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
-                {renderCartContent()}
+                <CartContent />
             </Body>
 
-            {cart.length > 0 && (
+            {shouldShowCartTotal && (
                 <CartTotal
                     products={cart.filter((p) => checkedProducts[p._id])}
                     checkedProducts={checkedProducts}
