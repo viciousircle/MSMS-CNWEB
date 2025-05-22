@@ -1,41 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BanknotesIcon } from '@heroicons/react/24/outline';
-import Body from '@/components/Structure/Body';
-import { HeaderWithIcon } from '@/components/Structure/Header';
-import PaymentCard from '@/components/Cards/PaymentProductCard';
-import CardLayout from '@/components/Layouts/CardLayout';
-import Label from '@/components/Others/Label';
-import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
-import BillCard from '@/components/Cards/BillCard/BillCard';
-import VietQR from '@/components/Payment/VietQR';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
+import Body from '@/components/Structure/Body';
+import { HeaderWithIcon } from '@/components/Structure/Header';
 import Footer from '@/components/Structure/Footer';
+import PaymentReceiverCard from '@/components/Cards/PaymentReceiverCard';
+import BillCard from '@/components/Cards/BillCard/BillCard';
+import PaymentDetails from '@/components/Payment/PaymentDetails';
+import QRPaymentDialog from '@/components/Payment/QRPaymentDialog';
+import OrderSuccessDialog from '@/components/Payment/OrderSuccessDialog';
+
+// Constants
+const SHIPPING_COST = 30000;
+const TEST_AMOUNT = 10000; // Fixed amount for testing VietQR
+const BANK_INFO = {
+    bankName: 'VietinBank',
+    bankCode: 'vietinbank',
+    accountNumber: '106873633198',
+    accountName: 'MSMS CN WEB',
+};
 
 const Payment = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
     const products = location.state?.products || [];
+
     const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
     const [error, setError] = useState(null);
     const [orderData, setOrderData] = useState(null);
@@ -59,19 +52,6 @@ const Payment = () => {
         return acc + price * product.quantity;
     }, 0);
 
-    const shippingSubtotal = 30000;
-    // For testing VietQR, we'll use a fixed amount of 10,000 VND
-    const total = 10000; // Fixed amount for testing
-
-    // Mock bank info - In real app, this should come from your backend
-    const bankInfo = {
-        bankName: 'VietinBank',
-        bankCode: 'vietinbank', // VietQR.io bank code
-        accountNumber: '106873633198',
-        accountName: 'MSMS CN WEB',
-    };
-
-    // Handle payment method change
     const handlePaymentMethodChange = (method) => {
         if (method === 'qr') {
             setIsQRDialogOpen(true);
@@ -93,11 +73,8 @@ const Payment = () => {
 
         try {
             const data = buildOrderData(products, receiverInfo);
-            console.log('Sending order data:', data);
+            await createOrder(data);
 
-            const result = await createOrder(data);
-
-            console.log('Order response:', result);
             setOrderData(data);
             setIsQRDialogOpen(false);
             setIsOrderSuccessDialogOpen(true);
@@ -107,67 +84,16 @@ const Payment = () => {
         }
     };
 
-    const OrderSummary = ({ order }) => (
-        <div className="space-y-3">
-            <div className="border-b pb-3">
-                <h3 className="font-semibold text-gray-900">
-                    Delivery Information
-                </h3>
-                <p>
-                    <strong>Receiver:</strong>{' '}
-                    {order.receiverInformation.receiverName}
-                </p>
-                <p>
-                    <strong>Phone:</strong>{' '}
-                    {order.receiverInformation.receiverPhone}
-                </p>
-                <p>
-                    <strong>Address:</strong>{' '}
-                    {order.receiverInformation.receiverAddress}
-                </p>
-            </div>
+    const handlePrintInvoice = () => {
+        window.print();
+    };
 
-            <div className="border-b pb-3">
-                <h3 className="font-semibold text-gray-900">Payment Method</h3>
-                <p>{order.paymentMethod}</p>
-            </div>
-
-            <div>
-                <h3 className="font-semibold text-gray-900">Order Items</h3>
-                <ul className="space-y-2 mt-2">
-                    {order.orderItems.map((item, index) => (
-                        <li key={index} className="flex justify-between">
-                            <span>
-                                {item.productName || `Product ${item.product}`}{' '}
-                                ({item.color}) × {item.quantity}
-                            </span>
-                            {item.price && (
-                                <span>
-                                    ${(item.price * item.quantity).toFixed(2)}
-                                </span>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            {order.totalAmount && (
-                <div className="border-t pt-3 text-right font-semibold">
-                    Total: ${order.totalAmount.toFixed(2)}
-                </div>
-            )}
-
-            <div className="text-sm text-gray-500 mt-4">
-                Order ID: #
-                {Math.random().toString(36).substring(2, 10).toUpperCase()}
-                <br />
-                Date: {new Date(order.orderDate).toLocaleString()}
-            </div>
-        </div>
-    );
+    const handleTrackOrder = () => {
+        console.log('View order status:', orderData);
+    };
 
     if (!isAuthenticated()) {
-        return null; // Will redirect in useEffect
+        return null;
     }
 
     return (
@@ -179,92 +105,30 @@ const Payment = () => {
 
                 <BillCard
                     merchandiseSubtotal={merchandiseSubtotal}
-                    shippingSubtotal={shippingSubtotal}
+                    shippingSubtotal={SHIPPING_COST}
                     onPaymentMethodChange={handlePaymentMethodChange}
                 />
 
-                <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Scan QR Code to Pay</DialogTitle>
-                        </DialogHeader>
-                        <div className="mt-4">
-                            <VietQR
-                                amount={total}
-                                orderId={`ORD-${Date.now()}`}
-                                bankInfo={bankInfo}
-                            />
-                        </div>
-                        {(error || orderError) && (
-                            <div className="text-red-500 p-3 bg-red-50 rounded-md mt-4">
-                                {error || orderError}
-                            </div>
-                        )}
-                        <DialogFooter className="mt-6">
-                            <button
-                                className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={handleCheckout}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Processing...' : 'Check out'}
-                            </button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <QRPaymentDialog
+                    isOpen={isQRDialogOpen}
+                    onOpenChange={setIsQRDialogOpen}
+                    total={TEST_AMOUNT}
+                    bankInfo={BANK_INFO}
+                    error={error}
+                    orderError={orderError}
+                    isLoading={isLoading}
+                    onCheckout={handleCheckout}
+                />
 
-                <AlertDialog
-                    open={isOrderSuccessDialogOpen}
+                <OrderSuccessDialog
+                    isOpen={isOrderSuccessDialogOpen}
                     onOpenChange={setIsOrderSuccessDialogOpen}
-                >
-                    <AlertDialogContent id="print-area">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle className="text-center text-lg font-medium text-green-600">
-                                Order Placed Successfully!
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="space-y-4">
-                                {orderData && (
-                                    <OrderSummary order={orderData} />
-                                )}
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Back to Store</AlertDialogCancel>
-                            <button
-                                className="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md"
-                                onClick={() => window.print()}
-                            >
-                                Print Invoice
-                            </button>
-                            <AlertDialogAction
-                                onClick={() =>
-                                    console.log('View order status:', orderData)
-                                }
-                            >
-                                Track Order
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                    orderData={orderData}
+                    onPrint={handlePrintInvoice}
+                    onTrackOrder={handleTrackOrder}
+                />
             </Body>
             <Footer />
-        </div>
-    );
-};
-
-const PaymentDetails = ({ products }) => {
-    return (
-        <div className="flex flex-col gap-4">
-            <Label
-                titles={[
-                    'Products',
-                    `${products.length} ITEM${products.length > 1 ? 'S' : ''}`,
-                ]}
-            />
-            <CardLayout variant="linear">
-                {products.map((product, index) => (
-                    <PaymentCard key={index} product={product} />
-                ))}
-            </CardLayout>
         </div>
     );
 };
