@@ -28,6 +28,7 @@ export const ViewDetailsSheet = ({
     onPaymentStatusUpdated,
 }) => {
     const [open, setOpen] = useState(false);
+    const [currentStage, setCurrentStage] = useState(orderStage);
     const { orderDetails, loading, error, refetch } = useOrderDetails(orderId);
     const { updateOrderStage, isUpdating } = useUpdateOrderStage();
     const { updatePaymentStatus, isUpdating: isPaymentUpdating } =
@@ -39,10 +40,15 @@ export const ViewDetailsSheet = ({
         }
     }, [open, orderId]);
 
+    useEffect(() => {
+        setCurrentStage(orderStage);
+    }, [orderStage]);
+
     const handleStageUpdate = async (newStage) => {
         try {
-            onStageUpdated?.(newStage);
             await updateOrderStage(orderId, newStage);
+            setCurrentStage(newStage);
+            onStageUpdated?.(newStage);
             toast.success(`Order status updated to ${newStage}`);
             await refetch();
         } catch (error) {
@@ -52,19 +58,12 @@ export const ViewDetailsSheet = ({
 
     const handlePaymentUpdate = async (isPaid) => {
         try {
-            onPaymentStatusUpdated?.(
-                isPaid
-                    ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
-                    : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID
-            );
+            const newStatus = isPaid
+                ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
+                : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID;
+            onPaymentStatusUpdated?.(newStatus);
             await updatePaymentStatus(orderId, isPaid);
-            toast.success(
-                `Payment status updated to ${
-                    isPaid
-                        ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
-                        : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID
-                }`
-            );
+            toast.success(`Payment status updated to ${newStatus}`);
             await refetch();
         } catch (error) {
             toast.error(`Failed to update payment status: ${error.message}`);
@@ -98,7 +97,7 @@ export const ViewDetailsSheet = ({
                                         orderDetails={orderDetails}
                                         dateOrder={dateOrder}
                                         paymentMethod={paymentMethod}
-                                        orderStage={orderStage}
+                                        orderStage={currentStage}
                                         paymentStatus={paymentStatus}
                                     />
                                     <div className="mt-6">
@@ -108,7 +107,7 @@ export const ViewDetailsSheet = ({
                                     </div>
                                     <div className="mt-6">
                                         <ViewDetailsActions
-                                            orderStage={orderStage}
+                                            orderStage={currentStage}
                                             isUpdating={isUpdating}
                                             handleStageUpdate={
                                                 handleStageUpdate

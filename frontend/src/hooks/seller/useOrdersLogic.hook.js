@@ -20,16 +20,18 @@ export const useOrdersLogic = () => {
     });
 
     const fetchOrders = async () => {
+        console.log('Fetching orders from backend');
         setStatus({ loading: true, error: null });
         try {
             const data = await api('/seller/orders');
+            console.log('Fetched orders:', data.orders);
             setOrders(data.orders);
         } catch (err) {
+            console.error('Error in fetchOrders:', err);
             setStatus({
                 loading: false,
                 error: err.message || 'Failed to fetch orders',
             });
-            console.error('Error fetching orders:', err);
             return;
         }
         setStatus({ loading: false, error: null });
@@ -40,33 +42,44 @@ export const useOrdersLogic = () => {
     }, []);
 
     const updateOrder = async (orderId, updatedFields) => {
+        console.log('updateOrder called with:', { orderId, updatedFields });
         try {
+            console.log('Sending PUT request to backend');
             const updatedOrder = await api(`/seller/orders/${orderId}`, {
-                method: 'PATCH',
+                method: 'PUT',
                 body: JSON.stringify(updatedFields),
             });
+            console.log('Backend response:', updatedOrder);
 
             // Update the order in the local state
             setOrders((prev) => {
-                return prev.map((order) => {
+                console.log('Previous orders state:', prev);
+                const newOrders = prev.map((order) => {
                     if (order._id === orderId) {
-                        return {
+                        const updated = {
                             ...order,
                             ...updatedOrder,
                             orderStage: updatedFields.stage || order.orderStage,
                         };
+                        console.log('Updated order:', updated);
+                        return updated;
                     }
                     return order;
                 });
+                console.log('New orders state:', newOrders);
+                return newOrders;
             });
+
+            return updatedOrder;
         } catch (err) {
-            console.error('Error updating order:', err);
+            console.error('Error in updateOrder:', err);
             throw err;
         }
     };
 
     const filteredOrders = useMemo(() => {
-        return orders.filter((order) => {
+        console.log('Filtering orders with:', { filters, orders });
+        const filtered = orders.filter((order) => {
             const matchesTab =
                 filters.activeTab === 'all' ||
                 order.orderStage.toLowerCase() ===
@@ -78,6 +91,8 @@ export const useOrdersLogic = () => {
 
             return matchesTab && matchesDate;
         });
+        console.log('Filtered orders:', filtered);
+        return filtered;
     }, [orders, filters]);
 
     const totalPages = Math.ceil(

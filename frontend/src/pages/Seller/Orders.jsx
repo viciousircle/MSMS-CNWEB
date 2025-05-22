@@ -12,6 +12,7 @@ import { FilterControls } from '@/components/Others/FilterControls';
 import { useOrdersLogic } from '@/hooks/seller/useOrdersLogic.hook';
 import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 import Footer from '@/components/Structure/Footer';
+import { toast } from 'sonner';
 
 const Orders = () => {
     const {
@@ -46,20 +47,43 @@ const Orders = () => {
     ];
 
     const handleStageUpdate = async (orderId, newStage) => {
+        console.log('handleStageUpdate called with:', { orderId, newStage });
+        console.log('Current selected orders:', Array.from(selectedRows));
+        console.log('Current paginated orders:', paginatedOrders);
+
         try {
             // Update the order in the backend
-            await updateOrder(orderId, { stage: newStage });
+            console.log('Sending update to backend:', {
+                orderId,
+                stage: newStage,
+            });
+            const updatedOrder = await updateOrder(orderId, {
+                stage: newStage,
+            });
+            console.log('Backend update response:', updatedOrder);
 
             // Immediately update the local state
-            const updatedOrders = paginatedOrders.map((order) =>
-                order.id === orderId ? { ...order, stage: newStage } : order
-            );
+            const updatedOrders = paginatedOrders.map((order) => {
+                if (order._id === orderId) {
+                    const updatedOrder = {
+                        ...order,
+                        orderStage: newStage,
+                    };
+                    console.log('Updated order in local state:', updatedOrder);
+                    return updatedOrder;
+                }
+                return order;
+            });
+            console.log('Setting updated orders:', updatedOrders);
             setPaginatedOrders(updatedOrders);
 
             // Update the orders in the parent component
+            console.log('Fetching fresh orders from backend');
             await fetchOrders();
+            console.log('Orders refreshed successfully');
         } catch (error) {
-            console.error('Error updating order stage:', error);
+            console.error('Error in handleStageUpdate:', error);
+            toast.error('Failed to update order stage');
         }
     };
 
