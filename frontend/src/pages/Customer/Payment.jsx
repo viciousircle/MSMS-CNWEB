@@ -4,6 +4,7 @@ import { BanknotesIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
+import { useQRPayment } from '@/hooks/payment/useQRPayment.hook';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
 import Footer from '@/components/Structure/Footer';
@@ -35,8 +36,17 @@ const Payment = () => {
     const [isOrderSuccessDialogOpen, setIsOrderSuccessDialogOpen] =
         useState(false);
 
-    const { createOrder, isLoading, error: orderError } = useCreateOrder();
+    const {
+        createOrder,
+        isLoading: isOrderLoading,
+        error: orderError,
+    } = useCreateOrder();
     const { validateOrder, buildOrderData } = useOrderValidation();
+    const {
+        generateQRPayment,
+        isLoading: isQRLoading,
+        error: qrError,
+    } = useQRPayment();
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -73,7 +83,10 @@ const Payment = () => {
 
         try {
             const data = buildOrderData(products, receiverInfo);
-            await createOrder(data);
+            const order = await createOrder(data);
+
+            // Generate QR code for the order
+            await generateQRPayment(TEST_AMOUNT, order.id, BANK_INFO);
 
             setOrderData(data);
             setIsQRDialogOpen(false);
@@ -114,9 +127,9 @@ const Payment = () => {
                     onOpenChange={setIsQRDialogOpen}
                     total={TEST_AMOUNT}
                     bankInfo={BANK_INFO}
-                    error={error}
+                    error={error || qrError}
                     orderError={orderError}
-                    isLoading={isLoading}
+                    isLoading={isOrderLoading || isQRLoading}
                     onCheckout={handleCheckout}
                 />
 
