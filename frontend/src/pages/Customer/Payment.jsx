@@ -6,6 +6,12 @@ import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
 import { useQRPayment } from '@/hooks/payment/useQRPayment.hook';
 import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
+import { calculateMerchandiseSubtotal } from '@/utils/payment/calculations';
+import {
+    handlePaymentMethod,
+    handlePrintInvoice,
+    handleTrackOrder,
+} from '@/utils/payment/methods';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
 import Footer from '@/components/Structure/Footer';
@@ -45,20 +51,10 @@ const Payment = () => {
         }
     }, [isAuthenticated, navigate, products]);
 
-    const parsePrice = (price) =>
-        typeof price === 'string' ? Number(price.replace(/\./g, '')) : price;
-
-    const merchandiseSubtotal = products.reduce((acc, product) => {
-        const price = parsePrice(product.price);
-        return acc + price * product.quantity;
-    }, 0);
+    const merchandiseSubtotal = calculateMerchandiseSubtotal(products);
 
     const handlePaymentMethodChange = (method) => {
-        if (method === PAYMENT_CONSTANTS.PAYMENT_METHODS.QR) {
-            setIsQRDialogOpen(true);
-        } else {
-            setIsQRDialogOpen(false);
-        }
+        handlePaymentMethod(method, setIsQRDialogOpen);
     };
 
     const handleCheckout = async () => {
@@ -94,14 +90,6 @@ const Payment = () => {
         }
     };
 
-    const handlePrintInvoice = () => {
-        window.print();
-    };
-
-    const handleTrackOrder = () => {
-        console.log('View order status:', orderData);
-    };
-
     if (!isAuthenticated()) {
         return null;
     }
@@ -134,8 +122,8 @@ const Payment = () => {
                     isOpen={isOrderSuccessDialogOpen}
                     onOpenChange={setIsOrderSuccessDialogOpen}
                     orderData={orderData}
-                    onPrint={handlePrintInvoice}
-                    onTrackOrder={handleTrackOrder}
+                    onPrint={() => handlePrintInvoice()}
+                    onTrackOrder={() => handleTrackOrder(orderData)}
                 />
             </Body>
             <Footer />
