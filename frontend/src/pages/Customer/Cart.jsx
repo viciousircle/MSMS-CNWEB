@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
@@ -7,7 +7,10 @@ import CartProductCard from '@/components/Cards/CartProductCard';
 import Label from '@/components/Others/Label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Section, SectionItem } from '@/components/Layouts/SectionLayout';
-import useCart from '@/hooks/useCart.hook';
+import { useCartState } from '@/hooks/cart/useCartState.hook';
+import { useFetchCart } from '@/hooks/cart/useFetchCart.hook';
+import { useUpdateQuantity } from '@/hooks/cart/useUpdateQuantity.hook';
+import { useDeleteItem } from '@/hooks/cart/useDeleteItem.hook';
 import CartTotal from '@/components/Others/CartTotal';
 import CartNotFound from '@/components/NotFounds/CartNotFound';
 import LoadingState from '@/components/States/LoadingState';
@@ -19,21 +22,38 @@ const Cart = () => {
         products: cart,
         checkedProducts,
         allChecked,
-        error,
-        loading,
+        updateProducts,
+        updateProductQuantity,
+        removeProduct,
         handleProductCheck,
         handleCheckAll,
-        deleteCartItem,
-        updateCartItemQuantity,
-    } = useCart();
+    } = useCartState();
+
+    const {
+        fetchCart,
+        isLoading: isFetching,
+        error: fetchError,
+    } = useFetchCart(updateProducts);
+
+    const { updateQuantity, error: updateError } = useUpdateQuantity(
+        updateProductQuantity
+    );
+    const { deleteItem, error: deleteError } = useDeleteItem(removeProduct);
 
     const handleDeleteItem = async (deletedId) => {
         try {
-            await deleteCartItem(deletedId);
+            await deleteItem(deletedId);
         } catch (error) {
             console.error('Failed to delete item:', error);
         }
     };
+
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
+
+    const error = fetchError || updateError || deleteError;
+    const loading = isFetching;
 
     if (loading) return <LoadingState icon={ShoppingCartIcon} title="Cart" />;
     if (error)
@@ -68,7 +88,7 @@ const Cart = () => {
                         isChecked={checkedProducts[item._id] || false}
                         onCheckChange={handleProductCheck}
                         onDelete={handleDeleteItem}
-                        onQuantityChange={updateCartItemQuantity}
+                        onQuantityChange={updateQuantity}
                     />
                 ))}
             </CardLayout>
