@@ -5,6 +5,7 @@ import BillRow from './BillRow';
 import { PaymentMethodSelector } from '@/components/Selectors/PaymentMethodSelector';
 import OrderDialog from '@/components/Others/OrderDialog';
 import { useLocation } from 'react-router-dom';
+import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
 
 const BillCard = ({
     merchandiseSubtotal,
@@ -23,8 +24,14 @@ const BillCard = ({
     }, []);
 
     const paymentMethods = [
-        { value: 'cod', label: 'Cash on Delivery' },
-        { value: 'qr', label: 'VietQR Payment' },
+        {
+            value: PAYMENT_CONSTANTS.PAYMENT_METHODS.CASH,
+            label: 'Cash on Delivery',
+        },
+        {
+            value: PAYMENT_CONSTANTS.PAYMENT_METHODS.QR,
+            label: 'VietQR Payment',
+        },
     ];
 
     const format = (value) => `${formatPrice(value)} VND`;

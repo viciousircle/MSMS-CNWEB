@@ -56,6 +56,8 @@ const Payment = () => {
     const handlePaymentMethodChange = (method) => {
         if (method === PAYMENT_CONSTANTS.PAYMENT_METHODS.QR) {
             setIsQRDialogOpen(true);
+        } else {
+            setIsQRDialogOpen(false);
         }
     };
 
