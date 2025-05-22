@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { api } from '/utils/api';
+import { signupUser } from '/utils/api/auth.api';
 
 const initialFormData = {
     name: '',
@@ -44,14 +44,7 @@ export const useSignUp = () => {
         setIsSubmitting(true);
 
         try {
-            await api('/users', {
-                method: 'POST',
-                body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                }),
-            });
+            await signupUser(formData);
 
             toast.success('Registration successful! Redirecting to login...', {
                 duration: 2000,

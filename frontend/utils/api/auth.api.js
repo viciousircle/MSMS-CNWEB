@@ -1,4 +1,3 @@
-// import { api } from './api';
 import { api } from '/utils/api';
 
 export const loginUser = async (formData) => {
@@ -18,7 +17,7 @@ export const loginUser = async (formData) => {
 };
 
 export const googleLogin = async (credential) => {
-    const response = await fetch('http://localhost:5678/api/users/google', {
+    const data = await api('/users/google', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -26,10 +25,28 @@ export const googleLogin = async (credential) => {
         body: JSON.stringify({ credential }),
     });
 
-    const data = await response.json();
+    if (!data || !data.token) {
+        throw new Error(data?.message || 'Google authentication failed');
+    }
 
-    if (!response.ok) {
-        throw new Error(data.message || 'Google authentication failed');
+    return data;
+};
+
+export const signupUser = async (userData) => {
+    const data = await api('/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+        }),
+    });
+
+    if (!data) {
+        throw new Error(data?.message || 'Registration failed');
     }
 
     return data;
