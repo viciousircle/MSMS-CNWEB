@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Sheet,
     SheetContent,
@@ -27,10 +27,17 @@ export const ViewDetailsSheet = ({
     onStageUpdated,
     onPaymentStatusUpdated,
 }) => {
+    const [open, setOpen] = useState(false);
     const { orderDetails, loading, error, refetch } = useOrderDetails(orderId);
     const { updateOrderStage, isUpdating } = useUpdateOrderStage();
     const { updatePaymentStatus, isUpdating: isPaymentUpdating } =
         useUpdatePaymentStatus();
+
+    useEffect(() => {
+        if (open && orderId) {
+            refetch();
+        }
+    }, [open, orderId]);
 
     const handleStageUpdate = async (newStage) => {
         try {
@@ -64,45 +71,64 @@ export const ViewDetailsSheet = ({
         }
     };
 
-    if (error) return <div>Error: {error}</div>;
-    if (!orderDetails) return <div>Order not found</div>;
-
     return (
-        <Sheet>
-            <SheetTrigger asChild>
-                <ViewDetailsTrigger loading={loading} />
-            </SheetTrigger>
+        <div className="relative">
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                    <div>
+                        <ViewDetailsTrigger loading={loading} />
+                    </div>
+                </SheetTrigger>
 
-            <SheetContent className="sm:max-w-lg overflow-y-auto">
-                <SheetHeader>
-                    <SheetTitle className="text-center">
-                        Order {formatDisplayId(orderId, 'ORD-')} Details
-                    </SheetTitle>
-                    <SheetDescription>
-                        <ViewDetailsInfo
-                            orderDetails={orderDetails}
-                            dateOrder={dateOrder}
-                            paymentMethod={paymentMethod}
-                            orderStage={orderStage}
-                            paymentStatus={paymentStatus}
-                        />
-                        <div className="mt-6">
-                            <OrderItemsTable items={orderDetails.items} />
-                        </div>
-                        <div className="mt-6">
-                            <ViewDetailsActions
-                                orderStage={orderStage}
-                                isUpdating={isUpdating}
-                                handleStageUpdate={handleStageUpdate}
-                                paymentStatus={paymentStatus}
-                                isPaymentUpdating={isPaymentUpdating}
-                                handlePaymentUpdate={handlePaymentUpdate}
-                            />
-                        </div>
-                    </SheetDescription>
-                </SheetHeader>
-            </SheetContent>
-        </Sheet>
+                <SheetContent className="sm:max-w-lg overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle className="text-center">
+                            Order {formatDisplayId(orderId, 'ORD-')} Details
+                        </SheetTitle>
+                        <SheetDescription>
+                            {loading ? (
+                                <div>Loading...</div>
+                            ) : error ? (
+                                <div>Error: {error}</div>
+                            ) : !orderDetails ? (
+                                <div>Order not found</div>
+                            ) : (
+                                <>
+                                    <ViewDetailsInfo
+                                        orderDetails={orderDetails}
+                                        dateOrder={dateOrder}
+                                        paymentMethod={paymentMethod}
+                                        orderStage={orderStage}
+                                        paymentStatus={paymentStatus}
+                                    />
+                                    <div className="mt-6">
+                                        <OrderItemsTable
+                                            items={orderDetails.items}
+                                        />
+                                    </div>
+                                    <div className="mt-6">
+                                        <ViewDetailsActions
+                                            orderStage={orderStage}
+                                            isUpdating={isUpdating}
+                                            handleStageUpdate={
+                                                handleStageUpdate
+                                            }
+                                            paymentStatus={paymentStatus}
+                                            isPaymentUpdating={
+                                                isPaymentUpdating
+                                            }
+                                            handlePaymentUpdate={
+                                                handlePaymentUpdate
+                                            }
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
+        </div>
     );
 };
 

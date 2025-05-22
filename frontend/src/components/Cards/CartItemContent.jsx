@@ -7,7 +7,6 @@ import CartItemQuantity from './CartItemQuantity';
 const CartItemContent = ({
     id,
     name,
-    image,
     price,
     quantity,
     stock,

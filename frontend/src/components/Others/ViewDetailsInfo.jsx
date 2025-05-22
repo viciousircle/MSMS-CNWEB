@@ -25,6 +25,7 @@ const ViewDetailsInfo = ({
     orderStage,
     paymentStatus,
 }) => {
+    console.log('orderDetails', orderDetails);
     return (
         <div className="flex flex-col gap-6 mt-6">
             <InfoSection title="Receiver Information">
@@ -45,7 +46,7 @@ const ViewDetailsInfo = ({
             <InfoSection title="Order Summary">
                 <InfoRow
                     label="Order ID"
-                    value={formatDisplayId(orderDetails.id, 'ORD-')}
+                    value={formatDisplayId(orderDetails.orderId, 'ORD-')}
                 />
                 <InfoRow label="Date" value={dateOrder} />
                 <InfoRow label="Payment Method" value={paymentMethod} />
