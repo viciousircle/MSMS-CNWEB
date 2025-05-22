@@ -26,8 +26,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { api } from '/utils/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
+import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
 import Footer from '@/components/Structure/Footer';
 
 const Payment = () => {
@@ -36,11 +37,13 @@ const Payment = () => {
     const { isAuthenticated } = useAuth();
     const products = location.state?.products || [];
     const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [orderData, setOrderData] = useState(null);
     const [isOrderSuccessDialogOpen, setIsOrderSuccessDialogOpen] =
         useState(false);
+
+    const { createOrder, isLoading, error: orderError } = useCreateOrder();
+    const { validateOrder, buildOrderData } = useOrderValidation();
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -75,70 +78,24 @@ const Payment = () => {
         }
     };
 
-    const validateOrder = () => {
-        if (!products?.length) {
-            setError('No products in cart');
-            return false;
-        }
-
-        const receiverInfo = JSON.parse(
-            localStorage.getItem('receiverInfo') || '{}'
-        );
-        if (
-            !receiverInfo?.name ||
-            !receiverInfo?.phone ||
-            !receiverInfo?.address
-        ) {
-            setError('Please complete receiver information');
-            return false;
-        }
-
-        return true;
-    };
-
-    const formatAddress = (address) =>
-        `${address.number}, ${address.street}, ${address.ward}, ${address.district}, ${address.province}`;
-
-    const buildOrderData = () => {
-        const receiverInfo = JSON.parse(
-            localStorage.getItem('receiverInfo') || '{}'
-        );
-        return {
-            orderItems: products.map((product) => ({
-                product: product.id,
-                productName: product.name,
-                color: product.color,
-                quantity: product.quantity,
-                price: product.price,
-            })),
-            receiverInformation: {
-                receiverName: receiverInfo.name,
-                receiverPhone: receiverInfo.phone,
-                receiverAddress: formatAddress(receiverInfo.address),
-            },
-            paymentMethod: 'QR',
-            orderDate: new Date().toISOString(),
-            totalAmount: products.reduce(
-                (sum, product) => sum + (product.price || 0) * product.quantity,
-                0
-            ),
-        };
-    };
-
     const handleCheckout = async () => {
-        if (!validateOrder()) return;
+        const receiverInfo = JSON.parse(
+            localStorage.getItem('receiverInfo') || '{}'
+        );
+        const validation = validateOrder(products, receiverInfo);
 
-        setIsLoading(true);
+        if (!validation.isValid) {
+            setError(validation.errors[0]);
+            return;
+        }
+
         setError(null);
 
         try {
-            const data = buildOrderData();
+            const data = buildOrderData(products, receiverInfo);
             console.log('Sending order data:', data);
 
-            const result = await api('/orders/', {
-                method: 'POST',
-                body: JSON.stringify(data),
-            });
+            const result = await createOrder(data);
 
             console.log('Order response:', result);
             setOrderData(data);
@@ -147,8 +104,6 @@ const Payment = () => {
         } catch (err) {
             console.error('Order failed:', err);
             setError('Failed to place order. Please try again.');
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -240,9 +195,9 @@ const Payment = () => {
                                 bankInfo={bankInfo}
                             />
                         </div>
-                        {error && (
+                        {(error || orderError) && (
                             <div className="text-red-500 p-3 bg-red-50 rounded-md mt-4">
-                                {error}
+                                {error || orderError}
                             </div>
                         )}
                         <DialogFooter className="mt-6">
