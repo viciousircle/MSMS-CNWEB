@@ -16,7 +16,7 @@ const CartTotal = ({ products, checkedProducts }) => {
     const checkedProductsData = products
         .filter((product) => checkedProducts[product._id])
         .map((product) => ({
-            id: product._id,
+            id: product.productId,
             name: product.name,
             img: product.image,
             color: product.color,
