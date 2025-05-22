@@ -1,9 +1,8 @@
 import React from 'react';
-import { TableCell, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ViewDetailsSheet } from '../../Others/ViewDetailsSheet';
-import { PaidStatusBadge, StageBadge } from '../../Others/StatusBadge';
-import { formatDisplayId } from '/utils/idConverter';
+import { TableRow } from '@/components/ui/table';
+import OrderTableCheckbox from './OrderTableCheckbox';
+import OrderTableCells from './OrderTableCells';
+import OrderTableActions from './OrderTableActions';
 
 export const OrderTableRow = ({
     order,
@@ -11,60 +10,16 @@ export const OrderTableRow = ({
     onToggleSelection,
     onUpdate,
 }) => {
-    // Extract the current stage (assuming orderStage is an array)
-    const currentStage = Array.isArray(order.orderStage)
-        ? order.orderStage.slice(-1)[0]?.stage
-        : order.orderStage;
-
-    const displayId = formatDisplayId(order._id, 'ORD-');
-
-    const cells = [
-        <StageBadge status={currentStage} />,
-        displayId,
-        order.customerName,
-        order.customerEmail,
-        `$${order.totalPayment}`,
-        order.dateOrder,
-        order.paymentMethod,
-        <PaidStatusBadge status={order.isPaid ? 'Paid' : 'Unpaid'} />,
-    ];
-
-    const handleStageUpdate = (newStage) => {
-        onUpdate?.(order._id, { orderStage: newStage });
-    };
-
     return (
         <TableRow>
-            <TableCell>
-                <div className="flex items-center justify-center">
-                    <Checkbox
-                        className="size-4 bg-white"
-                        checked={isSelected}
-                        onCheckedChange={onToggleSelection}
-                    />
-                </div>
-            </TableCell>
-
-            {cells.map((content, i) => (
-                <TableCell key={i} className="text-center">
-                    {i === 2 ? (
-                        <span className="font-medium">{content}</span>
-                    ) : (
-                        content
-                    )}
-                </TableCell>
-            ))}
-
-            <TableCell className="text-right">
-                <ViewDetailsSheet
-                    orderId={order._id}
-                    dateOrder={order.dateOrder}
-                    orderStage={currentStage}
-                    paymentMethod={order.paymentMethod}
-                    paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
-                    onStageUpdated={handleStageUpdate}
-                />
-            </TableCell>
+            <OrderTableCheckbox
+                isSelected={isSelected}
+                onToggleSelection={onToggleSelection}
+            />
+            <OrderTableCells order={order} />
+            <OrderTableActions order={order} onStageUpdated={onUpdate} />
         </TableRow>
     );
 };
+
+export default OrderTableRow;
