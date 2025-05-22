@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useLogin } from '@/hooks/useLogin.hook';
+import { useLogin } from '@/hooks/auth/useLogin.hook';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const LoginForm = ({
@@ -110,7 +110,7 @@ const SignupLink = () => (
 
 const LogIn = ({ className, ...props }) => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const { login, loading, error } = useLogin();
+    const { login, handleGoogleLogin, loading, error } = useLogin();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -119,41 +119,6 @@ const LogIn = ({ className, ...props }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         await login(formData);
-    };
-
-    const handleGoogleSuccess = async (credentialResponse) => {
-        try {
-            const response = await fetch(
-                'http://localhost:5678/api/users/google',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        credential: credentialResponse.credential,
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Google authentication failed');
-            }
-
-            console.log('Google login successful', data);
-            localStorage.setItem('token', data.token);
-            window.location.href = '/';
-        } catch (error) {
-            console.error('Google login error:', error);
-            // You might want to set an error state here to display to the user
-        }
-    };
-
-    const handleGoogleError = () => {
-        console.error('Google login failed');
-        // You might want to set an error state here to display to the user
     };
 
     return (
@@ -177,8 +142,10 @@ const LogIn = ({ className, ...props }) => {
                                 loading={loading}
                                 error={error}
                                 onSubmit={handleSubmit}
-                                handleGoogleSuccess={handleGoogleSuccess}
-                                handleGoogleError={handleGoogleError}
+                                handleGoogleSuccess={handleGoogleLogin}
+                                handleGoogleError={() =>
+                                    console.error('Google login failed')
+                                }
                             />
                         </CardContent>
                     </Card>
