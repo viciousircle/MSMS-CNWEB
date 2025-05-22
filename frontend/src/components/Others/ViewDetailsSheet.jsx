@@ -16,6 +16,7 @@ import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
 import { useUpdatePaymentStatus } from '@/hooks/seller/useUpdatePaymentStatus';
 import { toast } from 'sonner';
 import { formatDisplayId } from '/utils/idConverter';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 
 const InfoRow = ({ label, value }) => (
     <div className="flex justify-between">
@@ -44,54 +45,74 @@ const ActionButtons = ({
     return (
         <div className="space-y-3">
             <div className="flex gap-3">
-                {orderStage === 'New' && (
+                {orderStage === ORDER_CONSTANTS.STAGES.NEW && (
                     <>
                         <Button
                             className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                            onClick={() => handleStageUpdate('Prepare')}
+                            onClick={() =>
+                                handleStageUpdate(
+                                    ORDER_CONSTANTS.STAGES.PREPARE
+                                )
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Prepare'}
                         </Button>
                         <Button
                             className="flex-1 bg-red-100 text-red-700 hover:bg-red-200"
-                            onClick={() => handleStageUpdate('Reject')}
+                            onClick={() =>
+                                handleStageUpdate(ORDER_CONSTANTS.STAGES.REJECT)
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Reject'}
                         </Button>
                     </>
                 )}
-                {orderStage === 'Prepare' && (
+                {orderStage === ORDER_CONSTANTS.STAGES.PREPARE && (
                     <>
                         <Button
                             className="flex-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
-                            onClick={() => handleStageUpdate('New')}
+                            onClick={() =>
+                                handleStageUpdate(ORDER_CONSTANTS.STAGES.NEW)
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Revert to New'}
                         </Button>
                         <Button
                             className="flex-1 bg-green-100 text-green-800 hover:bg-green-200"
-                            onClick={() => handleStageUpdate('Shipping')}
+                            onClick={() =>
+                                handleStageUpdate(
+                                    ORDER_CONSTANTS.STAGES.SHIPPING
+                                )
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Mark as Shipping'}
                         </Button>
                     </>
                 )}
-                {orderStage === 'Shipping' && (
+                {orderStage === ORDER_CONSTANTS.STAGES.SHIPPING && (
                     <>
                         <Button
                             className="flex-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                            onClick={() => handleStageUpdate('Prepare')}
+                            onClick={() =>
+                                handleStageUpdate(
+                                    ORDER_CONSTANTS.STAGES.PREPARE
+                                )
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Revert to Prepare'}
                         </Button>
                         <Button
                             className="flex-1 bg-purple-100 text-purple-800 hover:bg-purple-200"
-                            onClick={() => handleStageUpdate('Shipped')}
+                            onClick={() =>
+                                handleStageUpdate(
+                                    ORDER_CONSTANTS.STAGES.SHIPPED
+                                )
+                            }
                             disabled={isUpdating}
                         >
                             {isUpdating ? 'Processing...' : 'Mark as Shipped'}
@@ -103,16 +124,20 @@ const ActionButtons = ({
             {/* Payment Status Toggle Button */}
             <Button
                 className={`w-full ${
-                    paymentStatus === 'Paid'
+                    paymentStatus === ORDER_CONSTANTS.PAYMENT_STATUS.PAID
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
                         : 'bg-green-100 text-green-800 hover:bg-green-200'
                 }`}
-                onClick={() => handlePaymentUpdate(paymentStatus !== 'Paid')}
+                onClick={() =>
+                    handlePaymentUpdate(
+                        paymentStatus !== ORDER_CONSTANTS.PAYMENT_STATUS.PAID
+                    )
+                }
                 disabled={isPaymentUpdating}
             >
                 {isPaymentUpdating
                     ? 'Processing...'
-                    : paymentStatus === 'Paid'
+                    : paymentStatus === ORDER_CONSTANTS.PAYMENT_STATUS.PAID
                     ? 'Mark as Unpaid'
                     : 'Mark as Paid'}
             </Button>
@@ -155,13 +180,21 @@ export const ViewDetailsSheet = ({
     const handlePaymentUpdate = async (isPaid) => {
         try {
             // Optimistically update parent state first
-            onPaymentStatusUpdated?.(isPaid ? 'Paid' : 'Unpaid');
+            onPaymentStatusUpdated?.(
+                isPaid
+                    ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
+                    : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID
+            );
 
             // Then make the API call
             await updatePaymentStatus(orderId, isPaid);
 
             toast.success(
-                `Payment status updated to ${isPaid ? 'Paid' : 'Unpaid'}`
+                `Payment status updated to ${
+                    isPaid
+                        ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
+                        : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID
+                }`
             );
 
             // Optional: Refetch to ensure complete sync with server

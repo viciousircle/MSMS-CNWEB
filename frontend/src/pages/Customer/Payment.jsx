@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
 import { useQRPayment } from '@/hooks/payment/useQRPayment.hook';
+import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
 import Footer from '@/components/Structure/Footer';
@@ -13,16 +14,6 @@ import BillCard from '@/components/Cards/BillCard/BillCard';
 import PaymentDetails from '@/components/Payment/PaymentDetails';
 import QRPaymentDialog from '@/components/Payment/QRPaymentDialog';
 import OrderSuccessDialog from '@/components/Payment/OrderSuccessDialog';
-
-// Constants
-const SHIPPING_COST = 30000;
-const TEST_AMOUNT = 10000; // Fixed amount for testing VietQR
-const BANK_INFO = {
-    bankName: 'VietinBank',
-    bankCode: 'vietinbank',
-    accountNumber: '106873633198',
-    accountName: 'MSMS CN WEB',
-};
 
 const Payment = () => {
     const location = useLocation();
@@ -63,7 +54,7 @@ const Payment = () => {
     }, 0);
 
     const handlePaymentMethodChange = (method) => {
-        if (method === 'qr') {
+        if (method === PAYMENT_CONSTANTS.PAYMENT_METHODS.QR) {
             setIsQRDialogOpen(true);
         }
     };
@@ -86,7 +77,11 @@ const Payment = () => {
             const order = await createOrder(data);
 
             // Generate QR code for the order
-            await generateQRPayment(TEST_AMOUNT, order.id, BANK_INFO);
+            await generateQRPayment(
+                PAYMENT_CONSTANTS.TEST_AMOUNT,
+                order.id,
+                PAYMENT_CONSTANTS.BANK_INFO
+            );
 
             setOrderData(data);
             setIsQRDialogOpen(false);
@@ -118,15 +113,15 @@ const Payment = () => {
 
                 <BillCard
                     merchandiseSubtotal={merchandiseSubtotal}
-                    shippingSubtotal={SHIPPING_COST}
+                    shippingSubtotal={PAYMENT_CONSTANTS.SHIPPING_COST}
                     onPaymentMethodChange={handlePaymentMethodChange}
                 />
 
                 <QRPaymentDialog
                     isOpen={isQRDialogOpen}
                     onOpenChange={setIsQRDialogOpen}
-                    total={TEST_AMOUNT}
-                    bankInfo={BANK_INFO}
+                    total={PAYMENT_CONSTANTS.TEST_AMOUNT}
+                    bankInfo={PAYMENT_CONSTANTS.BANK_INFO}
                     error={error || qrError}
                     orderError={orderError}
                     isLoading={isOrderLoading || isQRLoading}

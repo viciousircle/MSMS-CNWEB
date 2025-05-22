@@ -1,13 +1,14 @@
 import OrderItem from './OrderItem';
 import OrderSummaryItem from './OrderSummaryItem';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 
 const OrderItemsSection = ({ items }) => {
     const subtotal = items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
     );
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0); // Calculate total quantity
-    const shippingCost = 30.0; // Example shipping cost
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    const shippingCost = ORDER_CONSTANTS.DEFAULT_SHIPPING_COST;
     const total = subtotal + shippingCost;
 
     return (
@@ -30,17 +31,23 @@ const OrderItemsSection = ({ items }) => {
                 <div className="flex flex-col px-2">
                     <OrderSummaryItem
                         label="Subtotal"
-                        value={`$${subtotal.toFixed(2)}`}
-                        additionalInfo={`${totalQuantity} items`} // Use totalQuantity instead of items.length
+                        value={`${
+                            ORDER_CONSTANTS.DEFAULT_CURRENCY_SYMBOL
+                        }${subtotal.toFixed(2)}`}
+                        additionalInfo={`${totalQuantity} items`}
                     />
                     <OrderSummaryItem
                         label="Shipping"
-                        value={`$${shippingCost.toFixed(2)}`}
+                        value={`${
+                            ORDER_CONSTANTS.DEFAULT_CURRENCY_SYMBOL
+                        }${shippingCost.toFixed(2)}`}
                         additionalInfo="Standard Shipping"
                     />
                     <OrderSummaryItem
                         label="Total"
-                        value={`$${total.toFixed(2)}`}
+                        value={`${
+                            ORDER_CONSTANTS.DEFAULT_CURRENCY_SYMBOL
+                        }${total.toFixed(2)}`}
                         additionalInfo=" "
                         isBold
                     />
