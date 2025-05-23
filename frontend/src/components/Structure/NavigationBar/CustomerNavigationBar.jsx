@@ -3,6 +3,7 @@ import {
     BuildingStorefrontIcon,
     InboxStackIcon,
     ShoppingBagIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import BaseNavigationBar from './BaseNavigationBar';
 import { Button } from '@/components/ui/button';

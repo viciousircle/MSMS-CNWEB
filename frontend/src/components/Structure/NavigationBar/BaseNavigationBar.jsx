@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import {
+    UserCircleIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline';
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -66,6 +69,12 @@ const BaseNavigationBar = ({
                             </div>
                         </Link>
                     ))}
+
+                <Link to="/about">
+                    <div className="flex gap-4 items-center border-x py-2 px-6 border-gray-950/5 uppercase tracking-wider hover:bg-gray-950/5">
+                        <InformationCircleIcon className="size-6" />
+                    </div>
+                </Link>
             </div>
         </nav>
     );

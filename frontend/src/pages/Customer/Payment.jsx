@@ -76,7 +76,7 @@ const Payment = () => {
 
             // Generate QR code for the order
             await generateQRPayment(
-                PAYMENT_CONSTANTS.TEST_AMOUNT,
+                merchandiseSubtotal + PAYMENT_CONSTANTS.SHIPPING_COST,
                 order.id,
                 PAYMENT_CONSTANTS.BANK_INFO
             );
@@ -110,7 +110,9 @@ const Payment = () => {
                 <QRPaymentDialog
                     isOpen={isQRDialogOpen}
                     onOpenChange={setIsQRDialogOpen}
-                    total={PAYMENT_CONSTANTS.TEST_AMOUNT}
+                    total={
+                        merchandiseSubtotal + PAYMENT_CONSTANTS.SHIPPING_COST
+                    }
                     bankInfo={PAYMENT_CONSTANTS.BANK_INFO}
                     error={error || qrError}
                     orderError={orderError}
