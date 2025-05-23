@@ -13,6 +13,29 @@ import { useOrdersLogic } from '@/hooks/seller/useOrdersLogic.hook';
 import { useOrderTable } from '@/hooks/seller/useOrderTable.hook';
 import Footer from '@/components/Structure/Footer';
 import { toast } from 'sonner';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+};
 
 const Orders = () => {
     const {
@@ -106,17 +129,24 @@ const Orders = () => {
             <div className="flex flex-col min-h-screen">
                 <Body>
                     <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
-                    <div className="p-4 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="p-4 text-center"
+                    >
                         <p className="text-red-500 mb-2 bg-red-100 flex items-center justify-center px-4 py-2 rounded-lg w-fit text-center">
                             Error: {error}
                         </p>
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className="text-blue-500 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg"
                             onClick={() => window.location.reload()}
                         >
                             Try Again
-                        </button>
-                    </div>
+                        </motion.button>
+                    </motion.div>
                 </Body>
                 <Footer />
             </div>
@@ -126,15 +156,29 @@ const Orders = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
-                <div className="flex flex-col gap-4 px-4 w-full">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <HeaderWithIcon icon={ArchiveBoxIcon} title="Orders" />
+                </motion.div>
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="flex flex-col gap-4 px-4 w-full"
+                >
                     <Tabs
                         defaultValue="all"
                         value={activeTab}
                         onValueChange={setActiveTab}
                         className="w-full flex flex-col gap-4"
                     >
-                        <div className="flex justify-between items-center">
+                        <motion.div
+                            variants={itemVariants}
+                            className="flex justify-between items-center"
+                        >
                             <div className="flex items-center gap-2">
                                 <PrintButton />
                                 <ChangeStageMenu
@@ -150,32 +194,45 @@ const Orders = () => {
                                 selectedDate={selectedDate}
                                 onDateChange={setSelectedDate}
                             />
-                        </div>
+                        </motion.div>
 
-                        {tabValues.map((tabValue) => (
-                            <TabsContent
-                                key={tabValue}
-                                value={tabValue}
-                                className="w-full"
-                            >
-                                <OrderTable
-                                    orders={paginatedOrders}
-                                    onUpdate={handleStageUpdate}
-                                    selectedRows={selectedRows}
-                                    onToggleSelection={toggleRowSelection}
-                                    onToggleAll={toggleAllRows}
-                                    allSelected={allSelected}
-                                />
-                            </TabsContent>
-                        ))}
+                        <AnimatePresence mode="wait">
+                            {tabValues.map((tabValue) => (
+                                <TabsContent
+                                    key={tabValue}
+                                    value={tabValue}
+                                    className="w-full"
+                                >
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <OrderTable
+                                            orders={paginatedOrders}
+                                            onUpdate={handleStageUpdate}
+                                            selectedRows={selectedRows}
+                                            onToggleSelection={
+                                                toggleRowSelection
+                                            }
+                                            onToggleAll={toggleAllRows}
+                                            allSelected={allSelected}
+                                        />
+                                    </motion.div>
+                                </TabsContent>
+                            ))}
+                        </AnimatePresence>
                     </Tabs>
 
-                    <PaginationControls
-                        totalPages={totalPages}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                    />
-                </div>
+                    <motion.div variants={itemVariants}>
+                        <PaginationControls
+                            totalPages={totalPages}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    </motion.div>
+                </motion.div>
             </Body>
             <Footer />
         </div>

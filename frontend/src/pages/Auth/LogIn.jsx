@@ -12,6 +12,41 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/auth/useLogin.hook';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.6,
+            ease: 'easeOut',
+        },
+    },
+};
+
+const formVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const fieldVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+};
 
 const LoginForm = ({
     formData,
@@ -22,51 +57,74 @@ const LoginForm = ({
     handleGoogleSuccess,
     handleGoogleError,
 }) => (
-    <form onSubmit={onSubmit}>
+    <motion.form
+        onSubmit={onSubmit}
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+    >
         <div className="flex flex-col gap-6">
-            <FormField
-                id="email"
-                label="Email"
-                type="email"
-                placeholder="abc@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-            />
+            <motion.div variants={fieldVariants}>
+                <FormField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    placeholder="abc@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                />
+            </motion.div>
 
-            <FormField
-                id="password"
-                label="Password"
-                type="password"
-                placeholder="Enter password here"
-                value={formData.password}
-                onChange={handleChange}
-                required
-            />
+            <motion.div variants={fieldVariants}>
+                <FormField
+                    id="password"
+                    label="Password"
+                    type="password"
+                    placeholder="Enter password here"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                />
+            </motion.div>
 
-            {error && <ErrorMessage message={error} />}
+            {error && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <ErrorMessage message={error} />
+                </motion.div>
+            )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Logging in...' : 'Login'}
-            </Button>
+            <motion.div variants={fieldVariants}>
+                <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
+                </Button>
+            </motion.div>
 
-            <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
-                <div className="flex justify-center">
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={handleGoogleError}
-                        useOneTap={false}
-                        width={330}
-                        theme="neutral"
-                        shape="square"
-                        text="continue_with"
-                    />
-                </div>
-            </GoogleOAuthProvider>
+            <motion.div variants={fieldVariants}>
+                <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            useOneTap={false}
+                            width={330}
+                            theme="neutral"
+                            shape="square"
+                            text="continue_with"
+                        />
+                    </div>
+                </GoogleOAuthProvider>
+            </motion.div>
 
-            <SignupLink />
+            <motion.div variants={fieldVariants}>
+                <SignupLink />
+            </motion.div>
         </div>
-    </form>
+    </motion.form>
 );
 
 const FormField = ({
@@ -124,16 +182,28 @@ const LogIn = ({ className, ...props }) => {
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
             <div className="w-full max-w-sm">
-                <div
+                <motion.div
                     className={cn('flex flex-col gap-6', className)}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
                     {...props}
                 >
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-2xl">Login</CardTitle>
-                            <CardDescription>
-                                Enter your email below to login to your account
-                            </CardDescription>
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                                <CardTitle className="text-2xl">
+                                    Login
+                                </CardTitle>
+                                <CardDescription>
+                                    Enter your email below to login to your
+                                    account
+                                </CardDescription>
+                            </motion.div>
                         </CardHeader>
                         <CardContent>
                             <LoginForm
@@ -149,7 +219,7 @@ const LogIn = ({ className, ...props }) => {
                             />
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

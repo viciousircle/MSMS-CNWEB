@@ -28,6 +28,49 @@ import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
 import Footer from '@/components/Structure/Footer';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+};
+
+const dialogVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            duration: 0.3,
+            ease: 'easeOut',
+        },
+    },
+    exit: {
+        opacity: 0,
+        scale: 0.95,
+        transition: {
+            duration: 0.2,
+            ease: 'easeIn',
+        },
+    },
+};
 
 const ManageAccount = () => {
     const {
@@ -164,9 +207,26 @@ const ManageAccount = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <HeaderWithIcon icon={UsersIcon} title="Account Management" />
-                <div className="flex flex-col gap-4 px-4 w-full">
-                    <div className="flex justify-between items-center">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <HeaderWithIcon
+                        icon={UsersIcon}
+                        title="Account Management"
+                    />
+                </motion.div>
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="flex flex-col gap-4 px-4 w-full"
+                >
+                    <motion.div
+                        variants={itemVariants}
+                        className="flex justify-between items-center"
+                    >
                         <div className="flex items-center gap-2"></div>
                         <AccountFilterControls
                             accountsPerPage={accountsPerPage}
@@ -177,219 +237,308 @@ const ManageAccount = () => {
                             onTabChange={setActiveTab}
                             onAddClick={handleAddClick}
                         />
-                    </div>
+                    </motion.div>
 
-                    <AccountTable
-                        accounts={paginatedAccounts}
-                        onUpdate={updateAccount}
-                        onDelete={deleteAccount}
-                    />
+                    <motion.div variants={itemVariants}>
+                        <AccountTable
+                            accounts={paginatedAccounts}
+                            onUpdate={updateAccount}
+                            onDelete={deleteAccount}
+                        />
+                    </motion.div>
 
-                    <PaginationControls
-                        totalPages={totalPages}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                    />
+                    <motion.div variants={itemVariants}>
+                        <PaginationControls
+                            totalPages={totalPages}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    </motion.div>
 
-                    <Dialog
-                        open={isAddDialogOpen}
-                        onOpenChange={setIsAddDialogOpen}
-                    >
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle className="text-xl font-semibold">
-                                    Add New Account
-                                </DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="name"
-                                        className="text-sm font-medium"
+                    <AnimatePresence>
+                        {isAddDialogOpen && (
+                            <Dialog
+                                open={isAddDialogOpen}
+                                onOpenChange={setIsAddDialogOpen}
+                            >
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <motion.div
+                                        variants={dialogVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
                                     >
-                                        Full Name
-                                    </Label>
-                                    <Input
-                                        id="name"
-                                        value={newAccount.name}
-                                        onChange={(e) => {
-                                            setNewAccount({
-                                                ...newAccount,
-                                                name: e.target.value,
-                                            });
-                                            if (formErrors.name) {
-                                                setFormErrors({
-                                                    ...formErrors,
-                                                    name: '',
-                                                });
-                                            }
-                                        }}
-                                        className={
-                                            formErrors.name
-                                                ? 'border-red-500'
-                                                : ''
-                                        }
-                                        placeholder="Enter full name"
-                                    />
-                                    {formErrors.name && (
-                                        <p className="text-sm text-red-500">
-                                            {formErrors.name}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="email"
-                                        className="text-sm font-medium"
-                                    >
-                                        Email
-                                    </Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={newAccount.email}
-                                        onChange={(e) => {
-                                            setNewAccount({
-                                                ...newAccount,
-                                                email: e.target.value,
-                                            });
-                                            if (formErrors.email) {
-                                                setFormErrors({
-                                                    ...formErrors,
-                                                    email: '',
-                                                });
-                                            }
-                                        }}
-                                        className={
-                                            formErrors.email
-                                                ? 'border-red-500'
-                                                : ''
-                                        }
-                                        placeholder="Enter email address"
-                                    />
-                                    {formErrors.email && (
-                                        <p className="text-sm text-red-500">
-                                            {formErrors.email}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="password"
-                                        className="text-sm font-medium"
-                                    >
-                                        Password
-                                    </Label>
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        value={newAccount.password}
-                                        onChange={(e) => {
-                                            setNewAccount({
-                                                ...newAccount,
-                                                password: e.target.value,
-                                            });
-                                            if (formErrors.password) {
-                                                setFormErrors({
-                                                    ...formErrors,
-                                                    password: '',
-                                                });
-                                            }
-                                        }}
-                                        className={
-                                            formErrors.password
-                                                ? 'border-red-500'
-                                                : ''
-                                        }
-                                        placeholder="Enter password"
-                                    />
-                                    {formErrors.password && (
-                                        <p className="text-sm text-red-500">
-                                            {formErrors.password}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="confirmPassword"
-                                        className="text-sm font-medium"
-                                    >
-                                        Confirm Password
-                                    </Label>
-                                    <Input
-                                        id="confirmPassword"
-                                        type="password"
-                                        value={newAccount.confirmPassword}
-                                        onChange={(e) => {
-                                            setNewAccount({
-                                                ...newAccount,
-                                                confirmPassword: e.target.value,
-                                            });
-                                            if (formErrors.confirmPassword) {
-                                                setFormErrors({
-                                                    ...formErrors,
-                                                    confirmPassword: '',
-                                                });
-                                            }
-                                        }}
-                                        className={
-                                            formErrors.confirmPassword
-                                                ? 'border-red-500'
-                                                : ''
-                                        }
-                                        placeholder="Confirm password"
-                                    />
-                                    {formErrors.confirmPassword && (
-                                        <p className="text-sm text-red-500">
-                                            {formErrors.confirmPassword}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="role"
-                                        className="text-sm font-medium"
-                                    >
-                                        Role
-                                    </Label>
-                                    <Tabs
-                                        value={newAccount.role}
-                                        onValueChange={(value) =>
-                                            setNewAccount({
-                                                ...newAccount,
-                                                role: value,
-                                            })
-                                        }
-                                        className="w-full"
-                                    >
-                                        <TabsList className="grid w-full grid-cols-2">
-                                            <TabsTrigger value="seller">
-                                                Seller
-                                            </TabsTrigger>
-                                            <TabsTrigger value="admin">
-                                                Admin
-                                            </TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                </div>
-                            </div>
-                            <DialogFooter className="gap-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={handleCloseDialog}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={handleAddAccount}
-                                    className="bg-primary hover:bg-primary/90"
-                                >
-                                    Add Account
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-semibold">
+                                                Add New Account
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <motion.div
+                                                variants={itemVariants}
+                                                className="grid gap-2"
+                                            >
+                                                <Label
+                                                    htmlFor="name"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Full Name
+                                                </Label>
+                                                <Input
+                                                    id="name"
+                                                    value={newAccount.name}
+                                                    onChange={(e) => {
+                                                        setNewAccount({
+                                                            ...newAccount,
+                                                            name: e.target
+                                                                .value,
+                                                        });
+                                                        if (formErrors.name) {
+                                                            setFormErrors({
+                                                                ...formErrors,
+                                                                name: '',
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={
+                                                        formErrors.name
+                                                            ? 'border-red-500'
+                                                            : ''
+                                                    }
+                                                    placeholder="Enter full name"
+                                                />
+                                                {formErrors.name && (
+                                                    <motion.p
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        className="text-sm text-red-500"
+                                                    >
+                                                        {formErrors.name}
+                                                    </motion.p>
+                                                )}
+                                            </motion.div>
+                                            <motion.div
+                                                variants={itemVariants}
+                                                className="grid gap-2"
+                                            >
+                                                <Label
+                                                    htmlFor="email"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Email
+                                                </Label>
+                                                <Input
+                                                    id="email"
+                                                    type="email"
+                                                    value={newAccount.email}
+                                                    onChange={(e) => {
+                                                        setNewAccount({
+                                                            ...newAccount,
+                                                            email: e.target
+                                                                .value,
+                                                        });
+                                                        if (formErrors.email) {
+                                                            setFormErrors({
+                                                                ...formErrors,
+                                                                email: '',
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={
+                                                        formErrors.email
+                                                            ? 'border-red-500'
+                                                            : ''
+                                                    }
+                                                    placeholder="Enter email"
+                                                />
+                                                {formErrors.email && (
+                                                    <motion.p
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        className="text-sm text-red-500"
+                                                    >
+                                                        {formErrors.email}
+                                                    </motion.p>
+                                                )}
+                                            </motion.div>
+                                            <motion.div
+                                                variants={itemVariants}
+                                                className="grid gap-2"
+                                            >
+                                                <Label
+                                                    htmlFor="password"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Password
+                                                </Label>
+                                                <Input
+                                                    id="password"
+                                                    type="password"
+                                                    value={newAccount.password}
+                                                    onChange={(e) => {
+                                                        setNewAccount({
+                                                            ...newAccount,
+                                                            password:
+                                                                e.target.value,
+                                                        });
+                                                        if (
+                                                            formErrors.password
+                                                        ) {
+                                                            setFormErrors({
+                                                                ...formErrors,
+                                                                password: '',
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={
+                                                        formErrors.password
+                                                            ? 'border-red-500'
+                                                            : ''
+                                                    }
+                                                    placeholder="Enter password"
+                                                />
+                                                {formErrors.password && (
+                                                    <motion.p
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        className="text-sm text-red-500"
+                                                    >
+                                                        {formErrors.password}
+                                                    </motion.p>
+                                                )}
+                                            </motion.div>
+                                            <motion.div
+                                                variants={itemVariants}
+                                                className="grid gap-2"
+                                            >
+                                                <Label
+                                                    htmlFor="confirmPassword"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Confirm Password
+                                                </Label>
+                                                <Input
+                                                    id="confirmPassword"
+                                                    type="password"
+                                                    value={
+                                                        newAccount.confirmPassword
+                                                    }
+                                                    onChange={(e) => {
+                                                        setNewAccount({
+                                                            ...newAccount,
+                                                            confirmPassword:
+                                                                e.target.value,
+                                                        });
+                                                        if (
+                                                            formErrors.confirmPassword
+                                                        ) {
+                                                            setFormErrors({
+                                                                ...formErrors,
+                                                                confirmPassword:
+                                                                    '',
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={
+                                                        formErrors.confirmPassword
+                                                            ? 'border-red-500'
+                                                            : ''
+                                                    }
+                                                    placeholder="Confirm password"
+                                                />
+                                                {formErrors.confirmPassword && (
+                                                    <motion.p
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        className="text-sm text-red-500"
+                                                    >
+                                                        {
+                                                            formErrors.confirmPassword
+                                                        }
+                                                    </motion.p>
+                                                )}
+                                            </motion.div>
+                                            <motion.div
+                                                variants={itemVariants}
+                                                className="grid gap-2"
+                                            >
+                                                <Label
+                                                    htmlFor="role"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Role
+                                                </Label>
+                                                <Select
+                                                    value={newAccount.role}
+                                                    onValueChange={(value) =>
+                                                        setNewAccount({
+                                                            ...newAccount,
+                                                            role: value,
+                                                        })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select role" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="seller">
+                                                            Seller
+                                                        </SelectItem>
+                                                        <SelectItem value="customer">
+                                                            Customer
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </motion.div>
+                                        </div>
+                                        <DialogFooter>
+                                            <motion.div
+                                                className="flex gap-2"
+                                                variants={itemVariants}
+                                            >
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={handleCloseDialog}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    onClick={handleAddAccount}
+                                                >
+                                                    Add Account
+                                                </Button>
+                                            </motion.div>
+                                        </DialogFooter>
+                                    </motion.div>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
             </Body>
             <Footer />
         </div>

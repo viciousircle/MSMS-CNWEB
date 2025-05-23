@@ -8,6 +8,36 @@ import { useFetchOrders } from '@/hooks/order/useFetchOrders.hook';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
 import Footer from '@/components/Structure/Footer';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+    exit: {
+        opacity: 0,
+        y: -20,
+        transition: {
+            duration: 0.3,
+        },
+    },
+};
 
 const Order = () => {
     const { orders, loading, error, refetch } = useFetchOrders();
@@ -36,27 +66,62 @@ const Order = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <HeaderWithIcon
+                        icon={InboxArrowDownIcon}
+                        title="My Orders"
+                    />
+                </motion.div>
                 <div className="px-4">
-                    <div className="mb-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="mb-6"
+                    >
                         <StatusSelector
                             activeTab={activeTab}
                             setActiveTab={setActiveTab}
                         />
-                    </div>
-                    <div className="space-y-4">
-                        {filteredOrders.length > 0 ? (
-                            filteredOrders.map((order) => (
-                                <OrderItemAccordion
-                                    key={order._id}
-                                    order={order}
-                                    refetchOrders={refetch}
-                                />
-                            ))
-                        ) : (
-                            <EmptyState />
-                        )}
-                    </div>
+                    </motion.div>
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="space-y-4"
+                    >
+                        <AnimatePresence mode="wait">
+                            {filteredOrders.length > 0 ? (
+                                filteredOrders.map((order) => (
+                                    <motion.div
+                                        key={order._id}
+                                        variants={itemVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        layout
+                                    >
+                                        <OrderItemAccordion
+                                            order={order}
+                                            refetchOrders={refetch}
+                                        />
+                                    </motion.div>
+                                ))
+                            ) : (
+                                <motion.div
+                                    variants={itemVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    <EmptyState />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                 </div>
             </Body>
             <Footer />

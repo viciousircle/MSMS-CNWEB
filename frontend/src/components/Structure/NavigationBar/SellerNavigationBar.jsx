@@ -10,7 +10,7 @@ const SellerNavigationBar = () => {
         },
     ];
 
-    return <BaseNavigationBar brandLink="/dashboard" navLinks={navLinks} />;
+    return <BaseNavigationBar brandLink="/" navLinks={navLinks} />;
 };
 
 export default SellerNavigationBar;

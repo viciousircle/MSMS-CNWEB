@@ -20,6 +20,29 @@ import BillCard from '@/components/Cards/BillCard/BillCard';
 import PaymentDetails from '@/components/Payment/PaymentDetails';
 import QRPaymentDialog from '@/components/Payment/QRPaymentDialog';
 import OrderSuccessDialog from '@/components/Payment/OrderSuccessDialog';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+};
 
 const Payment = () => {
     const location = useLocation();
@@ -97,15 +120,35 @@ const Payment = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
-                <PaymentReceiverCard />
-                <PaymentDetails products={products} />
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <HeaderWithIcon icon={BanknotesIcon} title="Payment" />
+                </motion.div>
 
-                <BillCard
-                    merchandiseSubtotal={merchandiseSubtotal}
-                    shippingSubtotal={PAYMENT_CONSTANTS.SHIPPING_COST}
-                    onPaymentMethodChange={handlePaymentMethodChange}
-                />
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <motion.div variants={itemVariants}>
+                        <PaymentReceiverCard />
+                    </motion.div>
+
+                    <motion.div variants={itemVariants}>
+                        <PaymentDetails products={products} />
+                    </motion.div>
+
+                    <motion.div variants={itemVariants}>
+                        <BillCard
+                            merchandiseSubtotal={merchandiseSubtotal}
+                            shippingSubtotal={PAYMENT_CONSTANTS.SHIPPING_COST}
+                            onPaymentMethodChange={handlePaymentMethodChange}
+                        />
+                    </motion.div>
+                </motion.div>
 
                 <QRPaymentDialog
                     isOpen={isQRDialogOpen}

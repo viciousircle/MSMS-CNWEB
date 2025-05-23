@@ -14,6 +14,41 @@ import { useSignUp } from '@/hooks/auth/useSignUp.hook';
 import { Link } from 'react-router-dom';
 import { Chrome } from 'lucide-react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.6,
+            ease: 'easeOut',
+        },
+    },
+};
+
+const formVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const fieldVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            duration: 0.5,
+        },
+    },
+};
 
 const formFields = [
     {
@@ -86,26 +121,42 @@ const SignUp = ({ className, ...props }) => {
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
             <div className="w-full max-w-sm">
-                <div
+                <motion.div
                     className={cn('flex flex-col gap-6', className)}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
                     {...props}
                 >
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-2xl text-center">
-                                Sign Up
-                            </CardTitle>
-                            <CardDescription>
-                                Enter your information to create an account
-                            </CardDescription>
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                                <CardTitle className="text-2xl text-center">
+                                    Sign Up
+                                </CardTitle>
+                                <CardDescription>
+                                    Enter your information to create an account
+                                </CardDescription>
+                            </motion.div>
                         </CardHeader>
                         <CardContent>
-                            <form
+                            <motion.form
                                 onSubmit={handleSubmit}
                                 className="flex flex-col gap-4"
+                                variants={formVariants}
+                                initial="hidden"
+                                animate="visible"
                             >
                                 {formFields.map((field) => (
-                                    <div key={field.id} className="grid gap-2">
+                                    <motion.div
+                                        key={field.id}
+                                        className="grid gap-2"
+                                        variants={fieldVariants}
+                                    >
                                         <Label htmlFor={field.id}>
                                             {field.label}
                                         </Label>
@@ -117,32 +168,46 @@ const SignUp = ({ className, ...props }) => {
                                             value={formData[field.id]}
                                             onChange={handleChange}
                                         />
-                                    </div>
+                                    </motion.div>
                                 ))}
                                 {error && (
-                                    <p className="text-red-500 text-sm">
+                                    <motion.p
+                                        className="text-red-500 text-sm"
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
                                         {error}
-                                    </p>
+                                    </motion.p>
                                 )}
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    disabled={isSubmitting}
+                                <motion.div variants={fieldVariants}>
+                                    <Button
+                                        type="submit"
+                                        className="w-full"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting
+                                            ? 'Signing Up...'
+                                            : 'Sign Up'}
+                                    </Button>
+                                </motion.div>
+
+                                <motion.div variants={fieldVariants}>
+                                    <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
+                                        <div className="flex justify-center">
+                                            <GoogleLogin
+                                                onSuccess={handleGoogleSuccess}
+                                                onError={handleGoogleError}
+                                                useOneTap={false}
+                                            />
+                                        </div>
+                                    </GoogleOAuthProvider>
+                                </motion.div>
+
+                                <motion.p
+                                    className="text-sm text-center text-gray-400"
+                                    variants={fieldVariants}
                                 >
-                                    {isSubmitting ? 'Signing Up...' : 'Sign Up'}
-                                </Button>
-
-                                <GoogleOAuthProvider clientId="307929468741-krtae45ju48n573oouj2ksg61pm2p8li.apps.googleusercontent.com">
-                                    <div className="flex justify-center">
-                                        <GoogleLogin
-                                            onSuccess={handleGoogleSuccess}
-                                            onError={handleGoogleError}
-                                            useOneTap={false}
-                                        />
-                                    </div>
-                                </GoogleOAuthProvider>
-
-                                <p className="text-sm text-center text-gray-400">
                                     Already have an account?{' '}
                                     <Link
                                         to="/login"
@@ -150,11 +215,11 @@ const SignUp = ({ className, ...props }) => {
                                     >
                                         Log In
                                     </Link>
-                                </p>
-                            </form>
+                                </motion.p>
+                            </motion.form>
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
