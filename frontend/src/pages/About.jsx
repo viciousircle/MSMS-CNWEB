@@ -19,12 +19,12 @@ import { motion } from 'framer-motion';
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 },
+    transition: { duration: 0.8 },
 };
 
 const cardHover = {
-    scale: 1.03,
-    transition: { duration: 0.3 },
+    scale: 1.01,
+    transition: { duration: 0.5 },
 };
 
 const About = () => {
@@ -45,7 +45,7 @@ const About = () => {
                             animate="animate"
                             variants={fadeInUp}
                         >
-                            <h2 className="text-4xl tracking-widest font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-gray-600 bg-clip-text text-transparent text-center">
+                            <h2 className="text-4xl tracking-widest font-bold  bg-gradient-to-r from-purple-800 to-gray-300 bg-clip-text text-transparent text-center ">
                                 Project MSMS CN WEB
                             </h2>
                             <div className="grid md:grid-cols-1 gap-8">
@@ -55,12 +55,6 @@ const About = () => {
                                 >
                                     <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-gray-300 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
                                     <div className="relative bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-lg">
-                                        <div className="flex items-center mb-4">
-                                            <SparklesIcon className="h-6 w-6 text-purple-500 mr-2" />
-                                            <h3 className="text-xl font-semibold text-gray-800">
-                                                Giới thiệu Dự án
-                                            </h3>
-                                        </div>
                                         <p className="text-gray-700 leading-relaxed mb-6">
                                             Chào mừng bạn đến với dự án MSMS CN
                                             WEB! Đây là một dự án của môn học
