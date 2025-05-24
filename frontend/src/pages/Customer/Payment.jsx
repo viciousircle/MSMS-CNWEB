@@ -6,11 +6,11 @@ import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
 import { useQRPayment } from '@/hooks/payment/useQRPayment.hook';
 import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 import { calculateMerchandiseSubtotal } from '@/utils/payment/calculations';
 import {
     handlePaymentMethod,
     handlePrintInvoice,
-    handleTrackOrder,
 } from '@/utils/payment/methods';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
@@ -55,6 +55,9 @@ const Payment = () => {
     const [orderData, setOrderData] = useState(null);
     const [isOrderSuccessDialogOpen, setIsOrderSuccessDialogOpen] =
         useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+        ORDER_CONSTANTS.PAYMENT_METHODS.COD
+    );
 
     const {
         createOrder,
@@ -78,6 +81,7 @@ const Payment = () => {
 
     const handlePaymentMethodChange = (method) => {
         handlePaymentMethod(method, setIsQRDialogOpen);
+        setSelectedPaymentMethod(method);
     };
 
     const handleCheckout = async () => {
@@ -95,16 +99,20 @@ const Payment = () => {
 
         try {
             const data = buildOrderData(products, receiverInfo);
-            const order = await createOrder(data);
+            data.paymentMethod = selectedPaymentMethod;
+            const orderResponse = await createOrder(data);
+            const order = orderResponse.order;
 
-            // Generate QR code for the order
-            await generateQRPayment(
-                merchandiseSubtotal + PAYMENT_CONSTANTS.SHIPPING_COST,
-                order.id,
-                PAYMENT_CONSTANTS.BANK_INFO
-            );
+            if (selectedPaymentMethod === ORDER_CONSTANTS.PAYMENT_METHODS.QR) {
+                // Generate QR code for the order
+                await generateQRPayment(
+                    merchandiseSubtotal + PAYMENT_CONSTANTS.SHIPPING_COST,
+                    order.id,
+                    PAYMENT_CONSTANTS.BANK_INFO
+                );
+            }
 
-            setOrderData(data);
+            setOrderData(order);
             setIsQRDialogOpen(false);
             setIsOrderSuccessDialogOpen(true);
         } catch (err) {
@@ -150,6 +158,7 @@ const Payment = () => {
                             merchandiseSubtotal={merchandiseSubtotal}
                             shippingSubtotal={PAYMENT_CONSTANTS.SHIPPING_COST}
                             onPaymentMethodChange={handlePaymentMethodChange}
+                            onCheckout={handleCheckout}
                         />
                     </motion.div>
                 </motion.div>
@@ -172,7 +181,7 @@ const Payment = () => {
                     onOpenChange={setIsOrderSuccessDialogOpen}
                     orderData={orderData}
                     onPrint={() => handlePrintInvoice()}
-                    onTrackOrder={() => handleTrackOrder(orderData)}
+                    error={error || orderError}
                 />
             </Body>
             <Footer />

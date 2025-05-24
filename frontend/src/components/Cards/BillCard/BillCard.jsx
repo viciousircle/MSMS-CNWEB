@@ -3,33 +3,21 @@ import { formatPrice } from '/utils/formatPrice';
 import BillHeader from './BillHeader';
 import BillRow from './BillRow';
 import { PaymentMethodSelector } from '@/components/Selectors/PaymentMethodSelector';
-import OrderDialog from '@/components/Others/OrderDialog';
-import { useLocation } from 'react-router-dom';
-import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 
 const BillCard = ({
     merchandiseSubtotal,
     shippingSubtotal,
     onPaymentMethodChange,
+    onCheckout,
 }) => {
-    const location = useLocation();
-    const products = location.state?.products || [];
-    const [receiverInfo, setReceiverInfo] = React.useState(null);
-
-    React.useEffect(() => {
-        const storedInfo = localStorage.getItem('receiverInfo');
-        if (storedInfo) {
-            setReceiverInfo(JSON.parse(storedInfo));
-        }
-    }, []);
-
     const paymentMethods = [
         {
-            value: PAYMENT_CONSTANTS.PAYMENT_METHODS.CASH,
+            value: ORDER_CONSTANTS.PAYMENT_METHODS.COD,
             label: 'Cash on Delivery',
         },
         {
-            value: PAYMENT_CONSTANTS.PAYMENT_METHODS.QR,
+            value: ORDER_CONSTANTS.PAYMENT_METHODS.QR,
             label: 'VietQR Payment',
         },
     ];
@@ -75,29 +63,20 @@ const BillCard = ({
                                 containerClass="border-b"
                             />
                             <BillRow
-                                label="Total Payment"
+                                label="Total"
                                 value={format(total)}
-                                labelClass="font-bold py-4 text-amber-900"
-                                customValueClass="font-semibold text-amber-900"
-                                containerClass="text-amber-900 items-center"
+                                containerClass="items-center border-b"
                             />
                         </div>
                     </div>
-                    <SectionDivider position="bottom" />
                 </div>
             </div>
-
-            <div className="text-center relative">
-                <SectionDivider position="top" />
-                <div className="text-lg font-medium flex justify-center w-full">
-                    <OrderDialog
-                        products={products}
-                        receiverInfo={receiverInfo}
-                        total={total}
-                    />
-                </div>
-                <SectionDivider position="bottom" />
-            </div>
+            <button
+                className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-full"
+                onClick={onCheckout}
+            >
+                Check out
+            </button>
         </div>
     );
 };

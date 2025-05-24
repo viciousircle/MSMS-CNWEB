@@ -1,18 +1,39 @@
 import React from 'react';
 import DeliveryInformation from './DeliveryInformation';
 import OrderItems from './OrderItems';
-import OrderMetadata from './OrderMetadata';
+import { formatDisplayId } from '/utils/idConverter';
 
 const OrderSummary = ({ order }) => (
     <div className="space-y-3">
-        <DeliveryInformation receiverInformation={order.receiverInformation} />
+        {order?.receiverInformation && (
+            <div className="border-b pb-3">
+                <h3 className="font-semibold text-gray-900">
+                    Delivery Information
+                </h3>
+                <p>
+                    <strong>Receiver:</strong>{' '}
+                    {order.receiverInformation.receiverName}
+                </p>
+                <p>
+                    <strong>Phone:</strong>{' '}
+                    {order.receiverInformation.receiverPhone}
+                </p>
+                <p>
+                    <strong>Address:</strong>{' '}
+                    {order.receiverInformation.receiverAddress}
+                </p>
+            </div>
+        )}
 
         <div className="border-b pb-3">
             <h3 className="font-semibold text-gray-900">Payment Method</h3>
             <p>{order.paymentMethod}</p>
         </div>
 
-        <OrderItems orderItems={order.orderItems} />
+        <div>
+            <h3 className="font-semibold text-gray-900">Order Items</h3>
+            <OrderItems orderItems={order.orderItems} />
+        </div>
 
         {order.totalAmount && (
             <div className="border-t pt-3 text-right font-semibold">
@@ -20,7 +41,14 @@ const OrderSummary = ({ order }) => (
             </div>
         )}
 
-        <OrderMetadata orderDate={order.orderDate} />
+        <div className="text-sm text-gray-500 mt-4">
+            Order ID: {order._id ? formatDisplayId(order._id, '#') : 'N/A'}
+            <br />
+            Date:{' '}
+            {order.orderDate
+                ? new Date(order.orderDate).toLocaleString()
+                : 'N/A'}
+        </div>
     </div>
 );
 

@@ -1,7 +1,7 @@
-import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 
 export const handlePaymentMethod = (method, setQRDialogOpen) => {
-    if (method === PAYMENT_CONSTANTS.PAYMENT_METHODS.QR) {
+    if (method === ORDER_CONSTANTS.PAYMENT_METHODS.QR) {
         setQRDialogOpen(true);
     } else {
         setQRDialogOpen(false);
