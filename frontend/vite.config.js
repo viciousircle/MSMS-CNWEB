@@ -6,6 +6,7 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [react(), tailwindcss()],
+    base: '/',
     resolve: {
         alias: {
             '@': path.resolve(
@@ -22,5 +23,10 @@ export default defineConfig({
                 secure: false,
             },
         },
+    },
+    build: {
+        outDir: 'dist',
+        assetsDir: 'assets',
+        sourcemap: true,
     },
 });
