@@ -16,25 +16,32 @@ const containerVariants = {
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.1,
+            staggerChildren: 0.2,
+            delayChildren: 0.3,
         },
     },
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30, scale: 0.98 },
     visible: {
         opacity: 1,
         y: 0,
+        scale: 1,
         transition: {
-            duration: 0.5,
+            type: 'spring',
+            stiffness: 80,
+            damping: 20,
+            mass: 1,
         },
     },
     exit: {
         opacity: 0,
-        y: -20,
+        y: -30,
+        scale: 0.98,
         transition: {
-            duration: 0.3,
+            duration: 0.25,
+            ease: 'easeInOut',
         },
     },
 };
@@ -66,21 +73,19 @@ const Order = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <HeaderWithIcon
-                        icon={InboxArrowDownIcon}
-                        title="My Orders"
-                    />
-                </motion.div>
+                <HeaderWithIcon icon={InboxArrowDownIcon} title="My Orders" />
+
                 <div className="px-4">
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        transition={{
+                            type: 'spring',
+                            stiffness: 100,
+                            damping: 25,
+                            mass: 1.2,
+                            delay: 0.3,
+                        }}
                         className="mb-6"
                     >
                         <StatusSelector

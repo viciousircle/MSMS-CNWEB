@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
@@ -16,36 +16,7 @@ import CartNotFound from '@/components/NotFounds/CartNotFound';
 import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
 import Footer from '@/components/Structure/Footer';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-        opacity: 1,
-        x: 0,
-        transition: {
-            duration: 0.5,
-        },
-    },
-    exit: {
-        opacity: 0,
-        x: 20,
-        transition: {
-            duration: 0.3,
-        },
-    },
-};
 
 const Cart = () => {
     const {
@@ -58,6 +29,8 @@ const Cart = () => {
         handleProductCheck,
         handleCheckAll,
     } = useCartState();
+
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     const {
         fetchCart,
@@ -80,6 +53,10 @@ const Cart = () => {
 
     useEffect(() => {
         fetchCart();
+        const timer = setTimeout(() => {
+            setIsInitialLoad(false);
+        }, 1000);
+        return () => clearTimeout(timer);
     }, [fetchCart]);
 
     const error = fetchError || updateError || deleteError;
@@ -92,11 +69,7 @@ const Cart = () => {
         );
 
     const SelectAllSection = () => (
-        <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
+        <div>
             <Section>
                 <SectionItem
                     className="cursor-pointer"
@@ -110,54 +83,56 @@ const Cart = () => {
                     <div>Select All</div>
                 </SectionItem>
             </Section>
-        </motion.div>
+        </div>
     );
 
     const ProductList = () => (
-        <motion.div
-            className="flex flex-col gap-4"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-        >
+        <div className="flex flex-col gap-4">
             <Label titles={['Products', `${cart.length} ITEMS`]} />
             <CardLayout variant="linear">
-                <AnimatePresence>
-                    {cart.map((item) => (
-                        <motion.div
-                            key={item._id}
-                            variants={itemVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            layout
-                        >
-                            <CartProductCard
-                                product={item}
-                                isChecked={checkedProducts[item._id] || false}
-                                onCheckChange={handleProductCheck}
-                                onDelete={handleDeleteItem}
-                                onQuantityChange={updateQuantity}
-                            />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+                {cart.map((item) => (
+                    <div key={item._id}>
+                        <CartProductCard
+                            product={item}
+                            isChecked={checkedProducts[item._id] || false}
+                            onCheckChange={handleProductCheck}
+                            onDelete={handleDeleteItem}
+                            onQuantityChange={updateQuantity}
+                        />
+                    </div>
+                ))}
             </CardLayout>
-        </motion.div>
+        </div>
     );
 
     const CartContent = () => {
         if (cart.length === 0) return <CartNotFound />;
 
         return (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <SelectAllSection />
-                <ProductList />
-            </motion.div>
+            <AnimatePresence>
+                {isInitialLoad && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{
+                            type: 'spring',
+                            stiffness: 100,
+                            damping: 15,
+                            delay: 0.1,
+                        }}
+                    >
+                        <SelectAllSection />
+                        <ProductList />
+                    </motion.div>
+                )}
+                {!isInitialLoad && (
+                    <div>
+                        <SelectAllSection />
+                        <ProductList />
+                    </div>
+                )}
+            </AnimatePresence>
         );
     };
 
@@ -167,33 +142,16 @@ const Cart = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
-                </motion.div>
+                <HeaderWithIcon icon={ShoppingCartIcon} title="Cart" />
                 <CartContent />
             </Body>
 
-            <AnimatePresence>
-                {shouldShowCartTotal && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <CartTotal
-                            products={cart.filter(
-                                (p) => checkedProducts[p._id]
-                            )}
-                            checkedProducts={checkedProducts}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {shouldShowCartTotal && (
+                <CartTotal
+                    products={cart.filter((p) => checkedProducts[p._id])}
+                    checkedProducts={checkedProducts}
+                />
+            )}
             <Footer />
         </div>
     );

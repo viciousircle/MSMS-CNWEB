@@ -79,7 +79,6 @@ const Store = () => {
                             <motion.div
                                 key={product.id}
                                 variants={itemVariants}
-                                whileHover={{ scale: 1.02 }}
                                 transition={{ duration: 0.2 }}
                             >
                                 <StandardProductCard
