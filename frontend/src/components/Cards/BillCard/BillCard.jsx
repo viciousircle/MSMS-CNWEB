@@ -71,12 +71,14 @@ const BillCard = ({
                     </div>
                 </div>
             </div>
-            <button
-                className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-full"
-                onClick={onCheckout}
-            >
-                Check out
-            </button>
+            <div className="flex justify-center">
+                <button
+                    className="bg-black text-white px-16 py-2 shadow-inner hover:text-black hover:bg-gray-950/5 transition duration-300 cursor-pointer tracking-widest font-medium font-serif uppercase w-fit "
+                    onClick={onCheckout}
+                >
+                    Check out
+                </button>
+            </div>
         </div>
     );
 };
