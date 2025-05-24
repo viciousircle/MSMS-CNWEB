@@ -14,6 +14,9 @@ import BuyButton from '../Buttons/BuyButton';
 import QuantitySelector from '../Selectors/QuantitySelector';
 import ColorSelector from '../Selectors/ColorSelector';
 import useProductOptions from '@/hooks/useProductOption.hook';
+import { toast } from 'sonner';
+import { XCircle } from 'lucide-react';
+
 const OptionDrawer = ({ product }) => {
     const { name, colors, image, price, _id } = product;
 
@@ -35,6 +38,19 @@ const OptionDrawer = ({ product }) => {
         color: selectedColor,
         quantity,
         price,
+    };
+
+    const handleBuyClick = (e) => {
+        if (currentColorStock <= 0) {
+            e.preventDefault();
+            toast(
+                <div className="flex items-center gap-2 text-red-600">
+                    <XCircle />
+                    <span>This product is out of stock!</span>
+                </div>
+            );
+            return;
+        }
     };
 
     return (
@@ -70,6 +86,7 @@ const OptionDrawer = ({ product }) => {
                             <BuyButton
                                 products={[productData]}
                                 className="flex-1 bg-black text-white hover:bg-gray-800 rounded-md text-sm flex justify-center items-center"
+                                onClick={handleBuyClick}
                             />
                         </div>
                         <CancelButton onClose={() => setIsOpen(false)} />
