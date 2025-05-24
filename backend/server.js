@@ -9,9 +9,30 @@ const port = process.env.PORT || 5678;
 connectDB();
 const app = express();
 
+// app.use(
+//     cors({
+//         origin: 'http://localhost:5173',
+//         credentials: true,
+//     })
+// );
+
+const allowedOrigins = [
+    'http://localhost:5173', // for local dev
+    'https://msms-cnweb-t8rk4pnjp-viciousircles-projects.vercel.app', // your Vercel preview domain
+    'https://msms-cnweb-vic.vercel.app', // your Vercel production domain
+];
+
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: function (origin, callback) {
+            // allow requests with no origin (like mobile apps, curl, etc.)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                return callback(null, true);
+            } else {
+                return callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true,
     })
 );
