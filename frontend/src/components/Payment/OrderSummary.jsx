@@ -31,7 +31,6 @@ const OrderSummary = ({ order }) => (
         </div>
 
         <div>
-            <h3 className="font-semibold text-gray-900">Order Items</h3>
             <OrderItems orderItems={order.orderItems} />
         </div>
 

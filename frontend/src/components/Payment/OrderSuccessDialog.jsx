@@ -12,13 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import OrderSummary from './OrderSummary';
 
-const OrderSuccessDialog = ({
-    isOpen,
-    onOpenChange,
-    orderData,
-    onPrint,
-    error,
-}) => {
+const OrderSuccessDialog = ({ isOpen, onOpenChange, orderData, error }) => {
     const navigate = useNavigate();
 
     const handleBackToStore = () => {
@@ -55,12 +49,7 @@ const OrderSuccessDialog = ({
                     <AlertDialogCancel onClick={handleBackToStore}>
                         Back to Store
                     </AlertDialogCancel>
-                    <button
-                        className="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md"
-                        onClick={onPrint}
-                    >
-                        Print Invoice
-                    </button>
+
                     {orderData && (
                         <AlertDialogAction onClick={handleTrackOrder}>
                             Track Order
