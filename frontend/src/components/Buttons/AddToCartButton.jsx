@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { CircleCheck, AlertTriangle, XCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAddToCart } from '@/hooks/cart/useAddToCart.hook';
@@ -78,7 +78,7 @@ const AddToCartButton = ({ onClose, product, selectedColor, quantity }) => {
             await addToCart(product._id, selectedColor, quantity);
             showToast(
                 'Item added to cart successfully!',
-                <CircleCheck />,
+                <CheckCircle2 />,
                 'text-green-600'
             );
             onClose();
