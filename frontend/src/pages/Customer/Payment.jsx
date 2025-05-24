@@ -47,7 +47,7 @@ const itemVariants = {
 const Payment = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
     const products = location.state?.products || [];
 
     const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
@@ -69,10 +69,10 @@ const Payment = () => {
     } = useQRPayment();
 
     useEffect(() => {
-        if (!isAuthenticated()) {
+        if (!loading && !isAuthenticated()) {
             navigate('/login', { state: { from: '/payment', products } });
         }
-    }, [isAuthenticated, navigate, products]);
+    }, [isAuthenticated, loading, navigate, products]);
 
     const merchandiseSubtotal = calculateMerchandiseSubtotal(products);
 
@@ -112,6 +112,10 @@ const Payment = () => {
             setError('Failed to place order. Please try again.');
         }
     };
+
+    if (loading) {
+        return null; // or a loading spinner
+    }
 
     if (!isAuthenticated()) {
         return null;
