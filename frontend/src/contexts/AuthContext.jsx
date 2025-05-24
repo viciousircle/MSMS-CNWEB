@@ -3,8 +3,14 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [role, setRole] = useState(null);
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+    const [role, setRole] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser).role : null;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -14,10 +20,16 @@ export const AuthProvider = ({ children }) => {
                 try {
                     const userData = await fetchUserData(token);
                     setUser(userData);
-                    setRole(userData.role); //* API returns a role field
+                    setRole(userData.role);
+                    localStorage.setItem('user', JSON.stringify(userData));
                 } catch (error) {
                     console.error('Failed to fetch user data:', error);
-                    logout();
+                    if (
+                        error.message === 'Session expired. Please login again.'
+                    ) {
+                        logout();
+                        window.location.href = '/login';
+                    }
                 }
             }
             setLoading(false);
@@ -26,15 +38,28 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const fetchUserData = async (token) => {
-        const response = await fetch('http://localhost:5678/api/users/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        if (!response.ok) {
+        try {
+            const response = await fetch('http://localhost:5678/api/users/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 401) {
+                throw new Error('Session expired. Please login again.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+
+            return await response.json();
+        } catch (error) {
+            if (error.message === 'Session expired. Please login again.') {
+                throw error;
+            }
             throw new Error('Failed to fetch user data');
         }
-        return await response.json();
     };
 
     const login = async (token) => {
@@ -58,7 +83,27 @@ export const AuthProvider = ({ children }) => {
         setRole(null);
     };
 
-    const isAuthenticated = () => !!user;
+    const isAuthenticated = () => {
+        const token = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('user');
+        if (!token || !savedUser) return false;
+
+        try {
+            // Check if token is expired
+            const tokenData = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = tokenData.exp * 1000; // Convert to milliseconds
+            if (Date.now() >= expirationTime) {
+                logout();
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Error checking token:', error);
+            logout();
+            return false;
+        }
+    };
+
     const isCustomer = () => role === 'customer';
     const isSeller = () => role === 'seller';
     const isAdmin = () => role === 'admin';

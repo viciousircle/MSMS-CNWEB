@@ -13,15 +13,30 @@ export const api = async (endpoint, options = {}) => {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`http://localhost:5678/api${endpoint}`, {
-        ...options,
-        headers,
-    });
+    try {
+        const response = await fetch(`http://localhost:5678/api${endpoint}`, {
+            ...options,
+            headers,
+        });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Request failed');
+        if (response.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+            throw new Error('Session expired. Please login again.');
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Request failed');
+        }
+
+        return await response.json();
+    } catch (error) {
+        if (error.message === 'Session expired. Please login again.') {
+            throw error;
+        }
+        throw new Error(error.message || 'Network error occurred');
     }
-
-    return await response.json();
 };
