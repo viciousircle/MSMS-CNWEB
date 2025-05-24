@@ -90,17 +90,19 @@ const App = () => {
         <>
             {getNavigationBar()}
 
-            <Routes>
-                <Route path="/" element={getHomeRoute()} />
-                {renderPublicRoutes()}
-                {renderCustomerRoutes()}
-                {isAuthenticated() &&
-                    user?.role === 'seller' &&
-                    renderSellerRoutes()}
-                {isAuthenticated() &&
-                    user?.role === 'admin' &&
-                    renderAdminRoutes()}
-            </Routes>
+            <main className="pt-4 md:pt-4">
+                <Routes>
+                    <Route path="/" element={getHomeRoute()} />
+                    {renderPublicRoutes()}
+                    {renderCustomerRoutes()}
+                    {isAuthenticated() &&
+                        user?.role === 'seller' &&
+                        renderSellerRoutes()}
+                    {isAuthenticated() &&
+                        user?.role === 'admin' &&
+                        renderAdminRoutes()}
+                </Routes>
+            </main>
 
             <Toaster />
         </>
