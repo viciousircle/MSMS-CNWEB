@@ -30,6 +30,7 @@ import ErrorState from '@/components/States/ErrorState';
 import Footer from '@/components/Structure/Footer';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '/utils/api';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -134,11 +135,8 @@ const ManageAccount = () => {
         }
 
         try {
-            const response = await fetch('/api/users', {
+            await api('/users', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     name: newAccount.name,
                     email: newAccount.email,
@@ -146,11 +144,6 @@ const ManageAccount = () => {
                     role: newAccount.role,
                 }),
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to add account');
-            }
 
             // Close dialog and reset form
             setIsAddDialogOpen(false);
@@ -164,11 +157,12 @@ const ManageAccount = () => {
             setFormErrors({});
 
             // Refresh the accounts list
-            // You might want to add a refresh function to your useAccountsLogic hook
-            window.location.reload(); // Temporary solution - replace with proper refresh logic
+            window.location.reload(); // This will be replaced with proper refresh logic
         } catch (error) {
+            console.error('Error adding account:', error);
             setFormErrors({
-                submit: error.message || 'Failed to add account',
+                submit:
+                    error.message || 'Failed to add account. Please try again.',
             });
         }
     };
@@ -508,8 +502,8 @@ const ManageAccount = () => {
                                                         <SelectItem value="seller">
                                                             Seller
                                                         </SelectItem>
-                                                        <SelectItem value="customer">
-                                                            Customer
+                                                        <SelectItem value="admin">
+                                                            Admin
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -517,20 +511,41 @@ const ManageAccount = () => {
                                         </div>
                                         <DialogFooter>
                                             <motion.div
-                                                className="flex gap-2"
+                                                className="flex flex-col gap-2 w-full"
                                                 variants={itemVariants}
                                             >
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={handleCloseDialog}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    onClick={handleAddAccount}
-                                                >
-                                                    Add Account
-                                                </Button>
+                                                {formErrors.submit && (
+                                                    <motion.p
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        className="text-sm text-red-500 text-center"
+                                                    >
+                                                        {formErrors.submit}
+                                                    </motion.p>
+                                                )}
+                                                <div className="flex gap-2 justify-end">
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={
+                                                            handleCloseDialog
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button
+                                                        onClick={
+                                                            handleAddAccount
+                                                        }
+                                                    >
+                                                        Add Account
+                                                    </Button>
+                                                </div>
                                             </motion.div>
                                         </DialogFooter>
                                     </motion.div>
