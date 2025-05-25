@@ -45,7 +45,6 @@ export const ViewDetailsSheet = ({
             setCurrentStage(newStage);
             onStageUpdated?.(newStage);
             toast.success(`Order status updated to ${newStage}`);
-            await refetch();
         } catch (error) {
             toast.error(`Failed to update status: ${error.message}`);
         }

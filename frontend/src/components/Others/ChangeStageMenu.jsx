@@ -57,9 +57,6 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             );
 
             await Promise.all(updatePromises);
-            toast.success(
-                `Updated ${selectedOrders.size} order(s) to ${newStage}`
-            );
         } catch (error) {
             toast.error('Failed to update order stages');
             console.error('Error updating stages:', error);
@@ -106,9 +103,6 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             );
 
             await Promise.all(updatePromises.filter(Boolean));
-            toast.success(
-                `Moved ${selectedOrders.size} order(s) to next stage`
-            );
         } catch (error) {
             toast.error('Failed to update order stages');
             console.error('Error updating stages:', error);
@@ -155,9 +149,6 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             );
 
             await Promise.all(updatePromises.filter(Boolean));
-            toast.success(
-                `Moved ${selectedOrders.size} order(s) to previous stage`
-            );
         } catch (error) {
             toast.error('Failed to update order stages');
             console.error('Error updating stages:', error);
