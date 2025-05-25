@@ -39,11 +39,14 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token) => {
         try {
-            const response = await fetch('http://localhost:5678/api/users/me', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+            const response = await fetch(
+                'https://msms-cnweb.onrender.com/api/users/me',
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
 
             if (response.status === 401) {
                 throw new Error('Session expired. Please login again.');

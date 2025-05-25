@@ -84,10 +84,7 @@ const SignUp = ({ className, ...props }) => {
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             const response = await fetch(
-                `${
-                    import.meta.env.VITE_API_URL ||
-                    'https://msms-cnweb.onrender.com'
-                }/api/users/google`,
+                'https://msms-cnweb.onrender.com/api/users/google',
                 {
                     method: 'POST',
                     headers: {
