@@ -9,19 +9,11 @@ const port = process.env.PORT || 5678;
 connectDB();
 const app = express();
 
-// app.use(
-//     cors({
-//         origin: 'http://localhost:5173',
-//         credentials: true,
-//     })
-// );
-
 const allowedOrigins = [
     'http://localhost:5173', // for local dev
     'https://msms-cnweb-t8rk4pnjp-viciousircles-projects.vercel.app', // your Vercel preview domain
     'https://msms-cnweb-v2.vercel.app', // your Vercel production domain
     'https://msms-cnweb-kwl2khm28-viciousircles-projects.vercel.app', // your new Vercel deployment
-    'https://msms-cnweb-v2-2dj5iv695-viciousircles-projects.vercel.app/',
 ];
 
 app.use(
@@ -30,12 +22,16 @@ app.use(
             // allow requests with no origin (like mobile apps, curl, etc.)
             if (!origin) return callback(null, true);
             if (allowedOrigins.indexOf(origin) !== -1) {
-                return callback(null, true);
+                callback(null, true);
             } else {
-                return callback(new Error('Not allowed by CORS'));
+                callback(new Error('Not allowed by CORS'));
             }
         },
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     })
 );
 
