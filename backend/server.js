@@ -19,7 +19,7 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:5173', // for local dev
     'https://msms-cnweb-t8rk4pnjp-viciousircles-projects.vercel.app', // your Vercel preview domain
-    'https://msms-cnweb-vic.vercel.app', // your Vercel production domain
+    'https://msms-cnweb-v2.vercel.app', // your Vercel production domain
     'https://msms-cnweb-kwl2khm28-viciousircles-projects.vercel.app', // your new Vercel deployment
 ];
 
