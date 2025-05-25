@@ -16,7 +16,6 @@ const ACCOUNT_TABLE_COLUMNS = [
     { id: 'email', label: 'Email', width: '250px' },
     { id: 'role', label: 'Role', width: '120px' },
     { id: 'createdAt', label: 'Created At', width: '150px' },
-    { id: 'actions', label: 'Actions', width: '120px' },
 ];
 
 export const AccountTable = ({ accounts, onUpdate, onDelete }) => {

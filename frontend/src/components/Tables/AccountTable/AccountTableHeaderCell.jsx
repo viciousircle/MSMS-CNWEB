@@ -9,17 +9,21 @@ export const AccountTableHeaderCell = ({
 }) => {
     if (column.id === 'select') {
         return (
-            <TableHead style={{ width: column.width }}>
-                <Checkbox
-                    checked={allSelected}
-                    onCheckedChange={onSelectAll}
-                    aria-label="Select all"
-                />
+            <TableHead style={{ width: column.width }} className="text-center">
+                <div className="flex justify-center">
+                    <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={onSelectAll}
+                        aria-label="Select all"
+                    />
+                </div>
             </TableHead>
         );
     }
 
     return (
-        <TableHead style={{ width: column.width }}>{column.label}</TableHead>
+        <TableHead style={{ width: column.width }} className="text-center">
+            {column.label}
+        </TableHead>
     );
 };

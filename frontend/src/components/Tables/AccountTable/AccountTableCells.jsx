@@ -7,12 +7,14 @@ const AccountTableCells = ({ account }) => {
 
     return (
         <>
-            <TableCell className="font-medium">{name}</TableCell>
-            <TableCell>{email}</TableCell>
-            <TableCell>
+            <TableCell className="font-medium text-center">{name}</TableCell>
+            <TableCell className="text-center">{email}</TableCell>
+            <TableCell className="text-center">
                 <RoleBadge role={role} />
             </TableCell>
-            <TableCell>{new Date(createdAt).toLocaleString()}</TableCell>
+            <TableCell className="text-center">
+                {new Date(createdAt).toLocaleString()}
+            </TableCell>
         </>
     );
 };
