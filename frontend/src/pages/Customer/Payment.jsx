@@ -12,6 +12,7 @@ import {
     handlePaymentMethod,
     handlePrintInvoice,
 } from '@/utils/payment/methods';
+import { toast } from 'sonner';
 import Body from '@/components/Structure/Body';
 import { HeaderWithIcon } from '@/components/Structure/Header';
 import Footer from '@/components/Structure/Footer';
@@ -92,6 +93,9 @@ const Payment = () => {
 
         if (!validation.isValid) {
             setError(validation.errors[0]);
+            toast.error(
+                'Please provide complete receiver information before checkout.'
+            );
             return;
         }
 

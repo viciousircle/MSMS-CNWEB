@@ -54,6 +54,12 @@ const PaymentReceiverCard = () => {
         setIsDialogOpen(false);
     };
 
+    const handleClear = () => {
+        setReceiverInfo(INITIAL_RECEIVER_INFO);
+        setEditInfo(INITIAL_RECEIVER_INFO);
+        setIsDialogOpen(false);
+    };
+
     return (
         <div className="flex flex-col gap-0 mb-4">
             <div className="relative">
@@ -88,6 +94,7 @@ const PaymentReceiverCard = () => {
                                     updateEditInfo('phone', value)
                                 }
                                 onSubmit={handleSubmit}
+                                onClear={handleClear}
                             />
                         </DialogContent>
                     </Dialog>

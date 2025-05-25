@@ -17,6 +17,7 @@ export const EditForm = ({
     onAddressChange,
     onPhoneChange,
     onSubmit,
+    onClear,
 }) => {
     const [provinces] = useProvinces();
     const [districts] = useDistricts(editInfo.address.provinceCode);
@@ -200,9 +201,23 @@ export const EditForm = ({
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-                <Button type="submit" className="w-fit" disabled={!isFormValid}>
-                    Save changes
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-fit"
+                        onClick={onClear}
+                    >
+                        Clear
+                    </Button>
+                    <Button
+                        type="submit"
+                        className="w-fit"
+                        disabled={!isFormValid}
+                    >
+                        Save changes
+                    </Button>
+                </div>
             </DialogFooter>
         </form>
     );
