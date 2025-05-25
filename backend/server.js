@@ -20,17 +20,31 @@ app.use((req, res, next) => {
     next();
 });
 
-// Handle preflight requests explicitly
-app.options('*', cors());
+const allowedOrigins = [
+    'https://msms-cnweb-v2.vercel.app',
+    'http://localhost:5173',
+];
 
-// CORS configuration
 app.use(
     cors({
-        origin: 'https://msms-cnweb-v2.vercel.app',
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+
+            // Check if the origin is in the allowed list
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, origin); // Return the specific origin
+            }
+
+            const msg =
+                'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true,
-        maxAge: 86400, // 24 hours
+        credentials: true, // Explicitly allow credentials
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     })
 );
 
@@ -47,21 +61,6 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Add CORS headers to all responses
-app.use((req, res, next) => {
-    res.header(
-        'Access-Control-Allow-Origin',
-        'https://msms-cnweb-v2.vercel.app'
-    );
-    res.header(
-        'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS'
-    );
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
 
 app.use('/api/products', require('./routes/product.routes'));
 app.use('/api/users', require('./routes/user.routes'));

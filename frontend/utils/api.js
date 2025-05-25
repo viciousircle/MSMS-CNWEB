@@ -1,5 +1,4 @@
 export const api = async (endpoint, options = {}) => {
-    // * For debug purposes only
     console.log('API call details:', {
         endpoint,
         options,
@@ -14,7 +13,7 @@ export const api = async (endpoint, options = {}) => {
 
     const headers = {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...options.headers,
     };
 
@@ -47,7 +46,6 @@ export const api = async (endpoint, options = {}) => {
         });
 
         if (response.status === 401) {
-            // Token expired or invalid
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login';
