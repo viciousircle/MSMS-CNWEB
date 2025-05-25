@@ -15,10 +15,12 @@ export const api = async (endpoint, options = {}) => {
 
     try {
         const BASE_URL =
-            import.meta.env.VITE_API_URL || 'http://localhost:5678';
+            import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com';
         const response = await fetch(`${BASE_URL}/api${endpoint}`, {
             ...options,
             headers,
+            credentials: 'include',
+            mode: 'cors',
         });
 
         if (response.status === 401) {
