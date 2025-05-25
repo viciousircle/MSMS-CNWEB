@@ -32,6 +32,8 @@ const OptionDrawer = ({ product }) => {
         currentColorStock,
     } = useProductOptions(colors);
 
+    console.log('Drawer isOpen:', isOpen);
+
     const productData = {
         id: _id,
         name,
