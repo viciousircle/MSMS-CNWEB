@@ -21,6 +21,7 @@ const allowedOrigins = [
     'https://msms-cnweb-t8rk4pnjp-viciousircles-projects.vercel.app', // your Vercel preview domain
     'https://msms-cnweb-v2.vercel.app', // your Vercel production domain
     'https://msms-cnweb-kwl2khm28-viciousircles-projects.vercel.app', // your new Vercel deployment
+    'https://msms-cnweb-v2-2dj5iv695-viciousircles-projects.vercel.app/',
 ];
 
 app.use(
