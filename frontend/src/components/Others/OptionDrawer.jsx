@@ -26,6 +26,11 @@ const OptionDrawer = ({ product }) => {
         currentColorStock,
     } = useProductOptions(colors);
 
+    // Find the selected color object (if color-specific prices exist)
+    const selectedColorObj = colors?.find((c) => c.color === selectedColor);
+    // Use color-specific price if available, otherwise fallback to product price
+    const colorPrice = selectedColorObj?.price ?? price;
+
     useEffect(() => {
         if (isOpen) {
             document.body.classList.add('drawer-open');
@@ -44,7 +49,10 @@ const OptionDrawer = ({ product }) => {
         img: image,
         color: selectedColor,
         quantity,
-        price,
+        price:
+            typeof price === 'string'
+                ? parseFloat(price.replace(/[,.]/g, ''))
+                : price,
     };
 
     const handleBuyClick = (e) => {

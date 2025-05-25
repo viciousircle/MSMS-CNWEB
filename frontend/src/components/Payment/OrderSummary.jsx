@@ -5,9 +5,17 @@ import { formatDisplayId } from '/utils/idConverter';
 import { formatPrice } from '/utils/formatPrice';
 
 const OrderSummary = ({ order }) => {
-    const formattedTotal = order.totalAmount
-        ? formatPrice(order.totalAmount)
-        : '0';
+    // Use totalAmount or totalPayment
+    const totalRaw = order?.totalAmount ?? order?.totalPayment ?? 0;
+    const totalAmount =
+        typeof totalRaw === 'string'
+            ? parseFloat(totalRaw.replace(/[^0-9.-]+/g, ''))
+            : Number(totalRaw);
+    const formattedTotal = !isNaN(totalAmount) ? formatPrice(totalAmount) : '0';
+
+    // Use orderDate or createdAt
+    const dateRaw = order?.orderDate ?? order?.createdAt;
+    const formattedDate = dateRaw ? new Date(dateRaw).toLocaleString() : 'N/A';
 
     return (
         <div className="space-y-3">
@@ -40,19 +48,14 @@ const OrderSummary = ({ order }) => {
                 <OrderItems orderItems={order.orderItems} />
             </div>
 
-            {order.totalAmount && (
-                <div className="border-t pt-3 text-right font-semibold">
-                    Total: {formattedTotal} VND
-                </div>
-            )}
+            <div className="border-t pt-3 text-right font-semibold">
+                Total: {formattedTotal} VND
+            </div>
 
             <div className="text-sm text-gray-500 mt-4">
                 Order ID: {order._id ? formatDisplayId(order._id, '#') : 'N/A'}
                 <br />
-                Date:{' '}
-                {order.orderDate
-                    ? new Date(order.orderDate).toLocaleString()
-                    : 'N/A'}
+                Date: {formattedDate}
             </div>
         </div>
     );
