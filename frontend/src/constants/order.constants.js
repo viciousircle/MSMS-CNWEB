@@ -18,7 +18,7 @@ export const ORDER_CONSTANTS = {
         UNPAID: 'Unpaid',
     },
 
-    DEFAULT_SHIPPING_COST: 30.0,
+    DEFAULT_SHIPPING_COST: 30000,
     DEFAULT_CURRENCY: 'VND',
     DEFAULT_CURRENCY_SYMBOL: '$',
 };

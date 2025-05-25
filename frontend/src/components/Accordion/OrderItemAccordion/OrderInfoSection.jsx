@@ -13,13 +13,32 @@ import {
 const InfoRow = ({ icon: Icon, text, children }) => (
     <div className="flex items-center gap-2">
         <Icon className="h-5 w-5 text-gray-500" />
-        <div>{text || children}</div>
+        <div className="text-sm break-words whitespace-normal">
+            {text || children}
+        </div>
     </div>
 );
 
+// Helper to calculate estimated delivery date
+const getEstimatedDelivery = (orderDate) => {
+    if (!orderDate) return 'N/A';
+    let date = new Date(orderDate);
+    if (isNaN(date)) {
+        // Try Date.parse for formatted strings
+        const parsed = Date.parse(orderDate);
+        if (!isNaN(parsed)) {
+            date = new Date(parsed);
+        } else {
+            return 'N/A';
+        }
+    }
+    date.setDate(date.getDate() + 3);
+    return date.toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
+};
+
 const OrderInfoSection = ({ order }) => {
     return (
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1/2 flex flex-col gap-4">
             <div className="border border-gray-200 p-4 rounded-lg h-fit">
                 <h3 className="text-base font-medium text-black mb-4">
                     Shipping address
@@ -57,7 +76,11 @@ const OrderInfoSection = ({ order }) => {
                     />
                     <InfoRow
                         icon={CheckIcon}
-                        text="Estimated delivery: 2025-05-10"
+                        text={`Estimated delivery: ${getEstimatedDelivery(
+                            order.createdAtRaw ||
+                                order.createdAt ||
+                                order.orderDate
+                        )}`}
                     />
                 </div>
             </div>

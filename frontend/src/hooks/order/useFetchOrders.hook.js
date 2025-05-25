@@ -14,6 +14,7 @@ export const useFetchOrders = () => {
             const ordersData = Array.isArray(response.orders)
                 ? response.orders.map((order) => ({
                       ...order,
+                      createdAtRaw: order.createdAt,
                       createdAt: new Date(order.createdAt).toLocaleString(
                           'en-US',
                           {

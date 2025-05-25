@@ -11,8 +11,12 @@ const AccordionDetails = ({ order, refetchOrders }) => {
     return (
         <div className="px-4 py-2 flex flex-col gap-4">
             <div className="flex gap-4">
-                <OrderItemsSection items={order.orderItems} />
-                <OrderInfoSection order={order} />
+                <div className="flex-[3] min-w-0">
+                    <OrderItemsSection items={order.orderItems} />
+                </div>
+                <div className="flex-[1] min-w-0">
+                    <OrderInfoSection order={order} />
+                </div>
             </div>
             {['New', 'Prepare'].includes(order.currentStage) && (
                 <div className="flex justify-end">
