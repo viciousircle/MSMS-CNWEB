@@ -28,6 +28,60 @@ const availableColors = [
     'Purple',
 ];
 
+// Tech product categories and names
+const techProducts = [
+    {
+        category: 'Smartphone',
+        names: [
+            'iPhone 15 Pro',
+            'Samsung Galaxy S24',
+            'Google Pixel 8',
+            'OnePlus 12',
+            'Xiaomi 14',
+        ],
+    },
+    {
+        category: 'Laptop',
+        names: [
+            'MacBook Pro M3',
+            'Dell XPS 15',
+            'Lenovo ThinkPad X1',
+            'HP Spectre x360',
+            'ASUS ROG Zephyrus',
+        ],
+    },
+    {
+        category: 'Tablet',
+        names: [
+            'iPad Pro',
+            'Samsung Galaxy Tab S9',
+            'Microsoft Surface Pro',
+            'Lenovo Yoga Tab',
+            'Amazon Fire HD',
+        ],
+    },
+    {
+        category: 'Headphones',
+        names: [
+            'AirPods Pro',
+            'Sony WH-1000XM5',
+            'Bose QuietComfort 45',
+            'Samsung Galaxy Buds Pro',
+            'Beats Studio Pro',
+        ],
+    },
+    {
+        category: 'Smartwatch',
+        names: [
+            'Apple Watch Series 9',
+            'Samsung Galaxy Watch 6',
+            'Garmin Fenix 7',
+            'Fitbit Sense 2',
+            'Amazfit GTR 4',
+        ],
+    },
+];
+
 const seedProducts = async (count = 20) => {
     try {
         // Clear existing products
@@ -59,11 +113,49 @@ const seedProducts = async (count = 20) => {
                 }
             }
 
+            // Select random product category and name
+            const category =
+                techProducts[
+                    faker.number.int({ min: 0, max: techProducts.length - 1 })
+                ];
+            const productName =
+                category.names[
+                    faker.number.int({ min: 0, max: category.names.length - 1 })
+                ];
+
+            // Generate appropriate price based on category
+            let minPrice, maxPrice;
+            switch (category.category) {
+                case 'Smartphone':
+                    minPrice = 5000000;
+                    maxPrice = 30000000;
+                    break;
+                case 'Laptop':
+                    minPrice = 15000000;
+                    maxPrice = 50000000;
+                    break;
+                case 'Tablet':
+                    minPrice = 5000000;
+                    maxPrice = 20000000;
+                    break;
+                case 'Headphones':
+                    minPrice = 1000000;
+                    maxPrice = 8000000;
+                    break;
+                case 'Smartwatch':
+                    minPrice = 2000000;
+                    maxPrice = 15000000;
+                    break;
+                default:
+                    minPrice = 1000000;
+                    maxPrice = 10000000;
+            }
+
             const product = {
-                name: faker.commerce.productName(),
+                name: productName,
                 image: productImages[i % productImages.length],
                 price: parseFloat(
-                    faker.commerce.price({ min: 10000000, max: 1000000000 })
+                    faker.commerce.price({ min: minPrice, max: maxPrice })
                 ),
                 colors: colorVariants,
                 rate: faker.number.float({ min: 0, max: 5, precision: 0.1 }),
