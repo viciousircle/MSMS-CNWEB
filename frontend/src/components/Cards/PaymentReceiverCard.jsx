@@ -55,7 +55,7 @@ const PaymentReceiverCard = () => {
     };
 
     return (
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-0 mb-4">
             <div className="relative">
                 <hr className="border-gray-950/5 absolute left-[-100%] right-[-100%] top-0" />
                 <div className="text-gray-700 text-pretty font-medium font-mono px-4 tracking-widest uppercase flex gap-4">

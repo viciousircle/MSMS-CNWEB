@@ -4,7 +4,7 @@ import CardLayout from '@/components/Layouts/CardLayout';
 import PaymentCard from '@/components/Cards/PaymentProductCard';
 
 const PaymentDetails = ({ products }) => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mb-4">
         <Label
             titles={[
                 'Products',
