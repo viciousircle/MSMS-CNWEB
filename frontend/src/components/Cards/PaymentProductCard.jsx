@@ -11,7 +11,7 @@ const PaymentProductCard = ({ product }) => {
 
     const formattedPrice = formatPrice(productTotal);
 
-    console.log(product.price);
+    // console.log(product.price);
 
     return (
         <div className="flex flex-col w-full gap-0">

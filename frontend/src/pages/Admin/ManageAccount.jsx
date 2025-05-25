@@ -185,7 +185,7 @@ const ManageAccount = () => {
         setFormErrors({});
     };
 
-    console.log('paginatedAccounts', paginatedAccounts);
+    // console.log('paginatedAccounts', paginatedAccounts);
 
     if (loading) {
         return <LoadingState icon={UsersIcon} title="Account Management" />;

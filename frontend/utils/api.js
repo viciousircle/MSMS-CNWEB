@@ -1,13 +1,14 @@
 export const api = async (endpoint, options = {}) => {
-    console.log('API call details:', {
-        endpoint,
-        options,
-        baseUrl:
-            import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com',
-        fullUrl: `${
-            import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com'
-        }/api${endpoint}`,
-    });
+    // * For debugging purposes
+    // console.log('API call details:', {
+    //     endpoint,
+    //     options,
+    //     baseUrl:
+    //         import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com',
+    //     fullUrl: `${
+    //         import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com'
+    //     }/api${endpoint}`,
+    // });
 
     const token = localStorage.getItem('token');
 
@@ -24,12 +25,14 @@ export const api = async (endpoint, options = {}) => {
     try {
         const BASE_URL =
             import.meta.env.VITE_API_URL || 'https://msms-cnweb.onrender.com';
-        console.log('Making request with config:', {
-            url: `${BASE_URL}/api${endpoint}`,
-            headers,
-            credentials: 'include',
-            mode: 'cors',
-        });
+
+        // * For debugging purposes
+        // console.log('Making request with config:', {
+        //     url: `${BASE_URL}/api${endpoint}`,
+        //     headers,
+        //     credentials: 'include',
+        //     mode: 'cors',
+        // });
 
         const response = await fetch(`${BASE_URL}/api${endpoint}`, {
             ...options,
@@ -39,11 +42,12 @@ export const api = async (endpoint, options = {}) => {
             cache: 'no-cache',
         });
 
-        console.log('Response headers:', {
-            status: response.status,
-            statusText: response.statusText,
-            headers: Object.fromEntries(response.headers.entries()),
-        });
+        // * For debugging purposes
+        // console.log('Response headers:', {
+        //     status: response.status,
+        //     statusText: response.statusText,
+        //     headers: Object.fromEntries(response.headers.entries()),
+        // });
 
         if (response.status === 401) {
             localStorage.removeItem('token');
@@ -63,7 +67,10 @@ export const api = async (endpoint, options = {}) => {
         }
 
         const data = await response.json();
-        console.log('API Response:', data);
+
+        // * For debugging purposes
+        // console.log('API Response:', data);
+
         return data;
     } catch (error) {
         console.error('API Error Details:', {

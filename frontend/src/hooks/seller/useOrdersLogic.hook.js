@@ -20,11 +20,10 @@ export const useOrdersLogic = () => {
     });
 
     const fetchOrders = async () => {
-        console.log('Fetching orders from backend');
+        // console.log('Fetching orders from backend');
         setStatus({ loading: true, error: null });
         try {
             const data = await api('/seller/orders');
-            console.log('Fetched orders:', data.orders);
             setOrders(data.orders);
         } catch (err) {
             console.error('Error in fetchOrders:', err);
@@ -44,12 +43,14 @@ export const useOrdersLogic = () => {
     const updateOrder = async (orderId, updatedFields) => {
         console.log('updateOrder called with:', { orderId, updatedFields });
         try {
-            console.log('Sending PUT request to backend');
+            // console.log('Sending PUT request to backend');
             const updatedOrder = await api(`/seller/orders/${orderId}`, {
                 method: 'PUT',
                 body: JSON.stringify(updatedFields),
             });
-            console.log('Backend response:', updatedOrder);
+
+            // * For debugging purposes
+            // console.log('Backend response:', updatedOrder);
 
             // Update the order in the local state
             setOrders((prev) => {
@@ -61,12 +62,12 @@ export const useOrdersLogic = () => {
                             ...updatedOrder,
                             orderStage: updatedFields.stage || order.orderStage,
                         };
-                        console.log('Updated order:', updated);
+                        // console.log('Updated order:', updated);
                         return updated;
                     }
                     return order;
                 });
-                console.log('New orders state:', newOrders);
+                // console.log('New orders state:', newOrders);
                 return newOrders;
             });
 
@@ -78,7 +79,7 @@ export const useOrdersLogic = () => {
     };
 
     const filteredOrders = useMemo(() => {
-        console.log('Filtering orders with:', { filters, orders });
+        // console.log('Filtering orders with:', { filters, orders });
         const filtered = orders.filter((order) => {
             const matchesTab =
                 filters.activeTab === 'all' ||
@@ -91,7 +92,7 @@ export const useOrdersLogic = () => {
 
             return matchesTab && matchesDate;
         });
-        console.log('Filtered orders:', filtered);
+        // console.log('Filtered orders:', filtered);
         return filtered;
     }, [orders, filters]);
 
