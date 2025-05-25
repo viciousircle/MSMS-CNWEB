@@ -44,6 +44,16 @@ input[type='number'] {
     ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
+[data-vaul-drawer] {
+    position: fixed !important;
+    z-index: 50 !important;
+}
+
+[data-vaul-drawer-content] {
+    position: relative !important;
+    z-index: 51 !important;
+}
+
 :root {
     --radius: 0.625rem;
     --background: oklch(1 0 0);
