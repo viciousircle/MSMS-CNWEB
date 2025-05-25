@@ -14,6 +14,7 @@ export const api = async (endpoint, options = {}) => {
 
     const headers = {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         ...options.headers,
     };
 
@@ -36,6 +37,7 @@ export const api = async (endpoint, options = {}) => {
             headers,
             credentials: 'include',
             mode: 'cors',
+            cache: 'no-cache',
         });
 
         console.log('Response headers:', {
@@ -53,7 +55,7 @@ export const api = async (endpoint, options = {}) => {
         }
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             console.error('API Error:', {
                 status: response.status,
                 statusText: response.statusText,
