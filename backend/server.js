@@ -41,12 +41,32 @@ app.use(
             return callback(new Error(msg), false);
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true, // Explicitly allow credentials
+        allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+        exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+        credentials: true,
         preflightContinue: false,
         optionsSuccessStatus: 204,
+        maxAge: 86400, // 24 hours
     })
 );
+
+// Add headers middleware to ensure CORS headers are always present
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, DELETE, OPTIONS'
+    );
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, Accept'
+    );
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 
 // Debug middleware for CORS response
 app.use((req, res, next) => {
