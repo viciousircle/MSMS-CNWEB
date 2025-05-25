@@ -1,16 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import {
-    Drawer,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-    DrawerDescription,
-} from '@/components/ui/drawer';
 import CancelButton from '../Buttons/CancelButton';
 import AddToCartButton from '../Buttons/AddToCartButton';
 import BuyButton from '../Buttons/BuyButton';
@@ -34,7 +26,17 @@ const OptionDrawer = ({ product }) => {
         currentColorStock,
     } = useProductOptions(colors);
 
-    console.log('Drawer isOpen:', isOpen);
+    useEffect(() => {
+        if (isOpen) {
+            document.body.classList.add('drawer-open');
+        } else {
+            document.body.classList.remove('drawer-open');
+        }
+
+        return () => {
+            document.body.classList.remove('drawer-open');
+        };
+    }, [isOpen]);
 
     const productData = {
         id: _id,
@@ -59,49 +61,89 @@ const OptionDrawer = ({ product }) => {
     };
 
     return (
-        <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerTrigger asChild>
-                <Button variant="outline">View Details</Button>
-            </DrawerTrigger>
-            <DrawerContent>
-                <div className="mx-auto w-full max-w-sm">
-                    <DrawerHeader>
-                        <DrawerTitle>{name}</DrawerTitle>
-                        <DrawerDescription>
-                            Select your preferred color and quantity
-                        </DrawerDescription>
-                    </DrawerHeader>
-                    <ColorSelector
-                        colors={colors}
-                        selectedColor={selectedColor}
-                        onColorChange={setSelectedColor}
-                    />
-                    <StockInfo stock={currentColorStock} />
-                    <QuantitySelector
-                        quantity={quantity}
-                        maxStock={currentColorStock}
-                        updateQuantity={updateQuantity}
-                        handleInputChange={handleInputChange}
-                    />
-                    <DrawerFooter>
-                        <div className="flex w-full gap-2">
-                            <AddToCartButton
-                                onClose={() => setIsOpen(false)}
-                                product={product}
-                                selectedColor={selectedColor}
-                                quantity={quantity}
-                            />
-                            <BuyButton
-                                products={[productData]}
-                                className="flex-1 bg-black text-white hover:bg-gray-800 rounded-md text-sm flex justify-center items-center"
-                                onClick={handleBuyClick}
-                            />
-                        </div>
-                        <CancelButton onClose={() => setIsOpen(false)} />
-                    </DrawerFooter>
-                </div>
-            </DrawerContent>
-        </Drawer>
+        <>
+            <Button variant="outline" onClick={() => setIsOpen(true)}>
+                View Details
+            </Button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsOpen(false)}
+                            className="fixed inset-0 bg-black/40 z-50"
+                        />
+
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{
+                                type: 'spring',
+                                damping: 25,
+                                stiffness: 300,
+                            }}
+                            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-lg"
+                        >
+                            <div className="mx-auto w-full max-w-sm">
+                                <div className="p-4">
+                                    <div className="mb-4">
+                                        <h2 className="text-lg font-semibold">
+                                            {name}
+                                        </h2>
+                                        <p className="text-sm text-gray-500">
+                                            Select your preferred color and
+                                            quantity
+                                        </p>
+                                    </div>
+
+                                    <ColorSelector
+                                        colors={colors}
+                                        selectedColor={selectedColor}
+                                        onColorChange={setSelectedColor}
+                                    />
+
+                                    <StockInfo stock={currentColorStock} />
+
+                                    <QuantitySelector
+                                        quantity={quantity}
+                                        maxStock={currentColorStock}
+                                        updateQuantity={updateQuantity}
+                                        handleInputChange={handleInputChange}
+                                    />
+
+                                    <div className="mt-4 space-y-2">
+                                        <div className="flex w-full gap-2">
+                                            <AddToCartButton
+                                                onClose={() => setIsOpen(false)}
+                                                product={product}
+                                                selectedColor={selectedColor}
+                                                quantity={quantity}
+                                            />
+                                            <BuyButton
+                                                products={[productData]}
+                                                className="flex-1 bg-black text-white hover:bg-gray-800 rounded-md text-sm flex justify-center items-center"
+                                                onClick={handleBuyClick}
+                                            />
+                                        </div>
+                                        <div className="flex w-full">
+                                            <CancelButton
+                                                onClose={() => setIsOpen(false)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     );
 };
 

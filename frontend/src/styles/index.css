@@ -1,1 +1,16 @@
 @import 'tailwindcss';
+
+/* Drawer styles */
+.drawer-open nav {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(8px);
+}
+
+.drawer-open nav * {
+    color: white !important;
+}
+
+/* Ensure smooth transitions */
+nav {
+    transition: all 0.3s ease-in-out;
+}
