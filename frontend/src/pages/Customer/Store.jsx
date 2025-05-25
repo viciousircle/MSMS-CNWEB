@@ -10,18 +10,6 @@ import Footer from '@/components/Structure/Footer';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
-
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -104,24 +92,6 @@ const Store = () => {
                     </CardLayout>
                 </motion.div>
             </Body>
-
-            <Drawer>
-                <DrawerTrigger>Open</DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                        <DrawerDescription>
-                            This action cannot be undone.
-                        </DrawerDescription>
-                    </DrawerHeader>
-                    <DrawerFooter>
-                        <Button>Submit</Button>
-                        <DrawerClose>
-                            <Button variant="outline">Cancel</Button>
-                        </DrawerClose>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
 
             <Footer />
         </div>
