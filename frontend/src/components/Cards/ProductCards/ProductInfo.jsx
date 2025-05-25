@@ -24,7 +24,7 @@ const ProductInfo = React.memo(
                 <span
                     className={`text-gray-400 text-sm font-mono ${priceClassName}`}
                 >
-                    {price}
+                    {price} VND
                 </span>
             )}
             {color && (

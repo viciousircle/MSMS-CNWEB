@@ -1,10 +1,10 @@
 /**
  * Formats a number as a price with thousand separators
  * @param {number|string} price - The price to format
- * @param {string} [separator='.'] - The thousand separator
+ * @param {string} [separator=','] - The thousand separator
  * @returns {string} Formatted price string
  */
-export const formatPrice = (price, separator = '.') => {
+export const formatPrice = (price, separator = ',') => {
     // Convert to number if it's a string
     const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
 
@@ -13,11 +13,11 @@ export const formatPrice = (price, separator = '.') => {
         return '0';
     }
 
-    // Format the number with thousand separators
-    return numericPrice
-        .toString()
-        .replace(/\D/g, '') // Remove any non-digit characters
-        .replace(/\B(?=(\d{3})+(?!\d))/g, separator); // Add separators
+    // Format the number with thousand separators without decimals
+    return numericPrice.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    });
 };
 
 /**

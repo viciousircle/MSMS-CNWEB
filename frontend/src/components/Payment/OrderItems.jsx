@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPrice } from '/utils/formatPrice';
 
 const OrderItems = ({ orderItems = [] }) => (
     <div>
@@ -19,13 +20,16 @@ const OrderItems = ({ orderItems = [] }) => (
                     typeof item.price === 'number'
                         ? item.price
                         : Number(item.price);
+                const formattedPrice = formatPrice(price);
+                const formattedTotal = formatPrice(price * item.quantity);
+
                 return (
                     <li key={index} className="flex justify-between">
                         <span>
                             {productName} ({item.color}) × {item.quantity}
                         </span>
                         {price && !isNaN(price) && (
-                            <span>${(price * item.quantity).toFixed(2)}</span>
+                            <span>{formattedTotal} VND</span>
                         )}
                     </li>
                 );

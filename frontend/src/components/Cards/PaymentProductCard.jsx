@@ -8,8 +8,8 @@ const PaymentProductCard = ({ product }) => {
             : product.price;
 
     const productTotal = rawPrice * product.quantity;
-
-    const formattedPrice = formatPrice(productTotal);
+    const formattedPrice = formatPrice(product.price);
+    const formattedTotal = formatPrice(productTotal);
 
     // console.log(product.price);
 
@@ -58,13 +58,13 @@ const PaymentProductCard = ({ product }) => {
                                     <div className="font-medium text-gray-400 pr-2">
                                         Price
                                     </div>
-                                    {product.price} VND
+                                    {formattedPrice} VND
                                 </div>
                                 <div className="border px-4 py-1 rounded-lg text-sm bg-white text-gray-800 font-mono cursor-not-allowed flex justify-between">
                                     <div className="font-medium text-gray-400 pr-2">
                                         Total
                                     </div>
-                                    <div className="">{formattedPrice} VND</div>
+                                    <div className="">{formattedTotal} VND</div>
                                 </div>
                             </div>
                         </div>

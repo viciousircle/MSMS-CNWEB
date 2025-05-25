@@ -3,6 +3,7 @@ import ProductImage from './ProductCards/ProductImage';
 import ProductInfo from './ProductCards/ProductInfo';
 import DeleteCartItemButton from '../Buttons/DeleteCartItemButton';
 import CartItemQuantity from './CartItemQuantity';
+import { formatPrice } from '/utils/formatPrice';
 
 const CartItemContent = ({
     id,
@@ -15,13 +16,15 @@ const CartItemContent = ({
     onQuantityChange,
     onDelete,
 }) => {
+    const formattedPrice = formatPrice(price);
+
     return (
         <div className="flex flex-col w-full gap-2 px-4 justify-center">
             <div className="flex justify-between items-center">
                 <div className="w-full">
                     <ProductInfo
                         name={name}
-                        price={price}
+                        price={`${formattedPrice}`}
                         color={color}
                         stock={stock}
                         dimmed={isOutOfStock}
