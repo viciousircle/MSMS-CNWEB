@@ -10,6 +10,7 @@ const BillCard = ({
     shippingSubtotal,
     onPaymentMethodChange,
     onCheckout,
+    selectedPaymentMethod,
 }) => {
     const paymentMethods = [
         {
@@ -57,6 +58,7 @@ const BillCard = ({
                                         onValueChange={
                                             handlePaymentMethodChange
                                         }
+                                        defaultValue={selectedPaymentMethod}
                                     />
                                 }
                                 customValueClass="bg-gray-950/2.5 "

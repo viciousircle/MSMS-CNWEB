@@ -81,8 +81,15 @@ const Payment = () => {
     const merchandiseSubtotal = calculateMerchandiseSubtotal(products);
 
     const handlePaymentMethodChange = (method) => {
+        console.log('Payment method changed to:', method);
         handlePaymentMethod(method, setIsQRDialogOpen);
         setSelectedPaymentMethod(method);
+    };
+
+    const handleQRDialogClose = () => {
+        console.log('QR Dialog closed, resetting to COD');
+        setIsQRDialogOpen(false);
+        setSelectedPaymentMethod(ORDER_CONSTANTS.PAYMENT_METHODS.COD);
     };
 
     const handleCheckout = async () => {
@@ -163,13 +170,14 @@ const Payment = () => {
                             shippingSubtotal={PAYMENT_CONSTANTS.SHIPPING_COST}
                             onPaymentMethodChange={handlePaymentMethodChange}
                             onCheckout={handleCheckout}
+                            selectedPaymentMethod={selectedPaymentMethod}
                         />
                     </motion.div>
                 </motion.div>
 
                 <QRPaymentDialog
                     isOpen={isQRDialogOpen}
-                    onOpenChange={setIsQRDialogOpen}
+                    onOpenChange={handleQRDialogClose}
                     total={
                         merchandiseSubtotal + PAYMENT_CONSTANTS.SHIPPING_COST
                     }
