@@ -1,16 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-    Drawer,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-    DrawerDescription,
-} from '@/components/ui/drawer';
+import dynamic from 'next/dynamic';
 import CancelButton from '../Buttons/CancelButton';
 import AddToCartButton from '../Buttons/AddToCartButton';
 import BuyButton from '../Buttons/BuyButton';
@@ -20,7 +12,47 @@ import useProductOptions from '@/hooks/useProductOption.hook';
 import { toast } from 'sonner';
 import { XCircle } from 'lucide-react';
 
+// Dynamically import Drawer components
+const Drawer = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.Drawer),
+    { ssr: false }
+);
+const DrawerContent = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerContent),
+    { ssr: false }
+);
+const DrawerFooter = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerFooter),
+    { ssr: false }
+);
+const DrawerHeader = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerHeader),
+    { ssr: false }
+);
+const DrawerTitle = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerTitle),
+    { ssr: false }
+);
+const DrawerDescription = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerDescription),
+    { ssr: false }
+);
+const DrawerTrigger = dynamic(
+    () => import('@/components/ui/drawer').then((mod) => mod.DrawerTrigger),
+    { ssr: false }
+);
+
 const OptionDrawer = ({ product }) => {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
+
     const { name, colors, image, price, _id } = product;
 
     const {
