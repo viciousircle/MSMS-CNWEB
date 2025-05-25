@@ -7,6 +7,7 @@ import {
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
+    DrawerDescription,
 } from '@/components/ui/drawer';
 import CancelButton from '../Buttons/CancelButton';
 import AddToCartButton from '../Buttons/AddToCartButton';
@@ -62,6 +63,9 @@ const OptionDrawer = ({ product }) => {
                 <div className="mx-auto w-full max-w-sm">
                     <DrawerHeader>
                         <DrawerTitle>{name}</DrawerTitle>
+                        <DrawerDescription>
+                            Select your preferred color and quantity
+                        </DrawerDescription>
                     </DrawerHeader>
                     <ColorSelector
                         colors={colors}
