@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     AlertDialog,
@@ -19,6 +19,25 @@ const OrderSuccessDialog = ({ isOpen, onOpenChange, orderData, error }) => {
         onOpenChange(false);
         navigate('/');
     };
+
+    useEffect(() => {
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape' && isOpen) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Esc key pressed');
+                handleBackToStore();
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('keydown', handleEscKey, true);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscKey, true);
+        };
+    }, [isOpen, onOpenChange, navigate]);
 
     const handleTrackOrder = () => {
         onOpenChange(false);
