@@ -1,13 +1,7 @@
 import React from 'react';
 import { ArrowPathRoundedSquareIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Popover } from '@headlessui/react';
 import { toast } from 'sonner';
 
 const STAGE_FLOW = ['New', 'Prepare', 'Shipping', 'Shipped'];
@@ -180,8 +174,8 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
     );
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        <Popover className="relative">
+            <Popover.Button asChild>
                 <Button
                     disabled={
                         selectedOrders.size === 0 || hasCancelledOrRejected
@@ -190,26 +184,35 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
                     <ArrowPathRoundedSquareIcon className="w-4 h-4 mr-1" />
                     Change Stage
                 </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleNextStage}>
-                    Next Stage
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {STAGE_FLOW.map((stage) => (
-                    <DropdownMenuItem
-                        key={stage}
-                        onClick={() => handleStageChange(stage)}
+            </Popover.Button>
+            <Popover.Panel className="absolute z-10 mt-2 bg-white shadow-lg rounded-md border border-gray-200 w-48">
+                <div className="p-1">
+                    <button
+                        onClick={handleNextStage}
+                        className="w-full text-left px-2 py-1.5 text-sm hover:bg-gray-100 rounded-sm"
                     >
-                        {stage}
-                    </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handlePreviousStage}>
-                    Previous Stage
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                        Next Stage
+                    </button>
+                    <div className="h-px bg-gray-200 my-1" />
+                    {STAGE_FLOW.map((stage) => (
+                        <button
+                            key={stage}
+                            onClick={() => handleStageChange(stage)}
+                            className="w-full text-left px-2 py-1.5 text-sm hover:bg-gray-100 rounded-sm"
+                        >
+                            {stage}
+                        </button>
+                    ))}
+                    <div className="h-px bg-gray-200 my-1" />
+                    <button
+                        onClick={handlePreviousStage}
+                        className="w-full text-left px-2 py-1.5 text-sm hover:bg-gray-100 rounded-sm"
+                    >
+                        Previous Stage
+                    </button>
+                </div>
+            </Popover.Panel>
+        </Popover>
     );
 };
 

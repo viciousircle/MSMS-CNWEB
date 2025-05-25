@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 import { OrderItemsTable } from '../Tables/OrderItemsTable/OrderItemsTable';
 import { useOrderDetails } from '@/hooks/seller/useOrderDetails.hook';
 import { useUpdateOrderStage } from '@/hooks/seller/useUpdateOrderStage';
@@ -17,6 +11,7 @@ import { ORDER_CONSTANTS } from '@/constants/order.constants';
 import ViewDetailsTrigger from './ViewDetailsTrigger';
 import ViewDetailsInfo from './ViewDetailsInfo';
 import ViewDetailsActions from './ViewDetailsActions';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export const ViewDetailsSheet = ({
     orderId,
@@ -72,61 +67,109 @@ export const ViewDetailsSheet = ({
 
     return (
         <div className="relative">
-            <Sheet open={open} onOpenChange={setOpen}>
-                <SheetTrigger asChild>
-                    <div>
-                        <ViewDetailsTrigger loading={loading} />
-                    </div>
-                </SheetTrigger>
+            <div onClick={() => setOpen(true)}>
+                <ViewDetailsTrigger loading={loading} />
+            </div>
 
-                <SheetContent className="sm:max-w-lg overflow-y-auto">
-                    <SheetHeader>
-                        <SheetTitle className="text-center">
-                            Order {formatDisplayId(orderId, 'ORD-')} Details
-                        </SheetTitle>
-                        <SheetDescription>
-                            {loading ? (
-                                <div>Loading...</div>
-                            ) : error ? (
-                                <div>Error: {error}</div>
-                            ) : !orderDetails ? (
-                                <div>Order not found</div>
-                            ) : (
-                                <>
-                                    <ViewDetailsInfo
-                                        orderDetails={orderDetails}
-                                        dateOrder={dateOrder}
-                                        paymentMethod={paymentMethod}
-                                        orderStage={currentStage}
-                                        paymentStatus={paymentStatus}
-                                    />
-                                    <div className="mt-6">
-                                        <OrderItemsTable
-                                            items={orderDetails.items}
-                                        />
+            <Transition appear show={open} as={Fragment}>
+                <Dialog
+                    as="div"
+                    className="relative z-50"
+                    onClose={() => setOpen(false)}
+                >
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <Dialog.Title
+                                            as="h3"
+                                            className="text-lg font-medium leading-6 text-gray-900"
+                                        >
+                                            Order{' '}
+                                            {formatDisplayId(orderId, 'ORD-')}{' '}
+                                            Details
+                                        </Dialog.Title>
+                                        <button
+                                            onClick={() => setOpen(false)}
+                                            className="rounded-md p-1 hover:bg-gray-100"
+                                        >
+                                            <XMarkIcon className="h-5 w-5" />
+                                        </button>
                                     </div>
-                                    <div className="mt-6">
-                                        <ViewDetailsActions
-                                            orderStage={currentStage}
-                                            isUpdating={isUpdating}
-                                            handleStageUpdate={
-                                                handleStageUpdate
-                                            }
-                                            paymentStatus={paymentStatus}
-                                            isPaymentUpdating={
-                                                isPaymentUpdating
-                                            }
-                                            handlePaymentUpdate={
-                                                handlePaymentUpdate
-                                            }
-                                        />
-                                    </div>
-                                </>
-                            )}
-                        </SheetDescription>
-                    </SheetHeader>
-                </SheetContent>
-            </Sheet>
+
+                                    {loading ? (
+                                        <div className="flex justify-center items-center min-h-[50vh]">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                                        </div>
+                                    ) : error ? (
+                                        <div className="text-red-500">
+                                            Error: {error}
+                                        </div>
+                                    ) : !orderDetails ? (
+                                        <div className="text-gray-500">
+                                            Order not found
+                                        </div>
+                                    ) : (
+                                        <div className="mt-2">
+                                            <ViewDetailsInfo
+                                                orderDetails={orderDetails}
+                                                dateOrder={dateOrder}
+                                                paymentMethod={paymentMethod}
+                                                orderStage={currentStage}
+                                                paymentStatus={paymentStatus}
+                                            />
+                                            <div className="mt-6">
+                                                <OrderItemsTable
+                                                    items={orderDetails.items}
+                                                />
+                                            </div>
+                                            <div className="mt-6">
+                                                <ViewDetailsActions
+                                                    orderStage={currentStage}
+                                                    isUpdating={isUpdating}
+                                                    handleStageUpdate={
+                                                        handleStageUpdate
+                                                    }
+                                                    paymentStatus={
+                                                        paymentStatus
+                                                    }
+                                                    isPaymentUpdating={
+                                                        isPaymentUpdating
+                                                    }
+                                                    handlePaymentUpdate={
+                                                        handlePaymentUpdate
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
         </div>
     );
 };
