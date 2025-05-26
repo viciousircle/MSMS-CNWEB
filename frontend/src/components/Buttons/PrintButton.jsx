@@ -15,7 +15,12 @@ function generateShippingLabelHTML(order) {
     const receiver = order.receiverInfo || {};
     const items = order.orderItems || [];
     const summary = order.orderSummary || {};
-    const total = summary.shippingSubtotal || 0;
+    const SHIPPING_COST = 30000; // Fixed shipping cost
+    const itemsTotal = items.reduce(
+        (sum, item) => sum + (item.itemPrice || 0) * (item.itemQuantity || 0),
+        0
+    );
+    const total = itemsTotal + SHIPPING_COST;
     const paymentStatus = summary.isPaid ? 'Paid' : 'Unpaid';
     const stage = summary.currentStage || '';
     return `
@@ -79,8 +84,11 @@ function generateShippingLabelHTML(order) {
                         summary.paymentMethod || ''
                     }<br/>
                     <strong>Payment Status:</strong> ${paymentStatus}<br/>
-                    <strong>Shipping Subtotal:</strong> ${formatPrice(
-                        summary.shippingSubtotal || 0
+                    <strong>Items Total:</strong> ${formatPrice(
+                        itemsTotal
+                    )} VND<br/>
+                    <strong>Shipping Cost:</strong> ${formatPrice(
+                        SHIPPING_COST
                     )} VND<br/>
                 </div>
                 <div style="margin-bottom: 0.5rem; text-align: right; font-weight: bold; font-size: 1.2rem;">
