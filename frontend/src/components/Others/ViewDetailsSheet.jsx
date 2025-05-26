@@ -85,7 +85,7 @@ export const ViewDetailsSheet = ({
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-black/25" />
+                        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
                     </Transition.Child>
 
                     <div className="fixed inset-0 overflow-y-auto">
@@ -99,21 +99,26 @@ export const ViewDetailsSheet = ({
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                    <div className="flex justify-between items-center mb-4">
+                                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-2xl transition-all">
+                                    <div className="flex justify-between items-center mb-6 border-b pb-4">
                                         <Dialog.Title
                                             as="h3"
-                                            className="text-lg font-medium leading-6 text-gray-900"
+                                            className="text-xl font-semibold leading-6 text-gray-900"
                                         >
                                             Order{' '}
-                                            {formatDisplayId(orderId, 'ORD-')}{' '}
+                                            <span className="text-primary">
+                                                {formatDisplayId(
+                                                    orderId,
+                                                    'ORD-'
+                                                )}
+                                            </span>{' '}
                                             Details
                                         </Dialog.Title>
                                         <button
                                             onClick={() => setOpen(false)}
-                                            className="rounded-md p-1 hover:bg-gray-100"
+                                            className="rounded-full p-2 hover:bg-gray-100 transition-colors duration-200"
                                         >
-                                            <XMarkIcon className="h-5 w-5" />
+                                            <XMarkIcon className="h-5 w-5 text-gray-500" />
                                         </button>
                                     </div>
 
@@ -122,15 +127,15 @@ export const ViewDetailsSheet = ({
                                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                                         </div>
                                     ) : error ? (
-                                        <div className="text-red-500">
+                                        <div className="text-red-500 bg-red-50 p-4 rounded-lg">
                                             Error: {error}
                                         </div>
                                     ) : !orderDetails ? (
-                                        <div className="text-gray-500">
+                                        <div className="text-gray-500 bg-gray-50 p-4 rounded-lg">
                                             Order not found
                                         </div>
                                     ) : (
-                                        <div className="mt-2">
+                                        <div className="mt-4 space-y-8">
                                             <ViewDetailsInfo
                                                 orderDetails={orderDetails}
                                                 dateOrder={dateOrder}
@@ -138,12 +143,12 @@ export const ViewDetailsSheet = ({
                                                 orderStage={currentStage}
                                                 paymentStatus={paymentStatus}
                                             />
-                                            <div className="mt-6">
+                                            <div className="bg-gray-50 rounded-xl p-6">
                                                 <OrderItemsTable
                                                     items={orderDetails.items}
                                                 />
                                             </div>
-                                            <div className="mt-6">
+                                            <div className="bg-gray-50 rounded-xl p-6">
                                                 <ViewDetailsActions
                                                     orderStage={currentStage}
                                                     isUpdating={isUpdating}

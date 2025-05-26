@@ -69,19 +69,17 @@ const Orders = () => {
         'reject',
     ];
 
-    const handleStageUpdate = async (orderId, newStage) => {
+    const handleStageUpdate = async (orderId, updatedFields) => {
         try {
             // Update the order in the backend
-            const updatedOrder = await updateOrder(orderId, {
-                stage: newStage,
-            });
+            const updatedOrder = await updateOrder(orderId, updatedFields);
 
             // Immediately update the local state
             const updatedOrders = paginatedOrders.map((order) => {
                 if (order._id === orderId) {
                     return {
                         ...order,
-                        orderStage: newStage,
+                        ...updatedFields,
                     };
                 }
                 return order;
@@ -92,7 +90,7 @@ const Orders = () => {
             await fetchOrders();
         } catch (error) {
             console.error('Error in handleStageUpdate:', error);
-            toast.error('Failed to update order stage');
+            toast.error('Failed to update order');
         }
     };
 

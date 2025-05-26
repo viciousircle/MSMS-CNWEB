@@ -10,17 +10,16 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { formatDisplayId } from '/utils/idConverter';
+import { formatPrice } from '/utils/formatPrice';
+import { ORDER_CONSTANTS } from '@/constants/order.constants';
 
-const formatPrice = (price) => `$${price.toFixed(2)}`;
-
-export const OrderItemsTable = ({ items, shippingSubtotal }) => {
+export const OrderItemsTable = ({ items }) => {
     const subtotal = items.reduce(
-        (sum, item) => sum + parseFloat(item.itemAmount.replace('$', '')),
+        (sum, item) =>
+            sum + parseFloat(item.itemAmount.replace(/[^\d.-]/g, '')),
         0
     );
-    const shipping = shippingSubtotal
-        ? parseFloat(shippingSubtotal.replace('$', ''))
-        : 0;
+    const shipping = ORDER_CONSTANTS.DEFAULT_SHIPPING_COST;
     const total = subtotal + shipping;
 
     return (
@@ -52,8 +51,8 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                         <TableCell className="text-center">
                             {item.itemQuantity}
                         </TableCell>
-                        <TableCell className="text-center text-green-600">
-                            {item.itemAmount}
+                        <TableCell className="text-right text-green-600">
+                            {`${formatPrice(item.itemAmount)} VND`}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -63,24 +62,24 @@ export const OrderItemsTable = ({ items, shippingSubtotal }) => {
                     <TableCell colSpan={4} className="text-left font-medium">
                         Merchandise Subtotal
                     </TableCell>
-                    <TableCell className="text-center font-bold text-green-700">
-                        {formatPrice(subtotal)}
+                    <TableCell className="text-right font-bold text-green-700">
+                        {`${formatPrice(subtotal)} VND`}
                     </TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell colSpan={4} className="text-left font-medium">
                         Shipping Subtotal
                     </TableCell>
-                    <TableCell className="text-center font-bold text-green-700">
-                        ${shippingSubtotal}
+                    <TableCell className="text-right font-bold text-green-700">
+                        {`${formatPrice(shipping)} VND`}
                     </TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell colSpan={4} className="text-left font-medium">
                         Total Payment
                     </TableCell>
-                    <TableCell className="text-center font-bold text-green-700">
-                        {formatPrice(total)}
+                    <TableCell className="text-right font-bold text-green-700">
+                        {`${formatPrice(total)} VND`}
                     </TableCell>
                 </TableRow>
             </TableFooter>

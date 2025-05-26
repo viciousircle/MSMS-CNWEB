@@ -11,6 +11,11 @@ const OrderTableActions = ({ order, onStageUpdated }) => {
         onStageUpdated?.(order._id, { orderStage: newStage });
     };
 
+    const handlePaymentStatusUpdate = (newStatus) => {
+        onStageUpdated?.(order._id, { isPaid: newStatus === 'Paid' });
+        console.log('newStatus', newStatus);
+    };
+
     return (
         <TableCell className="text-right">
             <ViewDetailsSheet
@@ -20,6 +25,7 @@ const OrderTableActions = ({ order, onStageUpdated }) => {
                 paymentMethod={order.paymentMethod}
                 paymentStatus={order.isPaid ? 'Paid' : 'Unpaid'}
                 onStageUpdated={handleStageUpdate}
+                onPaymentStatusUpdated={handlePaymentStatusUpdate}
             />
         </TableCell>
     );

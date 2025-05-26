@@ -2,6 +2,7 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { StageBadge, PaidStatusBadge } from '../../Others/StatusBadge';
 import { formatDisplayId } from '/utils/idConverter';
+import { formatPrice } from '/utils/formatPrice';
 
 const OrderTableCells = ({ order }) => {
     const currentStage = Array.isArray(order.orderStage)
@@ -15,7 +16,7 @@ const OrderTableCells = ({ order }) => {
         displayId,
         order.customerName,
         order.customerEmail,
-        `$${order.totalPayment}`,
+        `${formatPrice(order.totalPayment)} VND`,
         order.dateOrder,
         order.paymentMethod,
         <PaidStatusBadge status={order.isPaid ? 'Paid' : 'Unpaid'} />,

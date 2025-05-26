@@ -10,6 +10,10 @@ const ViewDetailsActions = ({
     isPaymentUpdating,
     handlePaymentUpdate,
 }) => {
+    const isCancelledOrRejected =
+        orderStage === ORDER_CONSTANTS.STAGES.CANCELLED ||
+        orderStage === ORDER_CONSTANTS.STAGES.REJECT;
+
     return (
         <div className="space-y-3">
             <div className="flex gap-3">
@@ -89,25 +93,16 @@ const ViewDetailsActions = ({
                 )}
             </div>
 
-            <Button
-                className={`w-full ${
-                    paymentStatus === ORDER_CONSTANTS.PAYMENT_STATUS.PAID
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-green-100 text-green-800 hover:bg-green-200'
-                }`}
-                onClick={() =>
-                    handlePaymentUpdate(
-                        paymentStatus !== ORDER_CONSTANTS.PAYMENT_STATUS.PAID
-                    )
-                }
-                disabled={isPaymentUpdating}
-            >
-                {isPaymentUpdating
-                    ? 'Processing...'
-                    : paymentStatus === ORDER_CONSTANTS.PAYMENT_STATUS.PAID
-                    ? 'Mark as Unpaid'
-                    : 'Mark as Paid'}
-            </Button>
+            {!isCancelledOrRejected &&
+                paymentStatus === ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID && (
+                    <Button
+                        className="w-full bg-green-100 text-green-800 hover:bg-green-200"
+                        onClick={() => handlePaymentUpdate(true)}
+                        disabled={isPaymentUpdating}
+                    >
+                        {isPaymentUpdating ? 'Processing...' : 'Mark as Paid'}
+                    </Button>
+                )}
         </div>
     );
 };
