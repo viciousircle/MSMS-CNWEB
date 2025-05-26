@@ -12,8 +12,13 @@ const OrderTableActions = ({ order, onStageUpdated }) => {
     };
 
     const handlePaymentStatusUpdate = (newStatus) => {
-        onStageUpdated?.(order._id, { isPaid: newStatus === 'Paid' });
-        console.log('newStatus', newStatus);
+        onStageUpdated?.(order._id, {
+            isPaid: newStatus === 'Paid',
+            // Include other fields that might be needed for the update
+            _id: order._id,
+            orderStage: order.orderStage,
+            // Add any other fields that your backend might expect
+        });
     };
 
     return (

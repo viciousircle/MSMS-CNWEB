@@ -11,6 +11,13 @@ const OrderTableCells = ({ order }) => {
 
     const displayId = formatDisplayId(order._id, 'ORD-');
 
+    const paymentStatus =
+        typeof order.isPaid === 'boolean'
+            ? order.isPaid
+                ? 'Paid'
+                : 'Unpaid'
+            : order.isPaid;
+
     const cells = [
         <StageBadge status={currentStage} />,
         displayId,
@@ -19,7 +26,7 @@ const OrderTableCells = ({ order }) => {
         `${formatPrice(order.totalPayment)} VND`,
         order.dateOrder,
         order.paymentMethod,
-        <PaidStatusBadge status={order.isPaid ? 'Paid' : 'Unpaid'} />,
+        <PaidStatusBadge status={paymentStatus} />,
     ];
 
     return cells.map((content, i) => (

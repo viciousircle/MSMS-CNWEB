@@ -55,12 +55,18 @@ export const ViewDetailsSheet = ({
             const newStatus = isPaid
                 ? ORDER_CONSTANTS.PAYMENT_STATUS.PAID
                 : ORDER_CONSTANTS.PAYMENT_STATUS.UNPAID;
+
+            // Optimistically update the parent component first
             onPaymentStatusUpdated?.(newStatus);
+
+            // Then update the backend
             await updatePaymentStatus(orderId, isPaid);
+
             toast.success(`Payment status updated to ${newStatus}`);
-            await refetch();
         } catch (error) {
             toast.error(`Failed to update payment status: ${error.message}`);
+            // If error occurs, refetch to get correct state
+            await refetch();
         }
     };
 

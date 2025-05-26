@@ -54,6 +54,7 @@ const Orders = () => {
         handleItemsPerPageChange,
         fetchOrders,
         setPaginatedOrders,
+        setOrders,
     } = useOrdersLogic();
 
     const { selectedRows, toggleRowSelection, toggleAllRows, allSelected } =
@@ -71,26 +72,37 @@ const Orders = () => {
 
     const handleStageUpdate = async (orderId, updatedFields) => {
         try {
-            // Update the order in the backend
-            const updatedOrder = await updateOrder(orderId, updatedFields);
-
-            // Immediately update the local state
+            // Optimistically update the local state first
             const updatedOrders = paginatedOrders.map((order) => {
                 if (order._id === orderId) {
                     return {
                         ...order,
                         ...updatedFields,
+                        // Ensure isPaid is properly updated
+                        isPaid:
+                            updatedFields.isPaid !== undefined
+                                ? updatedFields.isPaid
+                                : order.isPaid,
                     };
                 }
+
+                console.log('order', order);
+                console.log('updatedFields', updatedFields);
+
                 return order;
             });
-            setPaginatedOrders(updatedOrders);
 
-            // Update the orders in the parent component
-            await fetchOrders();
+            setOrders(updatedOrders);
+
+            // Then update the backend
+            await updateOrder(orderId, updatedFields);
+
+            toast.success('Order updated successfully');
         } catch (error) {
             console.error('Error in handleStageUpdate:', error);
             toast.error('Failed to update order');
+            // Revert by fetching fresh data if there's an error
+            await fetchOrders();
         }
     };
 

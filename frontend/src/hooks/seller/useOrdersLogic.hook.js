@@ -131,5 +131,6 @@ export const useOrdersLogic = () => {
         updateOrder,
         handleItemsPerPageChange,
         fetchOrders,
+        setOrders,
     };
 };
