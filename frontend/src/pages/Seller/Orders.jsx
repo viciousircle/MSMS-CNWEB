@@ -176,7 +176,15 @@ const Orders = () => {
                             className="flex justify-between items-center"
                         >
                             <div className="flex items-center gap-2">
-                                <PrintButton />
+                                <PrintButton
+                                    selectedOrders={Array.from(
+                                        selectedRows
+                                    ).map((id) =>
+                                        paginatedOrders.find(
+                                            (order) => order._id === id
+                                        )
+                                    )}
+                                />
                                 <ChangeStageMenu
                                     selectedOrders={selectedRows}
                                     orders={paginatedOrders}
