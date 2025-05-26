@@ -5,11 +5,11 @@ const cartSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            default: null, // Null if it's a guest
+            default: null,
         },
         uuid: {
             type: String,
-            default: null, // Used for guest carts
+            default: null,
         },
         cartItems: [
             {
@@ -25,7 +25,7 @@ const cartSchema = new mongoose.Schema(
                 quantity: {
                     type: Number,
                     default: 1,
-                    min: 1, // Prevent negative or zero quantities
+                    min: 1,
                 },
                 dateAdded: {
                     type: Date,
