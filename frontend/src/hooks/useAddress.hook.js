@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // TODO: not good
+
 const useApiData = (url, condition) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);

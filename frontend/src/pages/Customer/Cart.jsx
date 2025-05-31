@@ -17,6 +17,7 @@ import LoadingState from '@/components/States/LoadingState';
 import ErrorState from '@/components/States/ErrorState';
 import Footer from '@/components/Structure/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
+// import CartContent from '@/components/CartContent';
 
 const Cart = () => {
     const {

@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSignUp } from '@/hooks/auth/useSignUp.hook';
 import { Link } from 'react-router-dom';
-import { Chrome } from 'lucide-react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
