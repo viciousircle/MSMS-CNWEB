@@ -9,7 +9,7 @@ import { ORDER_CONSTANTS } from '@/constants/order.constants';
 import { calculateMerchandiseSubtotal } from '@/utils/payment/calculations';
 import { handlePaymentMethod } from '@/utils/payment/methods';
 import { toast } from 'sonner';
-
+// XXX
 export const usePaymentLogic = () => {
     const location = useLocation();
     const navigate = useNavigate();
