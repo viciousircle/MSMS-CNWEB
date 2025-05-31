@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCreateOrder } from '@/hooks/payment/useCreateOrder.hook';
+import { useCreateOrder } from '../order/useCreateOrder.hook';
 import { useOrderValidation } from '@/hooks/payment/useOrderValidation.hook';
 import { useQRPayment } from '@/hooks/payment/useQRPayment.hook';
 import { PAYMENT_CONSTANTS } from '@/constants/payment.constants';
