@@ -22,7 +22,7 @@ const OrderTableActions = ({ order, onStageUpdated }) => {
     };
 
     return (
-        <TableCell className="text-right">
+        <TableCell className="text-center">
             <ViewDetailsSheet
                 orderId={order._id}
                 dateOrder={order.dateOrder}

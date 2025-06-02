@@ -5,6 +5,26 @@ export const OrderTableHeaderCell = ({
     children,
     className = '',
     align = 'center',
-}) => (
-    <TableHead className={`text-${align} ${className}`}>{children}</TableHead>
-);
+    responsive = 'always-visible',
+}) => {
+    const getResponsiveClass = () => {
+        switch (responsive) {
+            case 'always-visible':
+                return '';
+            case 'lg-visible':
+                return 'hidden lg:table-cell';
+            case 'md-visible':
+                return 'hidden md:table-cell';
+            default:
+                return '';
+        }
+    };
+
+    return (
+        <TableHead
+            className={`text-${align} ${getResponsiveClass()} ${className}`}
+        >
+            {children}
+        </TableHead>
+    );
+};

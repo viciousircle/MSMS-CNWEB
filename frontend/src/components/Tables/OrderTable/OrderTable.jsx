@@ -37,11 +37,9 @@ export const OrderTable = ({
                         {ORDER_TABLE_COLUMNS.map((column) => (
                             <OrderTableHeaderCell
                                 key={column.key}
-                                className={`${
-                                    column.responsive === 'md-visible'
-                                        ? 'hidden md:table-cell'
-                                        : ''
-                                } ${column.width || ''}`}
+                                className={column.width || ''}
+                                align={column.align}
+                                responsive={column.responsive}
                             >
                                 {column.header}
                             </OrderTableHeaderCell>

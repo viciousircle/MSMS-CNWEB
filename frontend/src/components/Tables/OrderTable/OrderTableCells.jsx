@@ -3,6 +3,7 @@ import { TableCell } from '@/components/ui/table';
 import { StageBadge, PaidStatusBadge } from '../../Others/StatusBadge';
 import { formatDisplayId } from '/utils/idConverter';
 import { formatPrice } from '/utils/formatPrice';
+import { ORDER_TABLE_COLUMNS } from '@/constants/orderTableConfig';
 
 const OrderTableCells = ({ order }) => {
     const currentStage = Array.isArray(order.orderStage)
@@ -18,48 +19,71 @@ const OrderTableCells = ({ order }) => {
                 : 'Unpaid'
             : order.isPaid;
 
-    // Define cells with responsive visibility, matching header order
-    const cells = [
-        // Order ID (always visible on md+, shown under stage on mobile)
-        <span className="font-medium">{displayId}</span>,
-        // Stage (always visible)
-        <div className="flex flex-col items-center gap-1">
-            <StageBadge status={currentStage} />
-            <span className="text-xs text-gray-500 md:hidden">{displayId}</span>
-        </div>,
-        // Customer (md+)
-        <span className="hidden md:inline font-medium">
-            {order.customerName}
-        </span>,
-        // Email (md+)
-        <span className="hidden md:inline">{order.customerEmail}</span>,
-        // Total (always visible)
-        <div className="flex flex-col items-center">
-            <span className="font-medium text-green-600">{`${formatPrice(
-                order.totalPayment
-            )} VND`}</span>
-            <span className="text-xs text-gray-500 md:hidden">
-                {order.paymentMethod}
-            </span>
-        </div>,
-        // Date (md+)
-        <span className="hidden md:inline">{order.dateOrder}</span>,
-        // Pay Method (md+)
-        <span className="hidden md:inline">{order.paymentMethod}</span>,
-        // Pay Status (always visible)
-        <PaidStatusBadge status={paymentStatus} />,
-    ];
+    const getResponsiveClass = (responsive) => {
+        switch (responsive) {
+            case 'always-visible':
+                return '';
+            case 'lg-visible':
+                return 'hidden lg:table-cell';
+            case 'md-visible':
+                return 'hidden md:table-cell';
+            default:
+                return '';
+        }
+    };
 
-    return cells.map((content, i) => (
-        <TableCell
-            key={i}
-            className={`text-center ${i === 0 ? 'w-[120px]' : ''} ${
-                i === 1 ? 'w-[120px] md:w-[180px]' : ''
-            } ${i === 4 ? 'w-[150px] md:w-[250px]' : ''}`}
-        >
-            {content}
-        </TableCell>
-    ));
+    return ORDER_TABLE_COLUMNS.map((column, index) => {
+        let content;
+        switch (column.key) {
+            case 'orderStage':
+                content = (
+                    <div className="flex flex-col items-center gap-1">
+                        <StageBadge status={currentStage} />
+                    </div>
+                );
+                break;
+            case 'order':
+                content = <span className="font-medium">{displayId}</span>;
+                break;
+            case 'customer':
+                content = (
+                    <span className="font-medium">{order.customerName}</span>
+                );
+                break;
+            case 'email':
+                content = <span>{order.customerEmail}</span>;
+                break;
+            case 'bill':
+                content = (
+                    <span className="font-medium text-green-600">
+                        {`${formatPrice(order.totalPayment)} VND`}
+                    </span>
+                );
+                break;
+            case 'dateOrder':
+                content = <span>{order.dateOrder}</span>;
+                break;
+            case 'payMethod':
+                content = <span>{order.paymentMethod}</span>;
+                break;
+            case 'payStatus':
+                content = <PaidStatusBadge status={paymentStatus} />;
+                break;
+            default:
+                content = null;
+        }
+
+        return (
+            <TableCell
+                key={column.key}
+                className={`text-${column.align} ${
+                    column.width || ''
+                } ${getResponsiveClass(column.responsive)}`}
+            >
+                {content}
+            </TableCell>
+        );
+    });
 };
 
 export default OrderTableCells;
