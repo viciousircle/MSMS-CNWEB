@@ -2,7 +2,7 @@ import React from 'react';
 import { useCartLogic } from '@/hooks/cart/useCartLogic.hook';
 import { CartView } from '@/components/Cart/CartView';
 
-// TODO: The BUY NOW SECTION not showing
+// XXX
 const Cart = () => {
     const {
         cart,
