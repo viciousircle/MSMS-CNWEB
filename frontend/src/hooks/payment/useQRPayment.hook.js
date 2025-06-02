@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { paymentApi } from '/utils/api/payment.api';
 
+// XXX
 export const useQRPayment = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);

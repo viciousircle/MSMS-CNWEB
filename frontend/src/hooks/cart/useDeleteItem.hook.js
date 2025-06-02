@@ -8,7 +8,6 @@ export const useDeleteItem = (removeProduct) => {
         async (id) => {
             setError(null);
             try {
-                // Optimistic update
                 removeProduct(id);
 
                 const response = await cartApi.removeFromCart(id);

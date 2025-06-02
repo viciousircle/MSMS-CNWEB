@@ -23,6 +23,8 @@ export const CartView = ({
             <ErrorState icon={ShoppingCartIcon} title="Cart" error={error} />
         );
 
+    console.log('Checked products:', checkedProducts);
+
     return (
         <div className="flex flex-col min-h-screen">
             <Body>
@@ -32,6 +34,7 @@ export const CartView = ({
                     isInitialLoad={isInitialLoad}
                     handleDeleteItem={handleDeleteItem}
                     updateQuantity={updateQuantity}
+                    checkedProducts={checkedProducts}
                 />
             </Body>
 

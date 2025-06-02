@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { productApi } from '/utils/api/product.api';
-
+// XXX
 export const useFetchProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
