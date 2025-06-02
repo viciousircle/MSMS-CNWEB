@@ -16,6 +16,8 @@ export const CartView = ({
     shouldShowCartTotal,
     handleDeleteItem,
     updateQuantity,
+    handleCheckAll,
+    handleProductCheck,
 }) => {
     if (loading) return <LoadingState icon={ShoppingCartIcon} title="Cart" />;
     if (error)
@@ -35,6 +37,8 @@ export const CartView = ({
                     handleDeleteItem={handleDeleteItem}
                     updateQuantity={updateQuantity}
                     checkedProducts={checkedProducts}
+                    handleCheckAll={handleCheckAll}
+                    handleProductCheck={handleProductCheck}
                 />
             </Body>
 

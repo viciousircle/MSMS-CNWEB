@@ -13,6 +13,8 @@ const Cart = () => {
         shouldShowCartTotal,
         handleDeleteItem,
         updateQuantity,
+        handleCheckAll,
+        handleProductCheck,
     } = useCartLogic();
 
     return (
@@ -25,6 +27,8 @@ const Cart = () => {
             shouldShowCartTotal={shouldShowCartTotal}
             handleDeleteItem={handleDeleteItem}
             updateQuantity={updateQuantity}
+            handleCheckAll={handleCheckAll}
+            handleProductCheck={handleProductCheck}
         />
     );
 };

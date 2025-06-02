@@ -30,6 +30,8 @@ export const useCartLogic = () => {
         updateProducts,
         updateProductQuantity,
         removeProduct,
+        handleProductCheck,
+        handleCheckAll,
     } = useCartState();
 
     // Trạng thái tải lần đầu (dùng để delay hiệu ứng loading nếu cần)
@@ -97,5 +99,7 @@ export const useCartLogic = () => {
         shouldShowCartTotal,
         handleDeleteItem,
         updateQuantity,
+        handleCheckAll,
+        handleProductCheck,
     };
 };

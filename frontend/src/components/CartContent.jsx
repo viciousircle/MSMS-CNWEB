@@ -9,8 +9,20 @@ const CartContent = ({
     isInitialLoad,
     handleDeleteItem,
     updateQuantity,
+    checkedProducts,
+    handleCheckAll,
+    handleProductCheck,
 }) => {
     if (cart.length === 0) return <CartNotFound />;
+
+    const commonProps = {
+        cart,
+        checkedProducts,
+        handleCheckAll,
+        handleProductCheck,
+        handleDeleteItem,
+        updateQuantity,
+    };
 
     return (
         <AnimatePresence>
@@ -26,22 +38,14 @@ const CartContent = ({
                         delay: 0.1,
                     }}
                 >
-                    <SelectAllSection cart={cart} />
-                    <ProductList
-                        cart={cart}
-                        handleDeleteItem={handleDeleteItem}
-                        updateQuantity={updateQuantity}
-                    />
+                    <SelectAllSection {...commonProps} />
+                    <ProductList {...commonProps} />
                 </motion.div>
             )}
             {!isInitialLoad && (
                 <div>
-                    <SelectAllSection cart={cart} />
-                    <ProductList
-                        cart={cart}
-                        handleDeleteItem={handleDeleteItem}
-                        updateQuantity={updateQuantity}
-                    />
+                    <SelectAllSection {...commonProps} />
+                    <ProductList {...commonProps} />
                 </div>
             )}
         </AnimatePresence>
