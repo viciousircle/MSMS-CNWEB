@@ -18,7 +18,7 @@ const AccordionDetails = ({ order, refetchOrders }) => {
                     <OrderInfoSection order={order} />
                 </div>
             </div>
-            {['New', 'Prepare'].includes(order.currentStage) && (
+            {order.currentStage === 'New' && (
                 <div className="flex justify-end">
                     <CancelOrderSection
                         orderId={order._id}

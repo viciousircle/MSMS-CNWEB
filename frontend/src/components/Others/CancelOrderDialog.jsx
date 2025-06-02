@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useCancelOrder } from '@/hooks/order/useCancelOrder.hook';
 import { X } from 'lucide-react';
+import { formatDisplayId } from '/utils/idConverter';
 
 const CancelOrderDialog = ({ orderId, onCancel }) => {
     const { cancelOrder, isLoading, error, isSuccess, cancelledOrder } =
@@ -63,7 +64,7 @@ const CancelOrderDialog = ({ orderId, onCancel }) => {
                             <div className="flex flex-col space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-semibold">
-                                        Cancel Order #{orderId}
+                                        Cancel Order {formatDisplayId(orderId)}
                                     </h2>
                                     <button
                                         onClick={() => setOpen(false)}
