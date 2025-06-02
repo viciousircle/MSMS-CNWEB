@@ -14,7 +14,8 @@ const ProductList = ({
         <div className="flex flex-col gap-4">
             <Label titles={['Products', `${cart.length} ITEMS`]} />
             <CardLayout variant="linear">
-                {cart.map((item) => (
+                {/* Reverse the cart to show the latest items first */}
+                {[...cart].reverse().map((item) => (
                     <div key={item._id}>
                         <CartProductCard
                             product={item}
