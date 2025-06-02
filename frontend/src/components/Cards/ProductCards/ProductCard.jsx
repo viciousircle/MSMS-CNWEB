@@ -9,15 +9,15 @@ const ProductCard = ({
 }) => {
     return (
         <div className="flex flex-col w-full">
-            {withDividers && <Divider horizontal />}
+            {/* {withDividers && <Divider horizontal />} */}
             <div className="flex w-full">
-                {withDividers && <Divider vertical />}
+                {/* {withDividers && <Divider vertical />} */}
                 <div className={`flex w-full ${contentClassName}`} {...props}>
                     {children}
                 </div>
-                {withDividers && <Divider vertical />}
+                {/* {withDividers && <Divider vertical />} */}
             </div>
-            {withDividers && <Divider horizontal />}
+            {/* {withDividers && <Divider horizontal />} */}
         </div>
     );
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import ProductImage from './ProductCards/ProductImage';
 import ProductInfo from './ProductCards/ProductInfo';
 import DeleteCartItemButton from '../Buttons/DeleteCartItemButton';
 import CartItemQuantity from './CartItemQuantity';
@@ -19,20 +18,23 @@ const CartItemContent = ({
     const formattedPrice = formatPrice(price);
 
     return (
-        <div className="flex flex-col w-full gap-2 px-4 justify-center">
-            <div className="flex justify-between items-center">
-                <div className="w-full">
-                    <ProductInfo
-                        name={name}
-                        price={`${formattedPrice}`}
-                        color={color}
-                        stock={stock}
-                        dimmed={isOutOfStock}
-                        className="w-full"
-                        nameClassName="text-xl break-words"
-                    />
-                </div>
+        <div className="flex-1 flex flex-col justify-between">
+            <div className="space-y-2">
+                <ProductInfo
+                    name={name}
+                    price={`${formattedPrice}`}
+                    color={color}
+                    stock={stock}
+                    dimmed={isOutOfStock}
+                    className="w-full"
+                    nameClassName="text-base font-medium text-gray-900"
+                    priceClassName="text-sm font-medium text-gray-500"
+                    colorClassName="text-sm text-gray-500"
+                    stockClassName="text-sm text-gray-500"
+                />
+            </div>
 
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <CartItemQuantity
                     id={id}
                     quantity={quantity}
@@ -40,9 +42,6 @@ const CartItemContent = ({
                     isOutOfStock={isOutOfStock}
                     onQuantityChange={onQuantityChange}
                 />
-            </div>
-
-            <div className="flex justify-end border-t border-gray-300 pt-2">
                 <DeleteCartItemButton id={id} onDelete={onDelete} />
             </div>
         </div>

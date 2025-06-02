@@ -3,27 +3,51 @@ import OptionDrawer from '../Others/OptionDrawer';
 import ProductCard from './ProductCards/ProductCard';
 import ProductImage from './ProductCards/ProductImage';
 import ProductInfo from './ProductCards/ProductInfo';
+
 const StandardProductCard = ({ product }) => {
     const { img, name, price, colors } = product;
 
     return (
         <ProductCard>
-            <div className="flex flex-col border border-gray-950/5 p-2 w-full gap-4 hover:bg-gray-950/2.5 min-w-max">
-                <ProductImage
-                    src={img}
-                    className=" w-full h-56"
-                    imgClassName="w-64 h-64 object-contain"
-                />
-                <div className="pb-2 flex justify-between items-center">
+            <div className="group relative flex flex-col w-full bg-white border border-gray-100 hover:border-gray-200 transition-all duration-200">
+                <div className="relative overflow-hidden">
+                    <ProductImage
+                        src={img}
+                        className="w-full aspect-square transition-transform duration-300 group-hover:scale-105"
+                        imgClassName="w-full h-full object-contain p-4"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-200" />
+                </div>
+                <div className="flex flex-col p-4 gap-3 border-t border-gray-100">
                     <ProductInfo
                         name={name}
                         price={price}
-                        className="w-full max-w-[150px]"
+                        className="w-full"
+                        nameClassName="text-base font-medium text-gray-900 line-clamp-2"
+                        priceClassName="text-sm font-medium text-gray-500"
                     />
-                    <OptionDrawer colors={colors} product={product} />
+                    <div className="flex justify-between items-center">
+                        <div className="flex gap-1">
+                            {colors.map(({ color, stock }) => (
+                                <div
+                                    key={color}
+                                    className={`w-3 h-3 border ${
+                                        stock > 0
+                                            ? 'border-gray-200'
+                                            : 'border-gray-100 opacity-50'
+                                    }`}
+                                    style={{
+                                        backgroundColor: color.toLowerCase(),
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        <OptionDrawer colors={colors} product={product} />
+                    </div>
                 </div>
             </div>
         </ProductCard>
     );
 };
+
 export default StandardProductCard;
