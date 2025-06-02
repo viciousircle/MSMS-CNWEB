@@ -71,7 +71,7 @@ const CartProductCard = ({
                     </div>
                 </div>
                 {/* Controls */}
-                <div className="flex flex-col items-end gap-4 min-w-[110px]">
+                <div className="flex items-center gap-4 min-w-[110px] justify-end">
                     <CartItemQuantity
                         id={_id}
                         quantity={quantity}
