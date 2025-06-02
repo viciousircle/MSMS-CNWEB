@@ -72,10 +72,13 @@ const Orders = () => {
 
     const handleStageUpdate = async (orderId, updatedFields) => {
         try {
+            console.log('Starting stage update for order:', orderId);
+            console.log('Update fields:', updatedFields);
+
             // Optimistically update the local state first
             const updatedOrders = paginatedOrders.map((order) => {
                 if (order._id === orderId) {
-                    return {
+                    const updatedOrder = {
                         ...order,
                         ...updatedFields,
                         // Ensure isPaid is properly updated
@@ -84,23 +87,33 @@ const Orders = () => {
                                 ? updatedFields.isPaid
                                 : order.isPaid,
                     };
+                    console.log('Updated order data:', updatedOrder);
+                    return updatedOrder;
                 }
-
-                console.log('order', order);
-                console.log('updatedFields', updatedFields);
-
                 return order;
             });
 
+            console.log('Setting updated orders:', updatedOrders);
             setOrders(updatedOrders);
 
             // Then update the backend
-            await updateOrder(orderId, updatedFields);
+            console.log('Calling updateOrder with:', {
+                orderId,
+                updatedFields,
+            });
+            const result = await updateOrder(orderId, updatedFields);
+            console.log('Update result:', result);
 
             toast.success('Order updated successfully');
         } catch (error) {
-            console.error('Error in handleStageUpdate:', error);
-            toast.error('Failed to update order');
+            console.error('Detailed error in handleStageUpdate:', {
+                error,
+                message: error.message,
+                stack: error.stack,
+                orderId,
+                updatedFields,
+            });
+            toast.error(`Failed to update order: ${error.message}`);
             // Revert by fetching fresh data if there's an error
             await fetchOrders();
         }

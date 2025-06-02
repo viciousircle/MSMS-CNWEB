@@ -4,7 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Popover } from '@headlessui/react';
 import { toast } from 'sonner';
 
-const STAGE_FLOW = ['New', 'Prepare', 'Shipping', 'Shipped'];
+const STAGE_FLOW = [
+    'New',
+    'Prepare',
+    'Shipping',
+    'Shipped',
+    'Cancelled',
+    'Reject',
+];
 const REVERSE_STAGE_FLOW = [...STAGE_FLOW].reverse();
 
 const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
@@ -35,11 +42,15 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             return;
         }
 
+        console.log('Starting stage change to:', newStage);
+        console.log('Selected orders:', Array.from(selectedOrders));
+
         // Check if any selected order is cancelled or rejected
         const hasCancelledOrRejected = Array.from(selectedOrders).some(
             (orderId) => {
                 const order = orders.find((o) => o._id === orderId);
                 const currentStage = getCurrentStage(order);
+                console.log('Checking order:', { orderId, currentStage });
                 return (
                     currentStage === 'Cancelled' || currentStage === 'Reject'
                 );
@@ -52,14 +63,31 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
         }
 
         try {
-            const updatePromises = Array.from(selectedOrders).map((orderId) =>
-                onStageUpdated(orderId, newStage)
+            console.log(
+                'Preparing stage updates for orders:',
+                Array.from(selectedOrders)
             );
+            const updatePromises = Array.from(selectedOrders).map((orderId) => {
+                const updateData = { stage: newStage };
+                console.log('Sending update for order:', {
+                    orderId,
+                    updateData,
+                });
+                return onStageUpdated(orderId, updateData);
+            });
 
-            await Promise.all(updatePromises);
+            console.log('Executing all update promises');
+            const results = await Promise.all(updatePromises);
+            console.log('Update results:', results);
         } catch (error) {
-            toast.error('Failed to update order stages');
-            console.error('Error updating stages:', error);
+            console.error('Detailed error in handleStageChange:', {
+                error,
+                message: error.message,
+                stack: error.stack,
+                newStage,
+                selectedOrders: Array.from(selectedOrders),
+            });
+            toast.error(`Failed to update order stages: ${error.message}`);
         }
     };
 
@@ -69,11 +97,15 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             return;
         }
 
+        console.log('Starting next stage update');
+        console.log('Selected orders:', Array.from(selectedOrders));
+
         // Check if any selected order is cancelled or rejected
         const hasCancelledOrRejected = Array.from(selectedOrders).some(
             (orderId) => {
                 const order = orders.find((o) => o._id === orderId);
                 const currentStage = getCurrentStage(order);
+                console.log('Checking order:', { orderId, currentStage });
                 return (
                     currentStage === 'Cancelled' || currentStage === 'Reject'
                 );
@@ -86,26 +118,50 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
         }
 
         try {
+            console.log('Preparing next stage updates');
             const updatePromises = Array.from(selectedOrders).map(
                 async (orderId) => {
                     const order = orders.find((o) => o._id === orderId);
-                    if (!order) return;
+                    if (!order) {
+                        console.log('Order not found:', orderId);
+                        return;
+                    }
 
                     const currentStage = getCurrentStage(order);
-                    if (!currentStage) return;
+                    if (!currentStage) {
+                        console.log('No current stage for order:', orderId);
+                        return;
+                    }
 
                     const nextStage = getNextStage(currentStage);
+                    console.log('Stage transition:', {
+                        orderId,
+                        currentStage,
+                        nextStage,
+                    });
 
                     if (nextStage !== currentStage) {
-                        return onStageUpdated(orderId, nextStage);
+                        const updateData = { stage: nextStage };
+                        console.log('Sending update for order:', {
+                            orderId,
+                            updateData,
+                        });
+                        return onStageUpdated(orderId, updateData);
                     }
                 }
             );
 
-            await Promise.all(updatePromises.filter(Boolean));
+            console.log('Executing all next stage updates');
+            const results = await Promise.all(updatePromises.filter(Boolean));
+            console.log('Next stage update results:', results);
         } catch (error) {
-            toast.error('Failed to update order stages');
-            console.error('Error updating stages:', error);
+            console.error('Detailed error in handleNextStage:', {
+                error,
+                message: error.message,
+                stack: error.stack,
+                selectedOrders: Array.from(selectedOrders),
+            });
+            toast.error(`Failed to update order stages: ${error.message}`);
         }
     };
 
@@ -115,11 +171,15 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
             return;
         }
 
+        console.log('Starting previous stage update');
+        console.log('Selected orders:', Array.from(selectedOrders));
+
         // Check if any selected order is cancelled or rejected
         const hasCancelledOrRejected = Array.from(selectedOrders).some(
             (orderId) => {
                 const order = orders.find((o) => o._id === orderId);
                 const currentStage = getCurrentStage(order);
+                console.log('Checking order:', { orderId, currentStage });
                 return (
                     currentStage === 'Cancelled' || currentStage === 'Reject'
                 );
@@ -132,26 +192,50 @@ const ChangeStageMenu = ({ selectedOrders, orders, onStageUpdated }) => {
         }
 
         try {
+            console.log('Preparing previous stage updates');
             const updatePromises = Array.from(selectedOrders).map(
                 async (orderId) => {
                     const order = orders.find((o) => o._id === orderId);
-                    if (!order) return;
+                    if (!order) {
+                        console.log('Order not found:', orderId);
+                        return;
+                    }
 
                     const currentStage = getCurrentStage(order);
-                    if (!currentStage) return;
+                    if (!currentStage) {
+                        console.log('No current stage for order:', orderId);
+                        return;
+                    }
 
                     const prevStage = getPreviousStage(currentStage);
+                    console.log('Stage transition:', {
+                        orderId,
+                        currentStage,
+                        prevStage,
+                    });
 
                     if (prevStage !== currentStage) {
-                        return onStageUpdated(orderId, prevStage);
+                        const updateData = { stage: prevStage };
+                        console.log('Sending update for order:', {
+                            orderId,
+                            updateData,
+                        });
+                        return onStageUpdated(orderId, updateData);
                     }
                 }
             );
 
-            await Promise.all(updatePromises.filter(Boolean));
+            console.log('Executing all previous stage updates');
+            const results = await Promise.all(updatePromises.filter(Boolean));
+            console.log('Previous stage update results:', results);
         } catch (error) {
-            toast.error('Failed to update order stages');
-            console.error('Error updating stages:', error);
+            console.error('Detailed error in handlePreviousStage:', {
+                error,
+                message: error.message,
+                stack: error.stack,
+                selectedOrders: Array.from(selectedOrders),
+            });
+            toast.error(`Failed to update order stages: ${error.message}`);
         }
     };
 
