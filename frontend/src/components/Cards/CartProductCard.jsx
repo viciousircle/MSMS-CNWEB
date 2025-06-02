@@ -2,8 +2,9 @@ import React from 'react';
 import ProductCard from './ProductCards/ProductCard';
 import { DEFAULT_PRODUCT } from '@/constants/cartProductConfig';
 import CartItemCheckbox from './CartItemCheckbox';
-import CartItemContent from './CartItemContent';
 import ProductImage from './ProductCards/ProductImage';
+import CartItemQuantity from './CartItemQuantity';
+import DeleteCartItemButton from '../Buttons/DeleteCartItemButton';
 
 const CartProductCard = ({
     product = DEFAULT_PRODUCT,
@@ -24,11 +25,12 @@ const CartProductCard = ({
     return (
         <ProductCard>
             <div
-                className={`group relative flex w-full bg-white border border-gray-100 hover:border-gray-200 transition-all duration-200 ${
+                className={`group relative flex w-full bg-white border border-gray-100 hover:border-gray-200 transition-all duration-200 items-center px-4 py-6 gap-6 ${
                     isChecked ? 'bg-gray-50' : ''
                 } ${isOutOfStock ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-                <div className="flex items-center p-4 border-r border-gray-100">
+                {/* Checkbox on the far left */}
+                <div className="flex items-center justify-center h-full pr-2">
                     <CartItemCheckbox
                         id={_id}
                         isChecked={isChecked}
@@ -36,36 +38,48 @@ const CartProductCard = ({
                         onCheckChange={onCheckChange}
                     />
                 </div>
-
-                <div className="flex-1 flex gap-8 p-4">
-                    <div className="relative w-28 h-28 flex-shrink-0 bg-gray-50 border border-gray-100 flex items-center justify-center">
-                        <ProductImage
-                            src={image}
-                            dimmed={isOutOfStock}
-                            className="w-full h-full flex items-center justify-center"
-                            imgClassName="w-24 h-24 object-contain"
-                        />
-                        {isOutOfStock && (
-                            <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                                <span className="text-sm font-medium text-gray-500">
-                                    Out of stock
-                                </span>
-                            </div>
-                        )}
+                {/* Image */}
+                <div className="relative w-24 h-24 bg-gray-50 border border-gray-100 flex items-center justify-center">
+                    <ProductImage
+                        src={image}
+                        dimmed={isOutOfStock}
+                        className="w-full h-full flex items-center justify-center"
+                        imgClassName="w-20 h-20 object-contain"
+                    />
+                    {isOutOfStock && (
+                        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-500">
+                                Out of stock
+                            </span>
+                        </div>
+                    )}
+                </div>
+                {/* Info */}
+                <div className="flex-1 flex flex-col gap-2 min-w-0">
+                    <span
+                        className="font-semibold text-lg text-gray-900 truncate"
+                        title={name}
+                    >
+                        {name}
+                    </span>
+                    <span className="text-gray-500 text-base font-mono">
+                        {price?.toLocaleString()} VND
+                    </span>
+                    <div className="flex gap-4 text-sm text-gray-500">
+                        <span>Color: {color}</span>
+                        <span>Available: {stock}</span>
                     </div>
-
-                    <CartItemContent
+                </div>
+                {/* Controls */}
+                <div className="flex flex-col items-end gap-4 min-w-[110px]">
+                    <CartItemQuantity
                         id={_id}
-                        name={name}
-                        image={image}
-                        price={price}
                         quantity={quantity}
                         stock={stock}
-                        color={color}
                         isOutOfStock={isOutOfStock}
                         onQuantityChange={handleQuantityChange}
-                        onDelete={onDelete}
                     />
+                    <DeleteCartItemButton id={_id} onDelete={onDelete} />
                 </div>
             </div>
         </ProductCard>
