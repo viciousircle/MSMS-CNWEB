@@ -4,10 +4,49 @@ const dotenv = require('dotenv').config({ path: '../.env' });
 const { errorHandler } = require('./middleware/error.middleware');
 const { connectDB } = require('./config/db');
 const cors = require('cors');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
 const port = process.env.PORT || 5678;
 
 connectDB();
 const app = express();
+
+// Security middleware
+app.use(helmet()); // Set security HTTP headers
+app.use(xss()); // Sanitize data
+app.use(mongoSanitize()); // Sanitize MongoDB queries
+app.use(hpp()); // Prevent parameter pollution
+app.use(cookieParser()); // Parse cookies
+
+// CSRF Protection
+app.use(csrf({ cookie: true }));
+app.use((req, res, next) => {
+    res.cookie('XSRF-TOKEN', req.csrfToken());
+    next();
+});
+
+// Rate limiting
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message:
+        'Too many requests from this IP, please try again after 15 minutes',
+});
+app.use(globalLimiter);
+
+// Specific endpoint limiter for auth
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // 5 attempts
+    message: 'Too many login attempts, please try again after an hour',
+});
+app.use('/api/users/login', authLimiter);
+app.use('/api/users', authLimiter); // Apply to registration endpoint
 
 // Debug middleware for CORS
 app.use((req, res, next) => {

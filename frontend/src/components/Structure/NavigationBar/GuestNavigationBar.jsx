@@ -1,17 +1,16 @@
 import React from 'react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import BaseNavigationBar from './BaseNavigationBar';
 
 const GuestNavigationBar = () => {
-    const navLinks = [];
+    const navLinks = [
+        {
+            path: '/',
+            label: <BuildingStorefrontIcon className="size-6" />,
+        },
+    ];
 
-    return (
-        <BaseNavigationBar
-            brandLink="/"
-            navLinks={navLinks}
-            showBrandIcon={false}
-        />
-    );
+    return <BaseNavigationBar brandLink="/" navLinks={navLinks} />;
 };
 
 export default GuestNavigationBar;
