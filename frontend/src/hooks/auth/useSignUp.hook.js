@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { signupUser } from '/utils/api/auth.api';
+import { validateSignUpForm } from '@/utils/validation/auth.validation';
 
 const initialFormData = {
     name: '',
@@ -10,42 +11,56 @@ const initialFormData = {
     confirmPassword: '',
 };
 
-const validateForm = (formData) => {
-    if (formData.password !== formData.confirmPassword) {
-        return "Passwords don't match";
-    }
-    if (!formData.name || !formData.email || !formData.password) {
-        return 'All fields are required';
-    }
-    return '';
+const initialErrors = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
 };
 
 export const useSignUp = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState(initialFormData);
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState(initialErrors);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
+        // Clear error for the field being changed
+        setErrors((prev) => ({ ...prev, [id]: '' }));
+    };
+
+    const validateField = (fieldName, value) => {
+        const validation = validateSignUpForm({
+            ...formData,
+            [fieldName]: value,
+        });
+        return validation.errors[fieldName] || '';
+    };
+
+    const handleBlur = (e) => {
+        const { id, value } = e.target;
+        const fieldError = validateField(id, value);
+        setErrors((prev) => ({ ...prev, [id]: fieldError }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const validationError = validateForm(formData);
-        if (validationError) {
-            setError(validationError);
+        const validation = validateSignUpForm(formData);
+        if (!validation.isValid) {
+            setErrors(validation.errors);
+            // Show the first error message in a toast
+            const firstError = Object.values(validation.errors)[0];
+            toast.error(firstError);
             return;
         }
 
-        setError('');
         setIsSubmitting(true);
 
         try {
             await signupUser(formData);
-
             toast.success('Registration successful! Redirecting to login...', {
                 duration: 2000,
                 onAutoClose: () => {
@@ -56,8 +71,12 @@ export const useSignUp = () => {
                 },
             });
         } catch (err) {
-            setError(err.message);
-            toast.error(err.message || 'Registration failed');
+            const errorMessage = err.message || 'Registration failed';
+            toast.error(errorMessage);
+            // If the error is related to a specific field, set it in the errors state
+            if (err.field) {
+                setErrors((prev) => ({ ...prev, [err.field]: errorMessage }));
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -65,9 +84,10 @@ export const useSignUp = () => {
 
     return {
         formData,
-        error,
+        errors,
         isSubmitting,
         handleChange,
+        handleBlur,
         handleSubmit,
     };
 };

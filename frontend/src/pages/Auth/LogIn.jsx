@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import {
     Card,
@@ -7,12 +7,8 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-
 import { useLogin } from '@/hooks/auth/useLogin.hook';
-
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-
 import LoginForm from '@/components/Others/LoginForm';
 
 const cardVariants = {
@@ -28,17 +24,15 @@ const cardVariants = {
 };
 
 const LogIn = ({ className, ...props }) => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const { login, handleGoogleLogin, loading, error } = useLogin();
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        await login(formData);
-    };
+    const {
+        formData,
+        errors,
+        loading,
+        handleChange,
+        handleBlur,
+        login,
+        handleGoogleLogin,
+    } = useLogin();
 
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -57,7 +51,7 @@ const LogIn = ({ className, ...props }) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.2 }}
                             >
-                                <CardTitle className="text-2xl">
+                                <CardTitle className="text-2xl text-center">
                                     Login
                                 </CardTitle>
                                 <CardDescription>
@@ -69,10 +63,11 @@ const LogIn = ({ className, ...props }) => {
                         <CardContent>
                             <LoginForm
                                 formData={formData}
-                                handleChange={handleChange}
+                                errors={errors}
                                 loading={loading}
-                                error={error}
-                                onSubmit={handleSubmit}
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                onSubmit={login}
                                 handleGoogleSuccess={handleGoogleLogin}
                                 handleGoogleError={() =>
                                     console.error('Google login failed')

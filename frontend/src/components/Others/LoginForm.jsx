@@ -1,11 +1,12 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Link } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import SignupLink from '@/components/Buttons/SignupLink';
-import FormField from '@/components/Others/FormField';
 
 const formVariants = {
     hidden: { opacity: 0 },
@@ -28,55 +29,104 @@ const fieldVariants = {
     },
 };
 
+// Separate animation for error messages
+const errorVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: {
+        opacity: 1,
+        height: 'auto',
+        transition: {
+            duration: 0.2,
+        },
+    },
+    exit: {
+        opacity: 0,
+        height: 0,
+        transition: {
+            duration: 0.2,
+        },
+    },
+};
+
 const LoginForm = ({
     formData,
-    handleChange,
+    errors,
     loading,
-    error,
+    handleChange,
+    handleBlur,
     onSubmit,
     handleGoogleSuccess,
     handleGoogleError,
-}) => (
-    <motion.form
-        onSubmit={onSubmit}
-        variants={formVariants}
-        initial="hidden"
-        animate="visible"
-    >
-        <div className="flex flex-col gap-6">
-            <motion.div variants={fieldVariants}>
-                <FormField
+}) => {
+    return (
+        <motion.form
+            onSubmit={onSubmit}
+            variants={formVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col gap-6"
+        >
+            <motion.div className="grid gap-2" variants={fieldVariants}>
+                <Label htmlFor="email">Email</Label>
+                <Input
                     id="email"
-                    label="Email"
                     type="email"
                     placeholder="abc@example.com"
+                    required
                     value={formData.email}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    className={cn(
+                        errors.email &&
+                            'border-red-500 focus-visible:ring-red-500'
+                    )}
                 />
+                <AnimatePresence>
+                    {errors.email && (
+                        <motion.p
+                            key="email-error"
+                            className="text-red-500 text-sm overflow-hidden"
+                            variants={errorVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                        >
+                            {errors.email}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
             </motion.div>
 
-            <motion.div variants={fieldVariants}>
-                <FormField
+            <motion.div className="grid gap-2" variants={fieldVariants}>
+                <Label htmlFor="password">Password</Label>
+                <Input
                     id="password"
-                    label="Password"
                     type="password"
-                    placeholder="Enter password here"
+                    placeholder="Enter your password"
+                    required
                     value={formData.password}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    className={cn(
+                        errors.password &&
+                            'border-red-500 focus-visible:ring-red-500'
+                    )}
                 />
+                <AnimatePresence>
+                    {errors.password && (
+                        <motion.p
+                            key="password-error"
+                            className="text-red-500 text-sm overflow-hidden"
+                            variants={errorVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                        >
+                            {errors.password}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
             </motion.div>
-
-            {error && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <ErrorMessage message={error} />
-                </motion.div>
-            )}
 
             <motion.div variants={fieldVariants}>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -91,10 +141,6 @@ const LoginForm = ({
                             onSuccess={handleGoogleSuccess}
                             onError={handleGoogleError}
                             useOneTap={false}
-                            width={330}
-                            theme="neutral"
-                            shape="square"
-                            text="continue_with"
                         />
                     </div>
                 </GoogleOAuthProvider>
@@ -103,12 +149,8 @@ const LoginForm = ({
             <motion.div variants={fieldVariants}>
                 <SignupLink />
             </motion.div>
-        </div>
-    </motion.form>
-);
-
-const ErrorMessage = ({ message }) => (
-    <p className="text-red-500 text-sm">{message}</p>
-);
+        </motion.form>
+    );
+};
 
 export default LoginForm;

@@ -77,8 +77,14 @@ const formFields = [
 ];
 
 const SignUp = ({ className, ...props }) => {
-    const { formData, error, isSubmitting, handleChange, handleSubmit } =
-        useSignUp();
+    const {
+        formData,
+        errors,
+        isSubmitting,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+    } = useSignUp();
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
@@ -166,19 +172,24 @@ const SignUp = ({ className, ...props }) => {
                                             required
                                             value={formData[field.id]}
                                             onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={cn(
+                                                errors[field.id] &&
+                                                    'border-red-500 focus-visible:ring-red-500'
+                                            )}
                                         />
+                                        {errors[field.id] && (
+                                            <motion.p
+                                                className="text-red-500 text-sm"
+                                                initial={{ opacity: 0, y: -5 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                {errors[field.id]}
+                                            </motion.p>
+                                        )}
                                     </motion.div>
                                 ))}
-                                {error && (
-                                    <motion.p
-                                        className="text-red-500 text-sm"
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        {error}
-                                    </motion.p>
-                                )}
                                 <motion.div variants={fieldVariants}>
                                     <Button
                                         type="submit"
