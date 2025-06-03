@@ -55,6 +55,7 @@ const Orders = () => {
         fetchOrders,
         setPaginatedOrders,
         setOrders,
+        handleSort,
     } = useOrdersLogic();
 
     const { selectedRows, toggleRowSelection, toggleAllRows, allSelected } =
@@ -204,6 +205,12 @@ const Orders = () => {
                                     onStageUpdated={handleStageUpdate}
                                 />
                                 <StageFlow />
+                                <button
+                                    onClick={() => handleSort('EMAIL_ASC')}
+                                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    Sort by Email (A-Z)
+                                </button>
                             </div>
                             <FilterControls
                                 ordersPerPage={ordersPerPage}

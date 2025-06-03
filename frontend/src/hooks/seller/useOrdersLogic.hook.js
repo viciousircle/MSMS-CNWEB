@@ -4,6 +4,23 @@ import { api } from '/utils/api';
 
 const DEFAULT_ORDERS_PER_PAGE = 10;
 
+// Simple sort options - comment out when not needed
+const SORT_OPTIONS = {
+    NAME_ASC: { field: 'receiver.name', label: 'Name (A-Z)', direction: 'asc' },
+    EMAIL_ASC: {
+        field: 'receiver.email',
+        label: 'Email (A-Z)',
+        direction: 'asc',
+    },
+    TOTAL_ASC: { field: 'total', label: 'Total (Low-High)', direction: 'asc' },
+    DATE_ASC: { field: 'dateOrder', label: 'Date (Old-New)', direction: 'asc' },
+    PHONE_ASC: {
+        field: 'receiver.phone',
+        label: 'Phone (A-Z)',
+        direction: 'asc',
+    },
+};
+
 export const useOrdersLogic = () => {
     const [orders, setOrders] = useState([]);
     const [pagination, setPagination] = useState({
@@ -13,6 +30,7 @@ export const useOrdersLogic = () => {
     const [filters, setFilters] = useState({
         activeTab: 'all',
         selectedDate: null,
+        sortOption: null,
     });
     const [status, setStatus] = useState({
         loading: true,
@@ -79,7 +97,7 @@ export const useOrdersLogic = () => {
     };
 
     const filteredOrders = useMemo(() => {
-        // console.log('Filtering orders with:', { filters, orders });
+        // First apply filters
         const filtered = orders.filter((order) => {
             const matchesTab =
                 filters.activeTab === 'all' ||
@@ -92,7 +110,47 @@ export const useOrdersLogic = () => {
 
             return matchesTab && matchesDate;
         });
-        // console.log('Filtered orders:', filtered);
+
+        // Apply sorting if a sort option is selected
+        if (filters.sortOption) {
+            const { field, direction } = SORT_OPTIONS[filters.sortOption];
+            return [...filtered].sort((a, b) => {
+                const getValue = (obj, path) => {
+                    return path
+                        .split('.')
+                        .reduce((acc, part) => acc?.[part], obj);
+                };
+
+                const aValue = getValue(a, field);
+                const bValue = getValue(b, field);
+
+                // Handle date sorting
+                if (field === 'dateOrder') {
+                    const aDate = aValue.split('-').reverse().join('');
+                    const bDate = bValue.split('-').reverse().join('');
+                    return direction === 'asc'
+                        ? aDate.localeCompare(bDate)
+                        : bDate.localeCompare(aDate);
+                }
+
+                // Handle number sorting (for total)
+                if (field === 'total') {
+                    return direction === 'asc'
+                        ? aValue - bValue
+                        : bValue - aValue;
+                }
+
+                // Handle string sorting (for name, email, phone)
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return direction === 'asc'
+                        ? aValue.localeCompare(bValue)
+                        : bValue.localeCompare(aValue);
+                }
+
+                return 0;
+            });
+        }
+
         return filtered;
     }, [orders, filters]);
 
@@ -113,11 +171,20 @@ export const useOrdersLogic = () => {
         });
     };
 
+    const handleSort = (sortOption) => {
+        setFilters((prev) => ({
+            ...prev,
+            sortOption: prev.sortOption === sortOption ? null : sortOption,
+        }));
+    };
+
     return {
         currentPage: pagination.currentPage,
         ordersPerPage: pagination.ordersPerPage,
         activeTab: filters.activeTab,
         selectedDate: filters.selectedDate,
+        sortOptions: SORT_OPTIONS,
+        sortOption: filters.sortOption,
         paginatedOrders,
         totalPages,
         loading: status.loading,
@@ -128,6 +195,7 @@ export const useOrdersLogic = () => {
             setFilters((prev) => ({ ...prev, activeTab: tab })),
         setSelectedDate: (date) =>
             setFilters((prev) => ({ ...prev, selectedDate: date })),
+        handleSort,
         updateOrder,
         handleItemsPerPageChange,
         fetchOrders,
