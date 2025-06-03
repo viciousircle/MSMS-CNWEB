@@ -4,10 +4,74 @@ const dotenv = require('dotenv').config({ path: '../.env' });
 const { errorHandler } = require('./middleware/error.middleware');
 const { connectDB } = require('./config/db');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+const { validationResult } = require('express-validator');
 const port = process.env.PORT || 5678;
+
+// Security middleware setup
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message:
+        'Too many requests from this IP, please try again after 15 minutes',
+});
+
+// CSRF protection setup
+const csrfProtection = csrf({
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    },
+});
 
 connectDB();
 const app = express();
+
+// Apply security middleware
+app.use(helmet()); // Security headers
+app.use(cookieParser()); // Parse cookies
+app.use(limiter); // Rate limiting
+app.use(express.json({ limit: '10kb' })); // Body limit is 10kb
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Apply CSRF protection to all routes except those that need to be public
+app.use((req, res, next) => {
+    // Skip CSRF for public routes and API routes that use token auth
+    if (
+        req.path.startsWith('/api/users/login') ||
+        req.path.startsWith('/api/users/register') ||
+        req.path.startsWith('/api/users/google') ||
+        req.method === 'GET'
+    ) {
+        return next();
+    }
+    csrfProtection(req, res, next);
+});
+
+// Add CSRF token to all responses
+app.use((req, res, next) => {
+    if (req.csrfToken) {
+        res.cookie('XSRF-TOKEN', req.csrfToken(), {
+            httpOnly: false, // Allow JavaScript to read the token
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+    }
+    next();
+});
+
+// Input validation middleware
+app.use((req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+});
 
 // Debug middleware for CORS
 app.use((req, res, next) => {
@@ -78,9 +142,6 @@ app.use((req, res, next) => {
     });
     next();
 });
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/products', require('./routes/product.routes'));
 app.use('/api/users', require('./routes/user.routes'));

@@ -6,12 +6,15 @@ const {
     getMe,
     googleAuth,
 } = require('../controllers/user.controller');
-
 const { protect } = require('../middleware/auth.middleware');
+const validate = require('../middleware/validation.middleware');
 
-router.post('/', registerUser);
-router.post('/login', loginUser);
+// Public routes with validation
+router.post('/', validate.register, registerUser);
+router.post('/login', validate.login, loginUser);
 router.post('/google', googleAuth);
+
+// Protected routes
 router.get('/me', protect, getMe);
 
 module.exports = router;

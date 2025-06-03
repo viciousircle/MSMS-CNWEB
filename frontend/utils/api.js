@@ -11,6 +11,10 @@ export const api = async (endpoint, options = {}) => {
     // });
 
     const token = localStorage.getItem('token');
+    const csrfToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
 
     const headers = {
         'Content-Type': 'application/json',
@@ -20,6 +24,11 @@ export const api = async (endpoint, options = {}) => {
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Add CSRF token to non-GET requests
+    if (csrfToken && options.method && options.method !== 'GET') {
+        headers['X-XSRF-TOKEN'] = csrfToken;
     }
 
     try {
@@ -54,6 +63,15 @@ export const api = async (endpoint, options = {}) => {
             localStorage.removeItem('user');
             window.location.href = '/login';
             throw new Error('Session expired. Please login again.');
+        }
+
+        // Handle CSRF token errors
+        if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
+            // Refresh the page to get a new CSRF token
+            window.location.reload();
+            throw new Error(
+                'CSRF token invalid or expired. Refreshing page...'
+            );
         }
 
         if (!response.ok) {
