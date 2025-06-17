@@ -14,6 +14,11 @@ const SORT_OPTIONS = {
     },
     TOTAL_ASC: { field: 'total', label: 'Total (Low-High)', direction: 'asc' },
     DATE_ASC: { field: 'dateOrder', label: 'Date (Old-New)', direction: 'asc' },
+    DATE_DESC: {
+        field: 'dateOrder',
+        label: 'Date (New-Old)',
+        direction: 'desc',
+    },
     PHONE_ASC: {
         field: 'receiver.phone',
         label: 'Phone (A-Z)',

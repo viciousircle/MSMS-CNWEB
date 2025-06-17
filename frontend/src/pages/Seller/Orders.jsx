@@ -205,12 +205,12 @@ const Orders = () => {
                                     onStageUpdated={handleStageUpdate}
                                 />
                                 <StageFlow />
-                                <button
-                                    onClick={() => handleSort('EMAIL_ASC')}
+                                {/* <button
+                                    onClick={() => handleSort('DATE_ASC')}
                                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
                                 >
-                                    Sort by Email (A-Z)
-                                </button>
+                                    Sort
+                                </button> */}
                             </div>
                             <FilterControls
                                 ordersPerPage={ordersPerPage}

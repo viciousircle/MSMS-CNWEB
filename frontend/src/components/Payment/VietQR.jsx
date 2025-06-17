@@ -2,10 +2,7 @@ import React from 'react';
 import { formatPrice } from '/utils/formatPrice';
 
 const VietQR = ({ amount, orderId, bankInfo }) => {
-    // Generate VietQR URL using VietQR.io's Quicklink API
     const generateVietQRUrl = () => {
-        // Format: https://img.vietqr.io/image/{bankCode}-{accountNumber}-{template}.jpg?amount={amount}
-        // amount should be in VND without any formatting
         const formattedAmount = amount.toString().replace(/\./g, '');
         return `https://img.vietqr.io/image/${bankInfo.bankCode}-${bankInfo.accountNumber}-compact.jpg?amount=${formattedAmount}`;
     };
