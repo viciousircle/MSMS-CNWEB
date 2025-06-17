@@ -16,8 +16,14 @@ export const useFetchCart = (updateProducts) => {
             updateProducts(cartProducts);
             return response;
         } catch (err) {
-            setError(err.message || 'Failed to fetch cart');
-            throw err;
+            // If the error message is 'Cart not found', treat as empty cart
+            if (err.message === 'Cart not found') {
+                updateProducts([]);
+                return { items: [] };
+            } else {
+                setError(err.message || 'Failed to fetch cart');
+                throw err;
+            }
         } finally {
             setIsLoading(false);
         }
